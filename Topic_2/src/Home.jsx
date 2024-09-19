@@ -9,7 +9,7 @@ function Home() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch('/src/Home.html')
+    fetch('./src/HTML/Home.html')
       .then(response => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
