@@ -1,4 +1,4 @@
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { getDownloadURL, uploadBytes } from "firebase/storage";
 import { storage } from "../config/firebase";
 
 const uploadFile = async (file) => {
@@ -8,4 +8,4 @@ const uploadFile = async (file) => {
     return downloadUrl;
 }
 
-export default { uploadFile };
+export { uploadFile };
