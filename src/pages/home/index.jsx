@@ -8,7 +8,7 @@ function HomePage() {
   return (
     <div className="home-page">
       <Header />
-      
+
       <main>
         <h1>"Hành Trình Cá Koi Nhật Bản - Lựa Chọn & Đặt Ngay"</h1>
         {/* < Information/> */}
