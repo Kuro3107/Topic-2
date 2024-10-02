@@ -17,10 +17,10 @@ const Header = () => {
             <Link to="/login">Sản phẩm</Link>
           </li>
           <li>
-            <Link to="/login">Giới thiệu</Link>
+            <Link to="/login">Đăng nhập</Link>
           </li>
           <li>
-            <Link to="/login">Liên hệ</Link>
+            <Link to="/register">Đăng ký</Link>
           </li>
         </ul>
       </nav>
