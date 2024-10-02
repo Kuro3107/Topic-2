@@ -1,0 +1,18 @@
+.home-page {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main {
+    flex: 1;
+    padding: 20px;
+}
+
+main h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Thêm các style khác tùy theo nhu cầu của bạn */
+
