@@ -11,41 +11,42 @@ function LoginPage() {
   const navigate = useNavigate();
   const [form] = Form.useForm();
 
-  const handleLoginWithGoogle = () => {
-    const auth = getAuth();
-    signInWithPopup(auth, googleProvider)
-      .then((result) => {
-        // This gives you a Google Access Token. You can use it to access the Google API.
-        GoogleAuthProvider.credentialFromResult(result);
-        // The signed-in user info.
-        const user = result.user;
-        console.log(user);
-        // Xử lý đăng nhập thành công
-      })
-      .catch((error) => {
-        console.log(error);
-        // Xử lý lỗi
-      });
+  const handleLoginWithGoogle = async () => {
+    try {
+      const auth = getAuth();
+      const result = await signInWithPopup(auth, googleProvider);
+      const user = result.user;
+      console.log(user);
+      toast.success("Đăng nhập với Google thành công!");
+      // Xử lý đăng nhập thành công
+    } catch (error) {
+      console.error("Lỗi đăng nhập với Google:", error);
+      toast.error("Đăng nhập với Google thất bại. Vui lòng thử lại.");
+    }
   };
 
   const handleLogin = async (values) => {
     try {
       const response = await api.post("/login", values);
       console.log(response);
-      toast.success("Login successfully");
-      //token
-      const { role, token } = response.data;
+      const { role, token, user } = response.data;
       localStorage.setItem("token", token);
+      localStorage.setItem("userInfo", JSON.stringify(user));
+
+      toast.success("Đăng nhập thành công!");
 
       if (role === "ADMIN") {
         navigate("/dashboard");
-      }
-      if (role === "CUSTOMER") {
+      } else if (role === "CUSTOMER") {
         navigate("/");
       }
     } catch (error) {
-      console.log(error);
-      toast.error(error.response.data);
+      console.error("Lỗi đăng nhập:", error);
+      if (error.response && error.response.data) {
+        toast.error(error.response.data);
+      } else {
+        toast.error("Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin đăng nhập.");
+      }
     }
   };
 
@@ -53,22 +54,22 @@ function LoginPage() {
     <div>
       <AuthenTemplate>
         <Form form={form} labelCol={{ span: 24 }} onFinish={handleLogin}>
-          <Form.Item label="phone" name="phone">
+          <Form.Item label="Số điện thoại" name="phone" rules={[{ required: true, message: 'Vui lòng nhập số điện thoại!' }]}>
             <Input />
           </Form.Item>
-          <Form.Item label="Password" name="password">
+          <Form.Item label="Mật khẩu" name="password" rules={[{ required: true, message: 'Vui lòng nhập mật khẩu!' }]}>
             <Input.Password />
           </Form.Item>
 
           <Button type="primary" htmlType="submit">
-            Login
+            Đăng nhập
           </Button>
-          <Button onClick={handleLoginWithGoogle}>Login Google</Button>
+          <Button onClick={handleLoginWithGoogle}>Đăng nhập bằng Google</Button>
           <div>
-            <Link to="/register">Don&apos;t have an account?</Link>
+            <Link to="/register">Chưa có tài khoản?</Link>
           </div>
           <div>
-            <Link to="/">back to home page</Link>
+            <Link to="/">Quay lại trang chủ</Link>
           </div>
         </Form>
       </AuthenTemplate>

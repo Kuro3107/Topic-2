@@ -3,6 +3,7 @@ import Footer from "../../components/Footer";
 import ProductList from "../../components/ProductList";
 
 import "./index.css";
+import Banner from "../../components/banner";
 
 function HomePage() {
   return (
@@ -10,10 +11,11 @@ function HomePage() {
       <Header />
 
       <main>
-        <h1>"Hành Trình Cá Koi Nhật Bản - Lựa Chọn & Đặt Ngay"</h1>
-        {/* < Information/> */}
+      <Banner/>
+       
         <h1>Danh sách trang trại nổi tiếng</h1>
         <ProductList />
+       
       </main>
       <Footer />
     </div>

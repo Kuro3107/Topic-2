@@ -5,20 +5,31 @@ import { Link } from "react-router-dom";
 import api from "../../config/axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+
 function RegisterPage() {
   const navigate = useNavigate();
+
   const handleRegister = async (values) => {
     try {
       values.role = "CUSTOMER";
       const response = await api.post("/register", values);
       console.log(response);
-      toast.success("Register successfully");
-      navigate("/login");
+      
+      if (response.data && response.data.token) {
+        // Lưu thông tin người dùng vào localStorage
+        localStorage.setItem('userInfo', JSON.stringify(response.data));
+        toast.success("Đăng ký thành công và đã đăng nhập");
+        navigate("/profile"); // Chuyển hướng đến trang profile
+      } else {
+        toast.success("Đăng ký thành công");
+        navigate("/login");
+      }
     } catch (error) {
       console.log(error);
-      toast.error(error.response.data);
+      toast.error(error.response?.data || "Đăng ký thất bại");
     }
   };
+
   return (
     <div>
       <AuthenTemplate>

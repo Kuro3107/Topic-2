@@ -1,0 +1,84 @@
+.banner {
+  background-size: cover;
+  background-position: center;
+  height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.banner::before,
+.banner::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-size: cover;
+  background-position: center;
+  transition: opacity 1s ease-in-out;
+}
+
+.banner::before {
+  background-image: url('https://firebasestorage.googleapis.com/v0/b/koi-trip-system.appspot.com/o/ads.jpg?alt=media&token=7ca0c415-110f-4f8a-a4fc-02e27d40a8ef');
+  opacity: 1;
+}
+
+.banner::after {
+  background-image: url('https://firebasestorage.googleapis.com/v0/b/koi-trip-system.appspot.com/o/M7rzd4x.jpg?alt=media&token=6db47f3d-9e8e-45f0-a157-28b626294e56');
+  opacity: 0;
+}
+
+@keyframes slideBackground {
+  0%, 45%, 100% {
+    opacity: 1;
+  }
+  50%, 95% {
+    opacity: 0;
+  }
+}
+
+.banner::before {
+  animation: slideBackground 10s infinite;
+}
+
+.banner::after {
+  animation: slideBackground 10s infinite reverse;
+}
+
+.banner-content {
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 20px;
+  border-radius: 10px;
+  position: relative;
+  z-index: 1;
+}
+
+.banner h1 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+.banner p {
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+}
+
+.banner-button {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.banner-button:hover {
+  background-color: #45a049;
+}
