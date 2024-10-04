@@ -1,100 +1,80 @@
-import React from "react";
 import AuthenTemplate from "../../components/authen-template";
 import { Button, Form, Input } from "antd";
-import { GoogleAuthProvider, getAuth, signInWithPopup } from "firebase/auth";
-import { googleProvider } from "../../config/firebase";
+import { getAuth, signInWithPopup } from "firebase/auth";
+import { GoogleAuthProvider } from "firebase/auth/web-extension";
 import { Link, useNavigate } from "react-router-dom";
-import api from "../../config/axios";
 import { toast } from "react-toastify";
+import api from "../../config/axios";
+import { googleProvider } from "../../config/firebase";
+import { LockOutlined, UserOutlined } from '@ant-design/icons';
 
 function LoginPage() {
   const navigate = useNavigate();
-  const handleLoginGoogle = () => {
-    const auth = getAuth();
-    signInWithPopup(auth, googleProvider)
-      .then((result) => {
-        // This gives you a Google Access Token. You can use it to access the Google API.
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        const token = credential.accessToken;
-        // The signed-in user info.
-        const user = result.user;
+  const [form] = Form.useForm();
 
-        console.log(user);
-        // IdP data available using getAdditionalUserInfo(result)
-        // ...
-      })
-      .catch((error) => {
-        console.log(error);
-        // Handle Errors here.
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        // The email of the user's account used.
-        const email = error.customData.email;
-        // The AuthCredential type that was used.
-        const credential = GoogleAuthProvider.credentialFromError(error);
-        // ...
-      });
+  const handleLoginWithGoogle = async () => {
+    try {
+      const auth = getAuth();
+      const result = await signInWithPopup(auth, googleProvider);
+      const user = result.user;
+      console.log(user);
+      toast.success("Đăng nhập với Google thành công!");
+      // Xử lý đăng nhập thành công
+    } catch (error) {
+      console.error("Lỗi đăng nhập với Google:", error);
+      toast.error("Đăng nhập với Google thất bại. Vui lòng thử lại.");
+    }
   };
 
   const handleLogin = async (values) => {
     try {
-      const response = await api.post("login", values);
+      const response = await api.post("/login", values);
       console.log(response);
-      const { role, token } = response.data;
+      const { role, token, user } = response.data;
       localStorage.setItem("token", token);
+      localStorage.setItem("userInfo", JSON.stringify(user));
+
+      toast.success("Đăng nhập thành công!");
 
       if (role === "ADMIN") {
         navigate("/dashboard");
+      } else if (role === "CUSTOMER") {
+        navigate("/");
       }
-    } catch (err) {
-      toast.error(err.response.data);
+    } catch (error) {
+      console.error("Lỗi đăng nhập:", error);
+      if (error.response && error.response.data) {
+        toast.error(error.response.data);
+      } else {
+        toast.error("Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin đăng nhập.");
+      }
     }
   };
 
   return (
-    <AuthenTemplate>
-      <Form
-        labelCol={{
-          span: 24,
-        }}
-        onFinish={handleLogin}
-      >
-        <Form.Item
-          label="Phone or Email"
-          name="phone"
-          rules={[
-            {
-              required: true,
-              message: "Please input your phone or email!",
-            },
-          ]}
-        >
-          <Input />
-        </Form.Item>
-        <Form.Item
-          label="Password"
-          name="password"
-          rules={[
-            {
-              required: true,
-              message: "Please input your password!",
-            },
-          ]}
-        >
-          <Input.Password />
-        </Form.Item>
+    <div>
+      <AuthenTemplate>
+        <Form form={form} labelCol={{ span: 24 }} onFinish={handleLogin}>
+          <Form.Item label="Số điện thoại" name="phone" rules={[{ required: true, message: 'Vui lòng nhập số điện thoại!' }]}>
+            <Input prefix={<UserOutlined />} placeholder="Email hoặc Số điện thoại" />
+          </Form.Item>
+          <Form.Item label="Mật khẩu" name="password" rules={[{ required: true, message: 'Vui lòng nhập mật khẩu!' }]}>
+            <Input.Password prefix={<LockOutlined />} type="password" placeholder="Mật khẩu" />
+          </Form.Item>
 
-        <div>
-          <Link to="/register">Don't have account? Register new account</Link>
-        </div>
-
-        <Button type="primary" htmlType="submit">
-          Login
-        </Button>
-
-        <Button onClick={handleLoginGoogle}>Login google</Button>
-      </Form>
-    </AuthenTemplate>
+          <Button type="primary" htmlType="submit">
+            Đăng nhập
+          </Button>
+          <Button onClick={handleLoginWithGoogle}>Đăng nhập bằng Google</Button>
+          <div>
+            <Link to="/register">Chưa có tài khoản?</Link>
+          </div>
+          <div>
+            <Link to="/">Quay lại trang chủ</Link>
+          </div>
+        </Form>
+      </AuthenTemplate>
+    </div>
   );
 }
 

@@ -1,22 +1,22 @@
-.authen-template{
-    width: 100vw;
+.auth-template {
+    width: 100%;
     height: 100vh;
-    background-image: url('https://images.unsplash.com/photo-1521584934521-f27ac11b7523?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-image: url("https://plus.unsplash.com/premium_photo-1661878091370-4ccb8763756a?q=80&w=2532&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");
     background-repeat: no-repeat;
     background-size: cover;
-
-    display: flex;
-    align-items: center;
-}
-
-.authen-template__form{
-    width: 500px;
-    height: 80vh;
+    background-position: center;
+  }
+  .auth-template-form {
+    width: 400px;
+    height: 700px;
     background-color: #fff;
-    margin: auto; /* Thay đổi từ margin-left sang margin: auto để căn giữa */
-    border-radius: 12px;
-    padding: 30px;
-    display: flex; /* Thêm display flex */
-}
-
-/* flex box */
+    border-radius: 10px;
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-right: 500px;
+    
+  }
+  

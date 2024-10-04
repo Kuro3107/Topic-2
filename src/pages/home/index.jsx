@@ -2,15 +2,20 @@ import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import ProductList from "../../components/ProductList";
 
-import "../home/index.css";
+import "./index.css";
+import Banner from "../../components/banner";
 
 function HomePage() {
   return (
     <div className="home-page">
       <Header />
+
       <main>
-        <h1>Danh sách Farm</h1>
+      <Banner/>
+       
+        <h1>Danh sách trang trại nổi tiếng</h1>
         <ProductList />
+       
       </main>
       <Footer />
     </div>
