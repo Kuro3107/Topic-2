@@ -43,7 +43,9 @@
 
 .farm-list {
   width: 100%;
-  padding: 20px;
+  padding-left: 20%;
+  padding-right: 20%;
+  align-items: center;
 }
 
 .farm-grid {
