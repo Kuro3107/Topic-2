@@ -5,7 +5,9 @@ import RegisterPage from "./pages/register";
 import Profile from "./pages/user/profile";
 import EditProfile from "./pages/user/edit-profile";
 import { ToastContainer } from "react-toastify";
+import Dashboard from "./components/dashboard";
 import "react-toastify/dist/ReactToastify.css";
+import ManageFarm from "./pages/admin/manage-farm";
 
 function App() {
   const router = createBrowserRouter([
@@ -28,6 +30,11 @@ function App() {
     {
       path: "/edit-profile",
       element: <EditProfile />,
+    },
+    {
+      path: "/dashboard",
+      element: <Dashboard />,
+      children: [{ path: "farm", element: <ManageFarm /> }],
     },
   ]);
   return (

@@ -6,7 +6,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import api from "../../config/axios";
 import { googleProvider } from "../../config/firebase";
-import { LockOutlined, UserOutlined } from '@ant-design/icons';
+import { LockOutlined, UserOutlined } from "@ant-design/icons";
 
 function LoginPage() {
   const navigate = useNavigate();
@@ -46,21 +46,40 @@ function LoginPage() {
       if (error.response && error.response.data) {
         toast.error(error.response.data);
       } else {
-        toast.error("Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin đăng nhập.");
+        toast.error(
+          "Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin đăng nhập."
+        );
       }
     }
   };
 
   return (
-    <div>
+    <div className="wrapper">
       <AuthenTemplate>
+        <h1 className="login-title">Login</h1>
         <Form form={form} labelCol={{ span: 24 }} onFinish={handleLogin}>
-          <Form.Item label="Số điện thoại" name="phone" rules={[{ required: true, message: 'Vui lòng nhập số điện thoại!' }]}>
-            <Input prefix={<UserOutlined />} placeholder="Email hoặc Số điện thoại" />
-          </Form.Item>
-          <Form.Item label="Mật khẩu" name="password" rules={[{ required: true, message: 'Vui lòng nhập mật khẩu!' }]}>
-            <Input.Password prefix={<LockOutlined />} type="password" placeholder="Mật khẩu" />
-          </Form.Item>
+          <div className="login-form">
+            <Form.Item
+              label="Số điện thoại"
+              name="phone"
+              rules={[
+                { required: true, message: "Vui lòng nhập số điện thoại!" },
+              ]}
+            >
+              <Input prefix={<UserOutlined />} placeholder="Số điện thoại" />
+            </Form.Item>
+            <Form.Item
+              label ="Mật khẩu"
+              name="password"
+              rules={[{ required: true, message: "Vui lòng nhập mật khẩu!" }]}
+            >
+              <Input.Password
+                prefix={<LockOutlined />}
+                type="password"
+                placeholder="Mật khẩu"
+              />
+            </Form.Item>
+          </div>
 
           <Button type="primary" htmlType="submit">
             Đăng nhập
