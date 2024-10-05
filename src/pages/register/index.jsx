@@ -33,7 +33,7 @@ function RegisterPage() {
   return (
     <div>
       <AuthenTemplate>
-        <Form labelCol={{ span: 24 }} onFinish={handleRegister}>
+        <Form labelCol={{ span: 24 }} className="register-form" onFinish={handleRegister}>
           <Form.Item
             label="Username"
             name="username"
