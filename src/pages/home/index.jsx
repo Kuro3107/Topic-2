@@ -4,7 +4,8 @@ import ProductList from "../../components/ProductList";
 
 import "./index.css";
 import Banner from "../../components/banner";
-import Advertise from "../../components/advertise";
+import ProductList2 from "../../components/ProductList2";
+// import Advertise from "../../components/advertise";
 
 function HomePage() {
   return (
@@ -16,7 +17,10 @@ function HomePage() {
 
         <h1>Danh sách trang trại nổi tiếng</h1>
         <ProductList />
-        <Advertise />
+        <div>
+          <h1>Các loại koi phổ biến</h1>
+          <ProductList2 />
+        </div>
       </main>
       <Footer />
     </div>
