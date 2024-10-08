@@ -67,7 +67,7 @@
   }
   
   .form-group input::placeholder, textarea::placeholder {
-    color: #d1d5db; /* Màu của placeholder */
+    color: #d1d1db; /* Màu của placeholder */
   }
   
   .form-container button {
@@ -128,3 +128,70 @@
 }
 
   
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.checkbox-group input[type="checkbox"] {
+  margin-right: 5px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.checkbox-label input[type="checkbox"] {
+  margin-right: 10px;
+}
+
+.selected-options {
+  margin-top: 10px;
+  font-style: italic;
+}
+
+/* Thêm vào cuối file */
+.basic-multi-select {
+  color: black;
+}
+
+.select__control {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+  border-color: #ccc !important;
+}
+
+.select__menu {
+  background-color: white !important;
+}
+
+.select__option {
+  background-color: white !important;
+  color: black !important;
+}
+
+.select__option--is-selected {
+  background-color: #4CAF50 !important;
+  color: white !important;
+}
+
+.select__option--is-focused {
+  background-color: #e6e6e6 !important;
+}
+
+.select__multi-value {
+  background-color: #4CAF50 !important;
+}
+
+.select__multi-value__label {
+  color: white !important;
+}
+

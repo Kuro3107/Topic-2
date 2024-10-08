@@ -33,7 +33,7 @@ function App() {
       element: <EditProfile />,
     },
     {
-      path: "/dat-chuyen",
+      path: "/bookingform",
       element: <BookingForm />,
     },
     {

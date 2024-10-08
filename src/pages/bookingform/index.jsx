@@ -1,24 +1,41 @@
 import { useState } from "react";
+import axios from "axios";
+import { toast } from "react-toastify";
+import Select from "react-select";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import "./index.css";
 
+const api = "https://6704fc27031fd46a830e2ee2.mockapi.io/BookingForm";
+
+const koiOptions = [
+  { value: "koi1", label: "Koi loại 1" },
+  { value: "koi2", label: "Koi loại 2" },
+  { value: "koi3", label: "Koi loại 3" },
+  { value: "koi4", label: "Koi loại 4" },
+  // Thêm nhiều lựa chọn khác nếu cần
+];
+
+const farmOptions = [
+  { value: "farm1", label: "Trang trại 1" },
+  { value: "farm2", label: "Trang trại 2" },
+  { value: "farm3", label: "Trang trại 3" },
+  { value: "farm4", label: "Trang trại 4" },
+  // Thêm nhiều lựa chọn khác nếu cần
+];
+
 function BookingForm() {
   const [formData, setFormData] = useState({
-    name: "",
+    startDate: "",
+    endDate: "",
+    fullname: "",
     phone: "",
     email: "",
     gender: "male",
-    farm: "",
-    fishType: "",
-    checkInDate: "",
-    checkOutDate: "",
-    hotel: "",
-    hotelPrice: "",
-    notes: ""
+    favoriteKoi: [],
+    favoritefarm: [],
+    note: "",
   });
-
-  const [isSubmitted, setIsSubmitted] = useState(false); // Trạng thái cho thông báo
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -28,14 +45,39 @@ function BookingForm() {
     }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Form data:", formData);
-    setIsSubmitted(true); // Cập nhật trạng thái khi gửi form
+  const handleSelectChange = (selectedOptions, actionMeta) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      [actionMeta.name]: selectedOptions.map((option) => option.value),
+    }));
   };
 
-  const handleCloseModal = () => {
-    setIsSubmitted(false); // Đóng thông báo
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post(api, formData);
+      console.log("Response from server:", response.data);
+      toast.success("Đặt chuyến thành công! Chúng tôi sẽ liên hệ với bạn sớm.");
+      toast.info(
+        `Thông tin đặt chuyến: Loại cá yêu thích - ${formData.favoriteKoi.join(
+          ", "
+        )}, Trang trại yêu thích - ${formData.favoritefarm.join(", ")}`
+      );
+      setFormData({
+        startDate: "",
+        endDate: "",
+        fullname: "",
+        phone: "",
+        email: "",
+        gender: "male",
+        favoriteKoi: [],
+        favoritefarm: [],
+        note: "",
+      });
+    } catch (error) {
+      console.error("Lỗi khi gửi dữ liệu:", error);
+      toast.error("Có lỗi xảy ra khi đặt chuyến. Vui lòng thử lại sau.");
+    }
   };
 
   return (
@@ -45,15 +87,14 @@ function BookingForm() {
         <div className="form-container">
           <h1>Booking Form</h1>
           <form onSubmit={handleSubmit}>
-            {/* Name và Phone trên cùng 1 hàng */}
             <div className="form-row">
               <div className="form-column">
                 <div className="form-group">
-                  <label>Name (Tên):</label>
+                  <label>Họ và tên:</label>
                   <input
                     type="text"
-                    name="name"
-                    value={formData.name}
+                    name="fullname"
+                    value={formData.fullname}
                     onChange={handleChange}
                     required
                   />
@@ -61,7 +102,7 @@ function BookingForm() {
               </div>
               <div className="form-column">
                 <div className="form-group">
-                  <label>Số điện thoại: </label>
+                  <label>Số điện thoại:</label>
                   <input
                     type="text"
                     name="phone"
@@ -73,7 +114,6 @@ function BookingForm() {
               </div>
             </div>
 
-            {/* Email và Gender trên cùng 1 hàng */}
             <div className="form-row">
               <div className="form-column">
                 <div className="form-group">
@@ -89,7 +129,7 @@ function BookingForm() {
               </div>
               <div className="form-column">
                 <div className="form-group">
-                  <label>Gender (Giới tính):</label>
+                  <label>Giới tính:</label>
                   <select
                     name="gender"
                     value={formData.gender}
@@ -98,48 +138,94 @@ function BookingForm() {
                   >
                     <option value="male">Nam</option>
                     <option value="female">Nữ</option>
+                    <option value="other">Khác</option>
                   </select>
                 </div>
               </div>
             </div>
 
-            {/* Farm và Fish Type trên cùng 1 hàng */}
             <div className="form-row">
               <div className="form-column">
                 <div className="form-group">
-                  <label>Farm (Trang trại):</label>
-                  <input
-                    type="text"
-                    name="farm"
-                    value={formData.farm}
-                    onChange={handleChange}
-                    required
+                  <label>Loại cá yêu thích:</label>
+                  <Select
+                    isMulti
+                    name="favoriteKoi"
+                    options={koiOptions}
+                    className="basic-multi-select"
+                    classNamePrefix="select"
+                    onChange={(selectedOptions) =>
+                      handleSelectChange(selectedOptions, {
+                        name: "favoriteKoi",
+                      })
+                    }
+                    value={koiOptions.filter((option) =>
+                      formData.favoriteKoi.includes(option.value)
+                    )}
                   />
                 </div>
               </div>
               <div className="form-column">
                 <div className="form-group">
-                  <label>Fish Type (Loại cá):</label>
-                  <input
-                    type="text"
-                    name="fishType"
-                    value={formData.fishType}
-                    onChange={handleChange}
-                    required
+                  <label>Trang trại yêu thích:</label>
+                  <Select
+                    isMulti
+                    name="favoritefarm"
+                    options={farmOptions}
+                    className="basic-multi-select"
+                    classNamePrefix="select"
+                    onChange={(selectedOptions) =>
+                      handleSelectChange(selectedOptions, {
+                        name: "favoritefarm",
+                      })
+                    }
+                    value={farmOptions.filter((option) =>
+                      formData.favoritefarm.includes(option.value)
+                    )}
                   />
                 </div>
               </div>
             </div>
 
-            {/* Check-in Date và Check-out Date trên cùng 1 hàng */}
             <div className="form-row">
               <div className="form-column">
                 <div className="form-group">
-                  <label>Check-in Date (Ngày đến):</label>
+                  <label>Các loại cá đã chọn:</label>
+                  <p>
+                    {formData.favoriteKoi
+                      .map(
+                        (koi) =>
+                          koiOptions.find((option) => option.value === koi)
+                            ?.label
+                      )
+                      .join(", ")}
+                  </p>
+                </div>
+              </div>
+              <div className="form-column">
+                <div className="form-group">
+                  <label>Các trang trại đã chọn:</label>
+                  <p>
+                    {formData.favoritefarm
+                      .map(
+                        (farm) =>
+                          farmOptions.find((option) => option.value === farm)
+                            ?.label
+                      )
+                      .join(", ")}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="form-row">
+              <div className="form-column">
+                <div className="form-group">
+                  <label>Ngày bắt đầu:</label>
                   <input
                     type="date"
-                    name="checkInDate"
-                    value={formData.checkInDate}
+                    name="startDate"
+                    value={formData.startDate}
                     onChange={handleChange}
                     required
                   />
@@ -147,11 +233,11 @@ function BookingForm() {
               </div>
               <div className="form-column">
                 <div className="form-group">
-                  <label>Check-out Date (Ngày đi):</label>
+                  <label>Ngày kết thúc:</label>
                   <input
                     type="date"
-                    name="checkOutDate"
-                    value={formData.checkOutDate}
+                    name="endDate"
+                    value={formData.endDate}
                     onChange={handleChange}
                     required
                   />
@@ -159,62 +245,22 @@ function BookingForm() {
               </div>
             </div>
 
-            {/* Hotel và Hotel Price trên cùng 1 hàng */}
-            <div className="form-row">
-              <div className="form-column">
-                <div className="form-group">
-                  <label>Hotel (Khách sạn):</label>
-                  <input
-                    type="text"
-                    name="hotel"
-                    value={formData.hotel}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-              </div>
-              <div className="form-column">
-                <div className="form-group">
-                  <label>Hotel Price (Giá tiền chỗ ở):</label>
-                  <input
-                    type="number"
-                    name="hotelPrice"
-                    value={formData.hotelPrice}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Ô Note chiếm hết chiều rộng của form */}
             <div className="form-full-width">
               <div className="form-group">
-                <label>Notes (Ghi chú):</label>
+                <label>Ghi chú:</label>
                 <textarea
-                  name="notes"
-                  value={formData.notes}
+                  name="note"
+                  value={formData.note}
                   onChange={handleChange}
                 ></textarea>
               </div>
             </div>
 
-            <button type="submit">Send Request</button>
+            <button type="submit">Gửi yêu cầu</button>
           </form>
         </div>
       </main>
       <Footer />
-
-      {/* Hiển thị bảng thông báo nếu form được gửi */}
-      {isSubmitted && (
-        <div className="modal">
-          <div className="modal-content">
-            <h2>Request Sent Successfully!</h2>
-            <p>Your booking request has been sent. We will contact you shortly.</p>
-            <button onClick={handleCloseModal}>Close</button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

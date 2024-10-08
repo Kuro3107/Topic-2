@@ -29,7 +29,9 @@ const Banner = () => {
       toast.success("Đặt chuyến thành công! Chúng tôi sẽ liên hệ với bạn sớm.");
 
       // Hiển thị thông tin đặt chuyến dưới dạng toast
-      toast.info(`Thông tin đặt chuyến: Giống cá - ${Booking.fishType}, Trang trại - ${Booking.farm}`);
+      toast.info(
+        `Thông tin đặt chuyến: Giống cá - ${Booking.fishType}, Trang trại - ${Booking.farm}`
+      );
     } catch (error) {
       toast.error("Có lỗi xảy ra khi đặt chuyến. Vui lòng thử lại sau.");
     }

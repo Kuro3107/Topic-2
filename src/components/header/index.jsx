@@ -1,4 +1,3 @@
-import React, { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "./header.css";
@@ -20,10 +19,10 @@ const Header = () => {
       toast.error("Có lỗi xảy ra khi đăng xuất. Vui lòng thử lại.");
     }
   };
-
+    
   return (
     <header className="header">
-      <div className="logo-container" to="">
+      <div className="logo-container">
         <Link to="/" className="header-link">
           <img src={logo} alt="logo" className="logo-image" />
         </Link>
@@ -47,7 +46,7 @@ const Header = () => {
             </Link>
           </li>
           <li>
-            <Link to="/dat-chuyen" className="header-link">
+            <Link to="/bookingform" className="header-link">
               Đặt chuyến
             </Link>
           </li>
