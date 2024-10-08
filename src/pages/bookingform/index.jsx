@@ -31,7 +31,7 @@ function BookingForm() {
     fullname: "",
     phone: "",
     email: "",
-    gender: "male",
+    district: "",
     favoriteKoi: [],
     favoritefarm: [],
     note: "",
@@ -69,7 +69,7 @@ function BookingForm() {
         fullname: "",
         phone: "",
         email: "",
-        gender: "male",
+        district: "",
         favoriteKoi: [],
         favoritefarm: [],
         note: "",
@@ -129,17 +129,14 @@ function BookingForm() {
               </div>
               <div className="form-column">
                 <div className="form-group">
-                  <label>Giới tính:</label>
-                  <select
-                    name="gender"
-                    value={formData.gender}
+                  <label>Địa chỉ</label>
+                  <input
+                    type="text"
+                    name="district"
+                    value={formData.district}
                     onChange={handleChange}
                     required
-                  >
-                    <option value="male">Nam</option>
-                    <option value="female">Nữ</option>
-                    <option value="other">Khác</option>
-                  </select>
+                  ></input>
                 </div>
               </div>
             </div>
@@ -183,37 +180,6 @@ function BookingForm() {
                       formData.favoritefarm.includes(option.value)
                     )}
                   />
-                </div>
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-column">
-                <div className="form-group">
-                  <label>Các loại cá đã chọn:</label>
-                  <p>
-                    {formData.favoriteKoi
-                      .map(
-                        (koi) =>
-                          koiOptions.find((option) => option.value === koi)
-                            ?.label
-                      )
-                      .join(", ")}
-                  </p>
-                </div>
-              </div>
-              <div className="form-column">
-                <div className="form-group">
-                  <label>Các trang trại đã chọn:</label>
-                  <p>
-                    {formData.favoritefarm
-                      .map(
-                        (farm) =>
-                          farmOptions.find((option) => option.value === farm)
-                            ?.label
-                      )
-                      .join(", ")}
-                  </p>
                 </div>
               </div>
             </div>
