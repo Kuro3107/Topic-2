@@ -32,18 +32,23 @@ const Header = () => {
       <nav className="nav">
         <ul>
           <li>
+            <Link to="/gioi-thieu" className="header-link">
+              Giới thiệu
+            </Link>
+          </li>
+          <li>
             <Link to="/" className="header-link">
               Trang chủ
             </Link>
           </li>
           <li>
             <Link to="/san-pham" className="header-link">
-              Đặt chuyến
+              Sản phẩm
             </Link>
           </li>
           <li>
-            <Link to="/gioi-thieu" className="header-link">
-              Giới thiệu
+            <Link to="/dat-chuyen" className="header-link">
+              Đặt chuyến
             </Link>
           </li>
 

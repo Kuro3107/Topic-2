@@ -8,6 +8,7 @@ import { ToastContainer } from "react-toastify";
 import Dashboard from "./components/dashboard";
 import "react-toastify/dist/ReactToastify.css";
 import ManageFarm from "./pages/admin/manage-farm";
+import BookingForm from "./pages/bookingform";
 
 function App() {
   const router = createBrowserRouter([
@@ -30,6 +31,10 @@ function App() {
     {
       path: "/edit-profile",
       element: <EditProfile />,
+    },
+    {
+      path: "/dat-chuyen",
+      element: <BookingForm />,
     },
     {
       path: "/dashboard",

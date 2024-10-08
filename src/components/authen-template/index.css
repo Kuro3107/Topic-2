@@ -9,6 +9,7 @@
     background-size: cover;
     background-position: center;
   }
+  
   .auth-template-form {
     display: block; 
     width: 30rem; 
@@ -32,7 +33,7 @@
   }
 
   .auth-template-form:focus {
-     border-color: #3b82f6; 
+    border-color: #3b82f6; 
     outline: none; 
     box-shadow: none; 
     color: white; 
