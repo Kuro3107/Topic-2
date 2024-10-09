@@ -1,17 +1,17 @@
 import AuthenTemplate from "../../components/authen-template";
 import { Button, Form, Input } from "antd";
 import { getAuth, signInWithPopup } from "firebase/auth";
-import { GoogleAuthProvider } from "firebase/auth/web-extension";
+import { googleProvider } from "../../config/firebase";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import api from "../../config/axios";
-import { googleProvider } from "../../config/firebase";
+import api from "../../config/axios";  // Đảm bảo file api.js đã được cấu hình đúng
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
 
 function LoginPage() {
   const navigate = useNavigate();
   const [form] = Form.useForm();
 
+  // Xử lý đăng nhập bằng Google
   const handleLoginWithGoogle = async () => {
     try {
       const auth = getAuth();
@@ -19,38 +19,49 @@ function LoginPage() {
       const user = result.user;
       console.log(user);
       toast.success("Đăng nhập với Google thành công!");
-      // Xử lý đăng nhập thành công
     } catch (error) {
       console.error("Lỗi đăng nhập với Google:", error);
       toast.error("Đăng nhập với Google thất bại. Vui lòng thử lại.");
     }
   };
 
+  // Xử lý đăng nhập thông qua API backend
   const handleLogin = async (values) => {
+    console.log({
+      "username": "yourUsername",
+      "password": "yourPassword"
+    });  // Kiểm tra giá trị của form trước khi gửi
     try {
-      const response = await api.post("/login", values);
+      const response = await api.post("http://localhost:8080/api/v1/auth/login", values, {
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+        // Đảm bảo endpoint đúng
       console.log(response);
-      const { role, token, user } = response.data;
+      const { role_id, token, user } = response.data;
+
       localStorage.setItem("token", token);
       localStorage.setItem("userInfo", JSON.stringify(user));
 
       toast.success("Đăng nhập thành công!");
 
-      if (role === "ADMIN") {
+      // Điều hướng dựa trên vai trò người dùng
+      if (role_id == 1) {
         navigate("/dashboard");
-      } else if (role === "CUSTOMER") {
+      } else if (role_id == 5) {
         navigate("/");
       }
-    } catch (error) {
+    }  catch (error) {
       console.error("Lỗi đăng nhập:", error);
       if (error.response && error.response.data) {
-        toast.error(error.response.data);
+        console.log("Chi tiết lỗi từ backend:", error.response.data);  // Thêm dòng này
+        toast.error(error.response.data.message || "Đăng nhập thất bại");
       } else {
-        toast.error(
-          "Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin đăng nhập."
-        );
+        toast.error("Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin đăng nhập.");
       }
     }
+    
   };
 
   return (
@@ -59,17 +70,15 @@ function LoginPage() {
         <h1 className="login-title">Login</h1>
         <Form form={form} labelCol={{ span: 24 }} onFinish={handleLogin}>
           <div className="login-form">
+          <Form.Item
+  label="Username"
+  name="username"  // Sửa thành "username" nếu backend yêu cầu
+  rules={[{ required: true, message: "Vui lòng nhập username!" }]}
+>
+  <Input prefix={<UserOutlined />} placeholder="Username" />
+</Form.Item>
             <Form.Item
-              label="Số điện thoại"
-              name="phone"
-              rules={[
-                { required: true, message: "Vui lòng nhập số điện thoại!" },
-              ]}
-            >
-              <Input prefix={<UserOutlined />} placeholder="Số điện thoại" />
-            </Form.Item>
-            <Form.Item
-              label ="Mật khẩu"
+              label="Mật khẩu"
               name="password"
               rules={[{ required: true, message: "Vui lòng nhập mật khẩu!" }]}
             >
@@ -81,9 +90,7 @@ function LoginPage() {
             </Form.Item>
           </div>
 
-          <Button type="primary" htmlType="submit">
-            Đăng nhập
-          </Button>
+          <Button type="primary" htmlType="submit">Đăng nhập</Button>
           <Button onClick={handleLoginWithGoogle}>Đăng nhập bằng Google</Button>
           <div>
             <Link to="/register">Chưa có tài khoản?</Link>
