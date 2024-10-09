@@ -1,10 +1,11 @@
 import AuthenTemplate from "../../components/authen-template";
 import { Button, Form, Input } from "antd";
 import { getAuth, signInWithPopup } from "firebase/auth";
-import { googleProvider } from "../../config/firebase";
+import { GoogleAuthProvider } from "firebase/auth/web-extension";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import api from "../../config/axios";  // Đảm bảo file api.js đã được cấu hình đúng
+import api from "../../config/axios";
+import { googleProvider } from "../../config/firebase";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
 
 function LoginPage() {
@@ -27,19 +28,10 @@ function LoginPage() {
 
   // Xử lý đăng nhập thông qua API backend
   const handleLogin = async (values) => {
-    console.log({
-      "username": "yourUsername",
-      "password": "yourPassword"
-    });  // Kiểm tra giá trị của form trước khi gửi
     try {
-      const response = await api.post("http://localhost:8080/api/v1/auth/login", values, {
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      });
-        // Đảm bảo endpoint đúng
+      const response = await api.post("/login", values);
       console.log(response);
-      const { role_id, token, user } = response.data;
+      const { role, token, user } = response.data;
 
       localStorage.setItem("token", token);
       localStorage.setItem("userInfo", JSON.stringify(user));
@@ -47,18 +39,21 @@ function LoginPage() {
       toast.success("Đăng nhập thành công!");
 
       // Điều hướng dựa trên vai trò người dùng
-      if (role_id == 1) {
+      if (role === "ADMIN") {
         navigate("/dashboard");
-      } else if (role_id == 5) {
+      } else if (role === "CUSTOMER") {
         navigate("/");
+      } else if(role === "SALES") {
+        navigate("/salesdashboard")
       }
-    }  catch (error) {
+    } catch (error) {
       console.error("Lỗi đăng nhập:", error);
       if (error.response && error.response.data) {
-        console.log("Chi tiết lỗi từ backend:", error.response.data);  // Thêm dòng này
-        toast.error(error.response.data.message || "Đăng nhập thất bại");
+        toast.error(error.response.data);
       } else {
-        toast.error("Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin đăng nhập.");
+        toast.error(
+          "Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin đăng nhập."
+        );
       }
     }
     
@@ -70,15 +65,17 @@ function LoginPage() {
         <h1 className="login-title">Login</h1>
         <Form form={form} labelCol={{ span: 24 }} onFinish={handleLogin}>
           <div className="login-form">
-          <Form.Item
-  label="Username"
-  name="username"  // Sửa thành "username" nếu backend yêu cầu
-  rules={[{ required: true, message: "Vui lòng nhập username!" }]}
->
-  <Input prefix={<UserOutlined />} placeholder="Username" />
-</Form.Item>
             <Form.Item
-              label="Mật khẩu"
+              label="Số điện thoại"
+              name="phone"
+              rules={[
+                { required: true, message: "Vui lòng nhập số điện thoại!" },
+              ]}
+            >
+              <Input prefix={<UserOutlined />} placeholder="Số điện thoại" />
+            </Form.Item>
+            <Form.Item
+              label ="Mật khẩu"
               name="password"
               rules={[{ required: true, message: "Vui lòng nhập mật khẩu!" }]}
             >
@@ -90,7 +87,9 @@ function LoginPage() {
             </Form.Item>
           </div>
 
-          <Button type="primary" htmlType="submit">Đăng nhập</Button>
+          <Button type="primary" htmlType="submit">
+            Đăng nhập
+          </Button>
           <Button onClick={handleLoginWithGoogle}>Đăng nhập bằng Google</Button>
           <div>
             <Link to="/register">Chưa có tài khoản?</Link>

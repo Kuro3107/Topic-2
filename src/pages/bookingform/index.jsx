@@ -5,6 +5,7 @@ import Select from "react-select";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import "./index.css";
+import { useNavigate } from "react-router-dom";
 
 const api = "https://6704fc27031fd46a830e2ee2.mockapi.io/BookingForm";
 
@@ -37,6 +38,8 @@ function BookingForm() {
     note: "",
   });
 
+  const navigate = useNavigate();
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -63,6 +66,9 @@ function BookingForm() {
           ", "
         )}, Trang trại yêu thích - ${formData.favoritefarm.join(", ")}`
       );
+
+      navigate("/your-orders");
+
       setFormData({
         startDate: "",
         endDate: "",

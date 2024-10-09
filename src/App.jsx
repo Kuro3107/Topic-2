@@ -9,6 +9,8 @@ import Dashboard from "./components/dashboard";
 import "react-toastify/dist/ReactToastify.css";
 import ManageFarm from "./pages/admin/manage-farm";
 import BookingForm from "./pages/bookingform";
+import ManageForm from "./components/salesdashboard";
+import SalesDashBoard from "./components/salesdashboard";
 
 function App() {
   const router = createBrowserRouter([
@@ -40,6 +42,11 @@ function App() {
       path: "/dashboard",
       element: <Dashboard />,
       children: [{ path: "farm", element: <ManageFarm /> }],
+    },
+    {
+      path: "/salesdashboard",
+      element: <SalesDashBoard />,
+      children: [{ path: "form", element: <ManageForm /> }],
     },
   ]);
   return (

@@ -12,6 +12,7 @@ import {
   LockOutlined,
   EditOutlined,
   IdcardOutlined,
+  ShoppingOutlined,
 } from "@ant-design/icons";
 import "./profile.css";
 import api from "../../config/axios";
@@ -19,7 +20,9 @@ import api from "../../config/axios";
 function Profile() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [orders, setOrders] = useState([]);
   const navigate = useNavigate();
+
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -29,10 +32,15 @@ function Profile() {
           const parsedUser = JSON.parse(userInfo);
           if (parsedUser.token) {
             // Nếu có token, sử dụng nó để lấy thông tin người dùng từ server
-            const response = await api.get("/user/profile", {
+            const response = await api.get("https://66ffe95a4da5bd2375527007.mockapi.io/User", {
               headers: { Authorization: `Bearer ${parsedUser.token}` }
             });
             setUser(response.data);
+            // Gọi API để lấy danh sách đơn hàng của người dùng
+            const ordersResponse = await api.get("https://66ffe95a4da5bd2375527007.mockapi.io/Booking", {
+              headers: { Authorization: `Bearer ${parsedUser.token}` }
+            });
+            setOrders(ordersResponse.data); // Lưu danh sách đơn hàng vào state
           } else {
             setUser(parsedUser);
           }
@@ -93,6 +101,25 @@ function Profile() {
             <h3>Debug Information:</h3>
             <pre>{JSON.stringify(user, null, 2)}</pre>
           </div>
+        </Card>
+
+        {/* Thêm phần hiển thị danh sách đơn hàng */}
+        <Card title={<h2><ShoppingOutlined /> Đơn hàng của bạn</h2>}>
+          {orders.length > 0 ? (
+            <ul className="orders-list">
+              {orders.map((order) => (
+                <li key={order.id} className="order-item">
+                  <p>Order ID: {order.id}</p>
+                  <p>Loại cá: {order.favoriteKoi.join(", ")}</p>
+                  <p>Trang trại: {order.favoritefarm.join(", ")}</p>
+                  <p>Ngày bắt đầu: {order.startDate}</p>
+                  <p>Ngày kết thúc: {order.endDate}</p>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>Bạn chưa có đơn hàng nào.</p>
+          )}
         </Card>
       </main>
       <Footer />
