@@ -25,44 +25,43 @@ function LoginPage() {
     }
   };
 
-  // Xử lý đăng nhập thông qua API backend
   const handleLogin = async (values) => {
-    console.log({
-      "username": "yourUsername",
-      "password": "yourPassword"
-    });  // Kiểm tra giá trị của form trước khi gửi
     try {
       const response = await api.post("http://localhost:8080/api/v1/auth/login", values, {
         headers: {
           'Content-Type': 'application/json',
         }
       });
-        // Đảm bảo endpoint đúng
-      console.log(response);
+  
+      // Nhận user từ response
       const { role_id, token, user } = response.data;
-
+  
+      // Kiểm tra xem token và accountId có tồn tại không
+      if (!token || !user || !user.accountId) {
+        throw new Error("Không thể lấy được ID người dùng.");
+      }
+  
+      // Lưu token và userInfo vào localStorage
+      const userInfo = { id: user.accountId, username: user.username, fullName: user.fullName, email: user.email, phone: user.phone, roleId: user.roleId, status: user.status };
       localStorage.setItem("token", token);
-      localStorage.setItem("userInfo", JSON.stringify(user));
-
+      localStorage.setItem("userInfo", JSON.stringify(userInfo));
+  
       toast.success("Đăng nhập thành công!");
-
+  
       // Điều hướng dựa trên vai trò người dùng
-      if (role_id == 1) {
+      if (role_id === 1) { // Giả sử role_id 1 là manager
         navigate("/dashboard");
-      } else if (role_id == 5) {
+      } else if (role_id === 5) { // Giả sử role_id 5 là customer
         navigate("/");
       }
-    }  catch (error) {
+    } catch (error) {
       console.error("Lỗi đăng nhập:", error);
-      if (error.response && error.response.data) {
-        console.log("Chi tiết lỗi từ backend:", error.response.data);  // Thêm dòng này
-        toast.error(error.response.data.message || "Đăng nhập thất bại");
-      } else {
-        toast.error("Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin đăng nhập.");
-      }
+      toast.error("Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin đăng nhập.");
     }
-    
   };
+  
+  
+  
 
   return (
     <div className="wrapper">
