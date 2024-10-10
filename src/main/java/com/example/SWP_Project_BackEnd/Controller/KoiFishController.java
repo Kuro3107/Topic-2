@@ -43,9 +43,9 @@ public class KoiFishController {
         if (koiFish.isPresent()) {
             KoiFish updatedKoiFish = koiFish.get();
             updatedKoiFish.setType(koiFishDetails.getType());
-            updatedKoiFish.setKoiPrice(koiFishDetails.getKoiPrice());
+            updatedKoiFish.setKoi_price(koiFishDetails.getKoi_price());
             updatedKoiFish.setSize(koiFishDetails.getSize());
-            updatedKoiFish.setVarietyId(koiFishDetails.getVarietyId());
+            updatedKoiFish.setVariety_id(koiFishDetails.getVariety_id());
             updatedKoiFish.setImageUrl(koiFishDetails.getImageUrl());
 
             KoiFish savedKoiFish = koiFishRepository.save(updatedKoiFish);

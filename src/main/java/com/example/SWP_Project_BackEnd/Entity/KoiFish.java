@@ -19,8 +19,8 @@ public class KoiFish {
     private Long koiId;
 
     private String type;
-    private Double koiPrice;
+    private Double koi_price;
     private String size;
-    private Long varietyId;
+    private Long variety_id;
     private String imageUrl;
 }
