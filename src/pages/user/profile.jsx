@@ -11,16 +11,17 @@ import {
   PhoneOutlined,
   LockOutlined,
   EditOutlined,
-  IdcardOutlined,
-  ShoppingOutlined,
 } from "@ant-design/icons";
 import "./profile.css";
 import api from "../../config/axios";
+import { Upload, message } from "antd"; // Thêm import cho Upload
+
+const defaultImageUrl = "/istockphoto-1495088043-612x612.jpg"; // Đường dẫn đến hình ảnh mặc định
 
 function Profile() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [orders, setOrders] = useState([]);
+  const [parsedUser, setParsedUser] = useState(null); // Thêm trạng thái để lưu parsedUser
   const navigate = useNavigate();
 
 
@@ -28,23 +29,26 @@ function Profile() {
     const fetchUserInfo = async () => {
       try {
         const userInfo = localStorage.getItem("userInfo");
+        console.log("User Info from localStorage:", userInfo); // Kiểm tra giá trị của userInfo
         if (userInfo) {
-          const parsedUser = JSON.parse(userInfo);
-          if (parsedUser.token) {
-            // Nếu có token, sử dụng nó để lấy thông tin người dùng từ server
-            const response = await api.get("https://66ffe95a4da5bd2375527007.mockapi.io/User", {
-              headers: { Authorization: `Bearer ${parsedUser.token}` }
+          const parsedUserData = JSON.parse(userInfo);
+          setParsedUser(parsedUserData); // Lưu parsedUser vào trạng thái
+          
+          // Kiểm tra xem parsedUserData có chứa id hay không
+          if (!parsedUserData.id) {
+            toast.error("ID người dùng không tồn tại.");
+            return;
+          }
+  
+          if (parsedUserData.token) {
+            const response = await api.get("/accounts", {
+              headers: { Authorization: `Bearer ${parsedUserData.token}` }
             });
             setUser(response.data);
-            // Gọi API để lấy danh sách đơn hàng của người dùng
-            const ordersResponse = await api.get("https://66ffe95a4da5bd2375527007.mockapi.io/Booking", {
-              headers: { Authorization: `Bearer ${parsedUser.token}` }
-            });
-            setOrders(ordersResponse.data); // Lưu danh sách đơn hàng vào state
           } else {
-            setUser(parsedUser);
+            setUser(parsedUserData);
           }
-          console.log("Thông tin người dùng:", parsedUser); // Log để debug
+          console.log("Thông tin người dùng:", parsedUserData);
         } else {
           toast.warning("Vui lòng đăng nhập để xem thông tin cá nhân.");
           navigate("/login");
@@ -56,12 +60,45 @@ function Profile() {
         setLoading(false);
       }
     };
-
+  
     fetchUserInfo();
   }, [navigate]);
+  
 
   const handleEdit = () => {
     navigate("/edit-profile");
+  };
+
+  const roleMapping = {
+    1: "Manager",
+    2: "Sale Staff",
+    3: "Consultant Staff",
+    4: "Delivery Staff",
+    5: "Customer",
+  };
+
+  const handleImageChange = async (info) => {
+    if (info.file.status === "done") {
+      if (!parsedUser || !parsedUser.id) {
+        message.error("Không thể xác định người dùng.");
+        return;
+      }
+      const newImageUrl = info.file.response.url; // Giả sử API trả về URL hình ảnh
+      setUser((prevUser) => ({ ...prevUser, imageUrl: newImageUrl }));
+
+      // Cập nhật hình ảnh trong cơ sở dữ liệu
+      try {
+        await api.put(`/api/accounts/${parsedUser.id}/image`, { // Sử dụng parsedUser từ trạng thái
+          imageUrl: newImageUrl,
+        }, {
+          headers: { Authorization: `Bearer ${parsedUser.token}` }
+        });
+        message.success("Cập nhật hình ảnh thành công!");
+      } catch (error) {
+        console.error("Lỗi khi cập nhật hình ảnh:", error);
+        message.error("Có lỗi xảy ra khi cập nhật hình ảnh.");
+      }
+    }
   };
 
   if (loading) {
@@ -88,38 +125,34 @@ function Profile() {
     <div className="profile-page">
       <Header />
       <main className="profile-content">
-        <Card title={<h1><UserOutlined /> Thông tin cá nhân</h1>} extra={<Button onClick={handleEdit} type="primary" icon={<EditOutlined />}>Chỉnh sửa thông tin</Button>}>
+        <Card title={<div className="card-header"><h1><UserOutlined /> Thông tin tài khoản</h1></div>} extra={<Button className="edit-button" onClick={handleEdit} type="primary" icon={<EditOutlined />}>Chỉnh sửa thông tin</Button>}>
           <div className="profile-info">
-            <InfoItem icon={<IdcardOutlined />} label="ID" value={user.id ? user.id.toString() : "N/A"} />
+            {user.imageUrl ? (
+              <img src={user.imageUrl} alt="Profile" className="profile-image" />
+            ) : (
+              <img src={defaultImageUrl} alt="Default Profile" className="profile-image" />
+            )}
+            <Upload
+              name="image"
+              action={`/api/accounts/${parsedUser.id}/image`} // Đường dẫn đến API tải lên hình ảnh
+              showUploadList={false}
+              onChange={handleImageChange}
+              accept="image/*"
+            >
+              <Button icon={<EditOutlined />}>Chỉnh sửa ảnh</Button>
+            </Upload>
             <InfoItem icon={<UserOutlined />} label="Họ và tên" value={user.fullName || "Chưa cập nhật"} />
+            <InfoItem icon={<UserOutlined />} label="Username" value={user.username || "N/A"} />
             <InfoItem icon={<MailOutlined />} label="Email" value={user.email || "N/A"} />
             <InfoItem icon={<PhoneOutlined />} label="Số điện thoại" value={user.phone || "N/A"} />
-            <InfoItem icon={<LockOutlined />} label="Trạng thái tài khoản" value={user.accountStatus || "N/A"} />
-            <InfoItem icon={<UserOutlined />} label="Vai trò" value={user.role || "N/A"} />
+            <InfoItem icon={<LockOutlined />} label="Trạng thái tài khoản" value={user.status || "N/A"} />
+            <InfoItem icon={<UserOutlined />} label="Vai trò" value={user.roleId ? roleMapping[user.roleId] : "N/A"} />
           </div>
-          <div className="debug-info">
+          {/* Ẩn phần Debug Information */}
+          {/* <div className="debug-info">
             <h3>Debug Information:</h3>
             <pre>{JSON.stringify(user, null, 2)}</pre>
-          </div>
-        </Card>
-
-        {/* Thêm phần hiển thị danh sách đơn hàng */}
-        <Card title={<h2><ShoppingOutlined /> Đơn hàng của bạn</h2>}>
-          {orders.length > 0 ? (
-            <ul className="orders-list">
-              {orders.map((order) => (
-                <li key={order.id} className="order-item">
-                  <p>Order ID: {order.id}</p>
-                  <p>Loại cá: {order.favoriteKoi.join(", ")}</p>
-                  <p>Trang trại: {order.favoritefarm.join(", ")}</p>
-                  <p>Ngày bắt đầu: {order.startDate}</p>
-                  <p>Ngày kết thúc: {order.endDate}</p>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p>Bạn chưa có đơn hàng nào.</p>
-          )}
+          </div> */}
         </Card>
       </main>
       <Footer />

@@ -26,38 +26,45 @@ function LoginPage() {
     }
   };
 
-  // Xử lý đăng nhập thông qua API backend
   const handleLogin = async (values) => {
     try {
-      const response = await api.post("/login", values);
-      console.log(response);
-      const { role, token, user } = response.data;
-
+      const response = await api.post("http://localhost:8080/api/v1/auth/login", values, {
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+  
+      // Nhận user từ response
+      const { role_id, token, user } = response.data;
+  
+      // Kiểm tra xem token và accountId có tồn tại không
+      if (!token || !user || !user.accountId) {
+        throw new Error("Không thể lấy được ID người dùng.");
+      }
+  
+      // Lưu token và userInfo vào localStorage
+      const userInfo = { id: user.accountId, username: user.username, fullName: user.fullName, email: user.email, phone: user.phone, roleId: user.roleId, status: user.status };
       localStorage.setItem("token", token);
-      localStorage.setItem("userInfo", JSON.stringify(user));
-
+      localStorage.setItem("userInfo", JSON.stringify(userInfo));
+  
       toast.success("Đăng nhập thành công!");
-
+  
       // Điều hướng dựa trên vai trò người dùng
-      if (role === "ADMIN") {
+      if (role_id === 1) { // Giả sử role_id 1 là manager
         navigate("/dashboard");
-      } else if (role === "CUSTOMER") {
+      } else if (role_id === 5) { // Giả sử role_id 5 là customer
         navigate("/");
-      } else if(role === "SALES") {
+      } else if(role_id === "SALES") {
         navigate("/salesdashboard")
       }
     } catch (error) {
       console.error("Lỗi đăng nhập:", error);
-      if (error.response && error.response.data) {
-        toast.error(error.response.data);
-      } else {
-        toast.error(
-          "Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin đăng nhập."
-        );
-      }
+      toast.error("Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin đăng nhập.");
     }
-    
   };
+  
+  
+  
 
   return (
     <div className="wrapper">

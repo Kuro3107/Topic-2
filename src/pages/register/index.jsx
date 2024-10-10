@@ -11,9 +11,19 @@ function RegisterPage() {
 
   const handleRegister = async (values) => {
     try {
-      values.role = "CUSTOMER";
-      const response = await api.post("/register", values);
-      console.log(response);
+      const requestBody = {
+        username: values.username,
+        password: values.password,
+        phone: values.phone,
+        rePassword: values['re-password'],
+        fullName: values.fullName || null,
+        email: values.email || null,
+      };
+
+      console.log("Request Body:", requestBody);
+
+      const response = await api.post("/v1/auth/register", requestBody);
+      console.log("Response:", response);
 
       if (response.data && response.data.token) {
         localStorage.setItem("userInfo", JSON.stringify(response.data));
@@ -24,8 +34,8 @@ function RegisterPage() {
         navigate("/login");
       }
     } catch (error) {
-      console.log(error);
-      toast.error(error.response?.data || "Đăng ký thất bại");
+      console.error("Error details:", error.response || error);
+      toast.error(error.response?.data?.message || "Đăng ký thất bại. Vui lòng thử lại.");
     }
   };
 
@@ -40,46 +50,45 @@ function RegisterPage() {
           <Form.Item
             label="Username"
             name="username"
-            rules={[{ required: true, message: "Please input your username!" }]}
+            rules={[{ required: true, message: "Vui lòng nhập tên người dùng!" }]}
           >
             <Input />
           </Form.Item>
           <Form.Item
             label="Password"
             name="password"
-            rules={[{ required: true, message: "Please input your password!" }]}
+            rules={[{ required: true, message: "Vui lòng nhập mật khẩu!" }]}
           >
             <Input />
           </Form.Item>
-          <Form.Item label="Re-Password" name="re-password">
-            <Input />
+          <Form.Item
+            label="Re-Password"
+            name="re-password"
+            rules={[{ required: true, message: "Vui lòng xác nhận mật khẩu!" }]}
+          >
+            <Input.Password />
           </Form.Item>
-          <Form.Item label="Fullname" name="fullName">
-            {" "}
-            {/* Đảm bảo tên trường là "fullName" */}
+          <Form.Item label="Full Name (Optional)" name="fullName">
             <Input />
           </Form.Item>
           <Form.Item
-            label="Phone"
+            label="Số điện thoại"
             name="phone"
             rules={[
-              { required: true, message: "Please input your phone!" },
-              {
-                pattern: /^[0-9]{10}$/,
-                message: "Phone number must be 10 digits",
-              },
+              { required: true, message: "Vui lòng nhập số điện thoại!" },
+              { pattern: /^0\d{9}$/, message: "Số điện thoại phải có 10 chữ số và bắt đầu bằng 0" },
             ]}
           >
             <Input />
           </Form.Item>
-          <Form.Item label="Email" name="email">
+          <Form.Item label="Email (Optional)" name="email">
             <Input />
           </Form.Item>
           <Button type="primary" htmlType="submit">
-            Register
+            Đăng ký
           </Button>
           <div>
-            <Link to="/login">Already have an account?</Link>
+            <Link to="/login">Đã có tài khoản?</Link>
           </div>
         </Form>
       </AuthenTemplate>
@@ -88,3 +97,5 @@ function RegisterPage() {
 }
 
 export default RegisterPage;
+
+

@@ -7,7 +7,7 @@ const ManageFarm = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
   const [editingFarm, setEditingFarm] = useState(null);
-  const apiFarm = "https://66fbc1b08583ac93b40d17b4.mockapi.io/Farm";
+  const apiFarm = "http://localhost:8080/api/farms"; // Cập nhật URL API
 
   const fetchFarms = async () => {
     try {
@@ -39,25 +39,26 @@ const ManageFarm = () => {
   };
 
   const onFinish = async (values) => {
+    console.log("Dữ liệu gửi đến backend:", values); // Thêm log để kiểm tra dữ liệu
     try {
-      if (editingFarm) {
-        await axios.put(`${apiFarm}/${editingFarm.id}`, values);
-        message.success("Cập nhật trang trại thành công");
-      } else {
-        await axios.post(apiFarm, values);
-        message.success("Thêm trang trại mới thành công");
-      }
-      setIsModalVisible(false);
-      fetchFarms();
+        if (editingFarm) {
+            await axios.put(`${apiFarm}/${editingFarm.farmId}`, values); // Cập nhật farmId
+            message.success("Cập nhật trang trại thành công");
+        } else {
+            await axios.post(apiFarm, values); // Gửi dữ liệu mới
+            message.success("Thêm trang trại mới thành công");
+        }
+        setIsModalVisible(false);
+        fetchFarms();
     } catch (error) {
-      message.error("Có lỗi xảy ra khi lưu trang trại");
-      console.error("Error saving farm:", error);
+        message.error("Có lỗi xảy ra khi lưu trang trại");
+        console.error("Error saving farm:", error);
     }
-  };
+};
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`${apiFarm}/${id}`);
+      await axios.delete(`${apiFarm}/${id}`); // Xóa theo farm_id
       message.success("Xóa trang trại thành công");
       fetchFarms();
     } catch (error) {
@@ -67,28 +68,29 @@ const ManageFarm = () => {
   };
 
   const columns = [
-    {
-      title: "ID",
-      dataIndex: "id",
-      key: "id",
-    },
+    // Đã loại bỏ cột ID
     {
       title: "Tên trang trại",
-      dataIndex: "name",
-      key: "name",
+      dataIndex: "farmName",
+      key: "farmName",
     },
     {
       title: "Hình ảnh",
-      dataIndex: "avatar",
-      key: "avatar",
-      render: (avatar) => (
-        <img src={avatar} alt="Farm" style={{ width: 50, height: 50 }} />
+      dataIndex: "imageUrl",
+      key: "imageUrl",
+      render: (imageUrl) => (
+        <img src={imageUrl} alt="Farm" style={{ width: 50, height: 50 }} />
       ),
     },
     {
-      title: "Loại",
-      dataIndex: "variety",
-      key: "variety",
+      title: "Location",
+      dataIndex: "location",
+      key: "location",
+    },
+    {
+      title: "Thông tin liên hệ",
+      dataIndex: "contactInfo",
+      key: "contactInfo",
     },
     {
       title: "Hành động",
@@ -97,7 +99,7 @@ const ManageFarm = () => {
         <>
           <Button onClick={() => showModal(record)}>Sửa</Button>
           <Button
-            onClick={() => handleDelete(record.id)}
+            onClick={() => handleDelete(record.farmId)}
             danger
             style={{ marginLeft: 8 }}
           >
@@ -118,7 +120,7 @@ const ManageFarm = () => {
       >
         Thêm trang trại mới
       </Button>
-      <Table columns={columns} dataSource={farms} rowKey="id" />
+      <Table columns={columns} dataSource={farms} rowKey="farm_id" /> {/* Cập nhật để sử dụng farm_id */}
 
       <Modal
         title={editingFarm ? "Sửa thông tin trang trại" : "Thêm trang trại mới"}
@@ -128,23 +130,28 @@ const ManageFarm = () => {
       >
         <Form form={form} onFinish={onFinish} layout="vertical">
           <Form.Item
-            name="name"
+            name="farmName" // Cập nhật để sử dụng farmName
             label="Tên trang trại"
-            rules={[
-              { required: true, message: "Vui lòng nhập tên trang trại!" },
-            ]}
+            rules={[{ required: true, message: "Vui lòng nhập tên trang trại!" }]}
           >
             <Input placeholder="Nhập tên trang trại" />
           </Form.Item>
-          <Form.Item name="avatar" label="URL Hình ảnh">
+          <Form.Item name="imageUrl" label="URL Hình ảnh"> {/* Cập nhật để sử dụng imageUrl */}
             <Input placeholder="Nhập URL hình ảnh" />
           </Form.Item>
           <Form.Item
-            name="variety"
-            label="Loại"
-            rules={[{ required: true, message: "Vui lòng nhập loại!" }]}
+            name="location" // Cập nhật để sử dụng location
+            label="Location"
+            rules={[{ required: true, message: "Vui lòng nhập location!" }]}
           >
-            <Input placeholder="Nhập loại trang trại" />
+            <Input placeholder="Nhập location trang trại" />
+          </Form.Item>
+          <Form.Item
+            name="contactInfo" // Thêm trường cho thông tin liên hệ
+            label="Thông tin liên hệ"
+            rules={[{ required: true, message: "Vui lòng nhập thông tin liên hệ!" }]}
+          >
+            <Input placeholder="Nhập thông tin liên hệ" />
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">
