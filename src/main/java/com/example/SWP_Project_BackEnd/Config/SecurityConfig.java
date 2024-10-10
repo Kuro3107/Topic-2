@@ -23,7 +23,7 @@ public class SecurityConfig {
                 // Allow public access to register and login endpoints
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/auth/register", "/api/v1/auth/login", "/swagger-resources/**", "/swagger-ui/**","/api/farms","/api/farms/{id}","/api/tours","/api/tours/{id}",
-                                "/api/accounts","/api/accounts/{id}","/api/koifish","/api/koifish/{id}",
+                                "/api/accounts","/api/accounts/{id}", "/api/accounts/{id}/image", "/api/accounts/${parsedUser.id}/image", "/api/koifish","/api/koifish/{id}",
                                 "/api/booking", "/api/booking/{bookingId}/payment", "/api/booking/{bookingId}/payment/{bookingPaymentId}/complete").permitAll()
                         .anyRequest().authenticated()
                 )

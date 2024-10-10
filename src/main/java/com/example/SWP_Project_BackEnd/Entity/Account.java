@@ -23,22 +23,22 @@ public class Account {
     @Column(nullable = false)
     private String password;
 
-    @Column(name = "full_name", nullable = true)
-    private String fullName;
-
     @Column(unique = true, nullable = false)
     private String phone;
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true)
     private String email;
 
-    @Column(name = "image_url", nullable = true)
+    @Column(name = "image_url")
     private String imageUrl;
 
-    @Column(nullable = false)
-    private int roleId;
+    @Column(name = "role_id", nullable = false)
+    private int roleId;  // Đảm bảo sử dụng role_id đồng bộ với database
 
-    @Column(nullable = true)
+    @Column(name = "full_name")
+    private String fullName;
+
+    @Column(name = "status")
     private String status;
 
     // Constructors, getters, and setters

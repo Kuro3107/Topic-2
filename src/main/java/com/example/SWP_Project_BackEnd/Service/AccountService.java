@@ -21,6 +21,7 @@ public class AccountService {
     private PasswordEncoder passwordEncoder;
 
     public String registerUser(Account account, String rePassword) {
+        System.out.println("Full Name in Account: " + account.getFullName()); // Log giá trị fullName
         if (accountRepository.findByUsername(account.getUsername()).isPresent()) {
             return "Username already exists";
         }
@@ -29,9 +30,10 @@ public class AccountService {
             return "Phone number already exists";
         }
 
-        if (accountRepository.findByEmail(account.getEmail()).isPresent()) {
+        if (account.getEmail() != null && accountRepository.findByEmail(account.getEmail()).isPresent()) {
             return "Email already exists";
         }
+
 
         if (!account.getPassword().equals(rePassword)) {
             return "Passwords do not match";
@@ -41,20 +43,20 @@ public class AccountService {
             return "Phone not valid";
         }
 
-        if (!isValidEmail(account.getEmail())) {
-            return "Email not valid";
-        }
+//        if (!isValidEmail(account.getEmail())) {
+//            return "Email not valid";
+//        }
 
-        // Encrypt the password before saving
+        // Mã hóa mật khẩu trước khi lưu
         account.setPassword(passwordEncoder.encode(account.getPassword()));
+        account.setFullName(account.getFullName());
+        account.setEmail(account.getEmail());
 
-        // Set default role for customer
-        account.setRoleId(5);
-
-        // Save the account into the database
+        // Lưu tài khoản vào cơ sở dữ liệu
         accountRepository.save(account);
         return "User registered successfully";
     }
+
 
     public LoginResponse loginUser(LoginRequest loginRequest) {
         // Check if the user exists
@@ -97,6 +99,16 @@ public class AccountService {
             existingAccount.setRoleId(accountDetails.getRoleId());
             existingAccount.setStatus(accountDetails.getStatus());
             existingAccount.setFullName(accountDetails.getFullName());
+            return accountRepository.save(existingAccount);
+        }
+        return null;
+    }
+
+    public Account updateAccountImage(Long id, String imageUrl) {
+        Optional<Account> optionalAccount = accountRepository.findById(id);
+        if (optionalAccount.isPresent()) {
+            Account existingAccount = optionalAccount.get();
+            existingAccount.setImageUrl(imageUrl); // Cập nhật trường imageUrl
             return accountRepository.save(existingAccount);
         }
         return null;

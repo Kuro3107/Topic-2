@@ -17,13 +17,24 @@ public class RegisterController {
 
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestBody RegisterRequest registerRequest) {
+        System.out.println("Full Name from Request: " + registerRequest.getFullName()); // Log giá trị fullName
         Account account = new Account();
         account.setUsername(registerRequest.getUsername());
         account.setPassword(registerRequest.getPassword());
-        account.setFullName(registerRequest.getFullName()); // Gán fullName
+        if (registerRequest.getFullName() != null && !registerRequest.getFullName().trim().isEmpty()) {
+            account.setFullName(registerRequest.getFullName().trim());
+        } else {
+            account.setFullName(null); // hoặc chuỗi rỗng tùy theo thiết kế của bạn
+        }
         account.setPhone(registerRequest.getPhone());
-        account.setEmail(registerRequest.getEmail());
-        account.setRoleId(registerRequest.getRole_id());
+
+        // Bỏ qua việc lấy roleId từ request, luôn gán roleId là 5 cho khách hàng
+        account.setRoleId(5);  // Set role_id là 5 mặc định cho khách hàng
+        if (registerRequest.getEmail() != null && !registerRequest.getEmail().trim().isEmpty()) {
+            account.setEmail(registerRequest.getEmail().trim());
+        } else {
+            account.setEmail(null); // hoặc chuỗi rỗng tùy theo thiết kế của bạn
+        }
 
         // Các giá trị mặc định khác
         account.setImageUrl(null);  // No image by default

@@ -8,9 +8,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-@CrossOrigin("*")
 @RestController
 @RequestMapping("/api/farms")
+@CrossOrigin(origins = "http://localhost:5173")
 public class KoiFarmController {
 
     @Autowired

@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -50,5 +51,15 @@ public class AccountController {
     public ResponseEntity<Void> deleteAccount(@PathVariable Long id) {
         accountService.deleteAccount(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}/image")
+    public ResponseEntity<Account> updateAccountImage(@PathVariable Long id, @RequestBody Map<String, String> imageUrl) {
+        Account updatedAccount = accountService.updateAccountImage(id, imageUrl.get("imageUrl"));
+        if (updatedAccount != null) {
+            return ResponseEntity.ok(updatedAccount);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 }
