@@ -12,6 +12,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/accounts")
+@CrossOrigin(origins = "http://localhost:5173")  // Cấu hình CORS tại controller
 public class AccountController {
 
     @Autowired

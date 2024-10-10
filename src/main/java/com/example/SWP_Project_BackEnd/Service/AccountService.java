@@ -96,6 +96,22 @@ public class AccountService {
             existingAccount.setPhone(accountDetails.getPhone());
             existingAccount.setEmail(accountDetails.getEmail());
             existingAccount.setImageUrl(accountDetails.getImageUrl());
+//            existingAccount.setRoleId(accountDetails.getRoleId());
+            existingAccount.setStatus(accountDetails.getStatus());
+            existingAccount.setFullName(accountDetails.getFullName());
+            return accountRepository.save(existingAccount);
+        }
+        return null;
+    }
+
+    public Account updateAccountByManager(Long id, Account accountDetails) {
+        Optional<Account> account = accountRepository.findById(id);
+        if (account.isPresent()) {
+            Account existingAccount = account.get();
+            existingAccount.setUsername(accountDetails.getUsername());
+            existingAccount.setPhone(accountDetails.getPhone());
+            existingAccount.setEmail(accountDetails.getEmail());
+            existingAccount.setImageUrl(accountDetails.getImageUrl());
             existingAccount.setRoleId(accountDetails.getRoleId());
             existingAccount.setStatus(accountDetails.getStatus());
             existingAccount.setFullName(accountDetails.getFullName());

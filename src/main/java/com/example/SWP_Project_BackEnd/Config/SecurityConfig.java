@@ -14,23 +14,39 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                // Disable CSRF for testing purposes (you can enable it later with proper configuration)
-                .csrf(csrf -> csrf.disable())
-
-                // Allow public access to register and login endpoints
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/register", "/api/v1/auth/login", "/swagger-resources/**", "/swagger-ui/**","/api/farms","/api/farms/{id}","/api/tours","/api/tours/{id}",
-                                "/api/accounts","/api/accounts/{id}", "/api/accounts/{id}/image", "/api/accounts/${parsedUser.id}/image", "/api/koifish","/api/koifish/{id}",
-                                "/api/booking", "/api/booking/{bookingId}/payment", "/api/booking/{bookingId}/payment/{bookingPaymentId}/complete").permitAll()
-                        .anyRequest().authenticated()
-                )
-
-                // Use basic HTTP authentication for the remaining endpoints (you can switch to JWT later)
-                .httpBasic(withDefaults());
-        return http.build();
-    }
+//    @Bean
+//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//        http
+//                // Disable CSRF for testing purposes (you can enable it later with proper configuration)
+//                .csrf(csrf -> csrf.disable())
+//
+//                // Allow public access to register and login endpoints
+//                .authorizeHttpRequests(auth -> auth
+//                        .requestMatchers("/api/v1/auth/register",
+//                                "/api/v1/auth/login",
+//                                "/swagger-resources/**",
+//                                "/swagger-ui/**",
+//                                "/api/farms","/api/farms/{id}","/api/tours","/api/tours/{id}",
+//                                "/api/accounts","/api/accounts/{id}", "/api/accounts/{id}/image",
+//                                "/api/koifish","/api/koifish/{id}",
+//                                "/api/booking", "/api/booking/{bookingId}/payment", "/api/booking/{bookingId}/payment/{bookingPaymentId}/complete").permitAll()
+//                        .anyRequest().authenticated()
+//                )
+//
+//                // Use basic HTTP authentication for the remaining endpoints (you can switch to JWT later)
+//                .httpBasic(withDefaults());
+//        return http.build();
+//    }
+@Bean
+public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    http
+            .csrf(csrf -> csrf.disable())  // Disable CSRF
+            .authorizeHttpRequests(authorizeRequests ->
+                    authorizeRequests
+                            .requestMatchers("/**").permitAll()  // Allow all requests without authentication
+                            .anyRequest().authenticated()  // Other requests need authentication
+            );
+    return http.build();
+}
 }
 

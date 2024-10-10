@@ -5,9 +5,6 @@ import com.example.SWP_Project_BackEnd.Dto.RegisterRequest;
 //import com.example.SWP_Project_BackEnd.Entity.User;
 import com.example.SWP_Project_BackEnd.Service.AccountService;
 //import com.example.SWP_Project_BackEnd.Service.UserService;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,6 +28,9 @@ public class LoginController {
         if (loginResponse == null) {
             return ResponseEntity.badRequest().body("Wrong username or password");
         }
+
+        // In ra response để kiểm tra
+        System.out.println("LoginResponse: " + loginResponse.getUser().getAccountId());
 
         return ResponseEntity.ok(loginResponse);
     }
