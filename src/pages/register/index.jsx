@@ -1,10 +1,9 @@
 import React from "react";
 import AuthenTemplate from "../../components/authen-template";
 import { Button, Form, Input } from "antd";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import api from "../../config/axios";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
 
 function RegisterPage() {
   const navigate = useNavigate();
@@ -26,9 +25,9 @@ function RegisterPage() {
       console.log("Response:", response);
 
       if (response.data && response.data.token) {
-        localStorage.setItem("userInfo", JSON.stringify(response.data));
+        localStorage.setItem('userInfo', JSON.stringify(response.data));
         toast.success("Đăng ký thành công và đã đăng nhập");
-        navigate("/profile"); // Chuyển hướng đến trang profile
+        navigate("/profile");
       } else {
         toast.success("Đăng ký thành công");
         navigate("/login");
@@ -42,16 +41,12 @@ function RegisterPage() {
   return (
     <div>
       <AuthenTemplate>
-        <Form
-          labelCol={{ span: 24 }}
-          className="register-form"
-          onFinish={handleRegister}
-        >
+        <Form labelCol={{ span: 24 }} className="register-form" onFinish={handleRegister}>
           <Form.Item
             label="Username"
             name="username"
             rules={[{ required: true, message: "Vui lòng nhập tên người dùng!" }]}
-          >
+            >
             <Input />
           </Form.Item>
           <Form.Item

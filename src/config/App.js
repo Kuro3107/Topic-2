@@ -1,9 +1,9 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Switch, Link } from 'react-router-dom';
-import Home from './pages/Home'; // Sử dụng trang Home hiện tại
+import Home from '../pages/Home/index.jsx'; // Sử dụng trang Home hiện tại
 import Dashboard from './pages/Dashboard'; // Sử dụng trang Dashboard hiện tại
-import ManageFarm from './pages/admin/manage-farm/index.jsx'; // Đảm bảo file này tồn tại
-import LoginPage from './pages/login/index.jsx'; // Nhập file đăng nhập
+import ManageFarm from '../pages/admin/manage-farm/index.jsx'; // Đảm bảo file này tồn tại
+import LoginPage from '../pages/login/index.jsx'; // Nhập file đăng nhập
 import { useAuth } from './context/AuthContext';
 
 const App = () => {

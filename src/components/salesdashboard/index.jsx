@@ -4,7 +4,7 @@ import {
   UserOutlined,
 } from '@ant-design/icons';
 import { Breadcrumb, Layout, Menu, theme } from 'antd';
-import ManageForm from '../../pages/salestaff/manage-form';
+import ManageForm from '../../pages/staff/manage-form';
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -35,7 +35,7 @@ const SalesDashboard = () => {
 
   const renderContent = () => {
     switch (selectedKey) {
-      case 'Form':
+      case 'form':
         return <ManageForm />;
       // Thêm các case khác cho các menu item khác nếu cần
       default:
