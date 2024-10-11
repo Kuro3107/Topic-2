@@ -30,7 +30,7 @@ public class TourService {
         Optional<Tour> tour = tourRepository.findById(id);
         if (tour.isPresent()) {
             Tour existingTour = tour.get();
-            existingTour.setTripDetailId(tourDetails.getTripDetailId());
+//            existingTour.setTripDetailId(tourDetails.getTripDetailId());
             existingTour.setTripName(tourDetails.getTripName());
             existingTour.setPriceTotal(tourDetails.getPriceTotal());
             return tourRepository.save(existingTour);

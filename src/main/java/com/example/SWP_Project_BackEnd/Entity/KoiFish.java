@@ -19,8 +19,10 @@ public class KoiFish {
     private Long koiId;
 
     private String type;
+    @Column(name = "koi_price")
     private Double koi_price;
     private String size;
     private Long variety_id;
+    @Column(name = "image_url")
     private String imageUrl;
 }
