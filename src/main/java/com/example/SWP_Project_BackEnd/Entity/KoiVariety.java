@@ -13,16 +13,17 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class KoiFish {
+public class KoiVariety {
     @Id
+    @Column(name = "variety_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long koiId;
-
-    private String type;
+    private Long variety_id;
+    @Column(name = "variety_name")
+    private String variety_name;
+    @Column(name = "description")
+    private String description;
     @Column(name = "koi_price")
     private Double koi_price;
-    private String size;
-    private Long variety_id;
     @Column(name = "image_url")
     private String imageUrl;
 }
