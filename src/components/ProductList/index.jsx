@@ -12,14 +12,12 @@ function ProductList() {
 
   useEffect(() => {
     fetchFarms();
-    fetchKois();
+    fetchKois(); // Gọi hàm fetchKois để lấy dữ liệu Koi
   }, []);
 
   const fetchFarms = async () => {
     try {
-      const response = await fetch(
-        "https://66fbc1b08583ac93b40d17b4.mockapi.io/Farm"
-      );
+      const response = await fetch("http://localhost:8080/api/farms");
       if (!response.ok) {
         throw new Error("Không thể lấy dữ liệu Farm");
       }
@@ -34,15 +32,14 @@ function ProductList() {
 
   const fetchKois = async () => {
     try {
-      const response = await fetch(
-        "https://66fbc1b08583ac93b40d17b4.mockapi.io/Kois"
-      );
+      const response = await fetch("http://localhost:8080/api/koi_variety");
       if (!response.ok) {
         throw new Error("Không thể lấy dữ liệu Koi");
       }
       const data = await response.json();
       setKois(data);
     } catch (error) {
+      setError("Không thể lấy dữ liệu Koi");
       console.error("Không thể lấy dữ liệu Koi", error);
     }
   };
@@ -65,32 +62,32 @@ function ProductList() {
 
   // Lọc Koi theo variety của farm được chọn
   const filteredKois = selectedFarm
-    ? kois.filter((koi) => koi.variety === selectedFarm.variety)
+    ? kois.filter((koi) => koi.farmId === selectedFarm.farmId) // Giả sử rằng mỗi Koi có farmId
     : [];
 
   return (
     <div className="farm-list">
       {selectedFarm ? (
         <div className="farm-detail">
-          <h2>{selectedFarm.name}</h2>
+          <h2>{selectedFarm.farmName}</h2>
           <img
-            src={selectedFarm.avatar}
-            alt={selectedFarm.name}
+            src={selectedFarm.imageUrl}
+            alt={selectedFarm.farmName}
             className="farm-avatar"
           />
-          <p>Loại: {selectedFarm.variety}</p>
-          <p>Ngày: {new Date(selectedFarm.date * 1000).toLocaleDateString()}</p>
-          <h3>Các loại cá Koi:</h3>
+          <p>Địa điểm: {selectedFarm.location}</p>
+          <p>Thông tin liên hệ: {selectedFarm.contactInfo}</p> {/* Hiển thị thông tin liên hệ */}
+          <h3>Các giống cá Koi có tại farm:</h3>
           <div className="koi-grid">
             {filteredKois.map((koi) => (
               <div key={koi.id} className="koi-card">
                 <img
-                  src={koi.avatar}
-                  alt={koi.variety}
+                  src={koi.imageUrl}
+                  alt={koi.variety_name}
                   className="koi-avatar"
                 />
-                <p>Loại: {koi.variety}</p>
-                <p>Giá: {koi.price} VNĐ</p>
+                <p>Loại: {koi.variety_name}</p>
+                <p>Giá: {koi.koi_price} VNĐ</p>
               </div>
             ))}
           </div>
@@ -103,18 +100,17 @@ function ProductList() {
           <div className="farm-grid">
             {currentFarms.map((farm) => (
               <div
-                key={farm.id}
+                key={farm.farmId}
                 className="farm-card"
                 onClick={() => handleFarmClick(farm)}
               >
                 <img
-                  src={farm.avatar}
-                  alt={farm.name}
+                  src={farm.imageUrl}
+                  alt={farm.farmName}
                   className="farm-avatar"
                 />
-                <h3>{farm.name}</h3>
-                <p>Loại: {farm.variety}</p>
-                <p>Ngày: {new Date(farm.date * 1000).toLocaleDateString()}</p>
+                <h3>{farm.farmName}</h3>
+                <p>Địa điểm: {farm.location}</p>
               </div>
             ))}
           </div>
@@ -122,7 +118,15 @@ function ProductList() {
             {Array.from(
               { length: Math.ceil(farms.length / farmsPerPage) },
               (_, i) => (
-                <button key={i} onClick={() => paginate(i + 1)}>
+                <button
+                  key={i}
+                  onClick={() => paginate(i + 1)}
+                  style={{
+                    fontWeight: currentPage === i + 1 ? 'bold' : 'normal',
+                    backgroundColor: currentPage === i + 1 ? '#007bff' : '#fff',
+                    color: currentPage === i + 1 ? '#fff' : '#000',
+                  }}
+                >
                   {i + 1}
                 </button>
               )

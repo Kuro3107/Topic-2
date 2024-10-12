@@ -16,7 +16,7 @@ function HomePage() {
         <Banner />
 
         <h1>Danh sách trang trại nổi tiếng</h1>
-        <ProductList />
+        <ProductList /> {/* Hiển thị danh sách sản phẩm */}
         <div>
           <h1>Các loại koi phổ biến</h1>
           <ProductList2 />

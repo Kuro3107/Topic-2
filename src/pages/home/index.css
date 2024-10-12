@@ -20,6 +20,7 @@ main h1 {
     position: relative;
     padding-bottom: 15px;
     padding-top: 20px;
+    border-bottom: 2px solid #FF3366; /* Thêm đường viền dưới tiêu đề */
 }
 
 main h1::after {
