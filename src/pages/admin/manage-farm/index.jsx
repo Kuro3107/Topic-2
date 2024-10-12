@@ -8,7 +8,7 @@ const ManageFarm = () => {
   const [form] = Form.useForm();
   const [editingFarm, setEditingFarm] = useState(null);
   const apiFarm = "http://localhost:8080/api/farms"; // Cập nhật URL API
-
+  
   const fetchFarms = async () => {
     try {
       const response = await axios.get(apiFarm);

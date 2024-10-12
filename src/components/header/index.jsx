@@ -41,7 +41,7 @@ const Header = () => {
             </Link>
           </li>
           <li>
-            <Link to="/san-pham" className="header-link">
+            <Link to="/product" className="header-link">
               Sản phẩm
             </Link>
           </li>

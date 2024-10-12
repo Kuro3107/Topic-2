@@ -255,7 +255,13 @@ function Profile() {
           </div>
         </Card>
 
-        <Card title={<h2><ShoppingOutlined /> Đơn hàng của bạn</h2>}>
+        <Card
+          title={
+            <h2>
+              <ShoppingOutlined /> Đơn hàng của bạn
+            </h2>
+          }
+        >
           <Table
             columns={columns}
             dataSource={orders}
