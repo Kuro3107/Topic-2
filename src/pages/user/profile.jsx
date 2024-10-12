@@ -48,7 +48,7 @@ function Profile() {
             setUser(parsedUserData);
           }
 
-          const ordersResponse = await api.get("/Booking", {
+          const ordersResponse = await api.get("/booking", {
             headers: { Authorization: `Bearer ${parsedUser.token}` },
           });
           setOrders(ordersResponse.data);
@@ -70,13 +70,13 @@ function Profile() {
     navigate("/edit-profile");
   };
 
-  const handleCancelOrder = async (orderId) => {
+  const handleCancelOrder = async (tripId) => {
     try {
-      await api.delete(`/Booking/${orderId}`, {
+      await api.delete(`/booking/${tripId}`, {
         headers: { Authorization: `Bearer ${parsedUser.token}` },
       });
       toast.success("Đơn hàng đã được hủy thành công.");
-      setOrders(orders.filter((order) => order.id !== orderId));
+      setOrders(orders.filter((trip) => trip.id !== tripId));
     } catch (error) {
       toast.error("Có lỗi xảy ra khi hủy đơn hàng.");
     }
