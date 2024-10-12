@@ -19,10 +19,10 @@ function LoginPage() {
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
       console.log(user);
-      toast.success("Đăng nhập với Google thành công!");
+      toast.success("Sign in with Google successfully!");
     } catch (error) {
-      console.error("Lỗi đăng nhập với Google:", error);
-      toast.error("Đăng nhập với Google thất bại. Vui lòng thử lại.");
+      console.error("Error signing in with Google:", error);
+      toast.error("Sign in with Google failed. Please try again.");
     }
   };
 
@@ -43,7 +43,7 @@ function LoginPage() {
 
       // Kiểm tra xem token và accountId có tồn tại không
       if (!token || !user || !user.accountId) {
-        throw new Error("Không thể lấy được ID người dùng.");
+        throw new Error("Unable to get user ID.");
       }
 
       // Lưu token và userInfo vào localStorage
@@ -59,7 +59,7 @@ function LoginPage() {
       localStorage.setItem("token", token);
       localStorage.setItem("userInfo", JSON.stringify(userInfo));
 
-      toast.success("Đăng nhập thành công!");
+      toast.success("Login successful!");
 
       // Điều hướng dựa trên vai trò người dùng
       if (role_id === 1) {
@@ -70,9 +70,9 @@ function LoginPage() {
         navigate("/");
       }
     } catch (error) {
-      console.error("Lỗi đăng nhập:", error);
+      console.error("Login error:", error);
       toast.error(
-        "Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin đăng nhập."
+        "Login failed. Please check your login information again."
       );
     }
   };
@@ -86,19 +86,19 @@ function LoginPage() {
             <Form.Item
               label="Username"
               name="username" // Sửa thành "username" nếu backend yêu cầu
-              rules={[{ required: true, message: "Vui lòng nhập username!" }]}
+              rules={[{ required: true, message: "Please enter username!" }]}
             >
               <Input prefix={<UserOutlined />} placeholder="Username" />
             </Form.Item>
             <Form.Item
-              label="Mật khẩu"
+              label="Password"
               name="password"
-              rules={[{ required: true, message: "Vui lòng nhập mật khẩu!" }]}
+              rules={[{ required: true, message: "Please enter password!" }]}
             >
               <Input.Password
                 prefix={<LockOutlined />}
                 type="password"
-                placeholder="Mật khẩu"
+                placeholder="Password"
               />
             </Form.Item>
           </div>
@@ -106,12 +106,12 @@ function LoginPage() {
           <Button type="primary" htmlType="submit">
             Đăng nhập
           </Button>
-          <Button onClick={handleLoginWithGoogle}>Đăng nhập bằng Google</Button>
+          <Button onClick={handleLoginWithGoogle}>Sign in with Google</Button>
           <div>
-            <Link to="/register">Chưa có tài khoản?</Link>
+            <Link to="/register">Do not have an account?</Link>
           </div>
           <div>
-            <Link to="/">Quay lại trang chủ</Link>
+            <Link to="/">Back to home page</Link>
           </div>
         </Form>
       </AuthenTemplate>

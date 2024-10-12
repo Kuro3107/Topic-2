@@ -15,8 +15,8 @@ function ProductList2() {
             <div className="text-container">
               <h3>KOHAKU KOI FISH</h3>
               <p>
-                Kohaku Koi nổi bật với nền trắng tinh khiết và những đốm đỏ sắc
-                nét, tượng trưng cho sự thanh lịch và thuần khiết.
+                Kohaku Koi stands out with its pure white background and sharp
+                red spots, symbolizing elegance and purity.
               </p>
             </div>
           </div>
@@ -29,8 +29,9 @@ function ProductList2() {
             <div className="text-container">
               <h3>UTSURI KOI FISH</h3>
               <p>
-                Utsuri Koi với nền đen mạnh mẽ kết hợp cùng các mảng màu trắng,
-                đỏ, vàng, thể hiện sự tương phản và cá tính nổi bật.
+                Utsuri Koi with a strong black background combined with white,
+                red, yellow patches, showing contrast and outstanding
+                personality.
               </p>
             </div>
           </div>

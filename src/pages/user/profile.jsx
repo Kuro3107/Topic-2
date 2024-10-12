@@ -35,7 +35,7 @@ function Profile() {
           setParsedUser(parsedUserData);
 
           if (!parsedUserData.id) {
-            toast.error("ID người dùng không tồn tại.");
+            toast.error("User ID does not exist.");
             return;
           }
 
@@ -53,11 +53,11 @@ function Profile() {
           });
           setOrders(ordersResponse.data);
         } else {
-          toast.warning("Vui lòng đăng nhập để xem thông tin cá nhân.");
+          toast.warning("Please login to view personal information.");
           navigate("/login");
         }
       } catch (error) {
-        toast.error("Có lỗi xảy ra khi tải thông tin. Vui lòng thử lại.");
+        toast.error("An error occurred while loading the information. Please try again.");
       } finally {
         setLoading(false);
       }
@@ -75,10 +75,10 @@ function Profile() {
       await api.delete(`/booking/${tripId}`, {
         headers: { Authorization: `Bearer ${parsedUser.token}` },
       });
-      toast.success("Đơn hàng đã được hủy thành công.");
+      toast.success("Order was canceled successfully.");
       setOrders(orders.filter((trip) => trip.id !== tripId));
     } catch (error) {
-      toast.error("Có lỗi xảy ra khi hủy đơn hàng.");
+      toast.error("An error occurred while canceling the order.");
     }
   };
 
@@ -105,9 +105,9 @@ function Profile() {
           { imageUrl: newImageUrl },
           { headers: { Authorization: `Bearer ${parsedUser.token}` } }
         );
-        message.success("Cập nhật hình ảnh thành công!");
+        message.success("Image updated successfully!");
       } catch (error) {
-        message.error("Có lỗi xảy ra khi cập nhật hình ảnh.");
+        message.error("An error occurred while updating the image.");
       }
     }
   };
@@ -116,7 +116,7 @@ function Profile() {
     return (
       <div className="loading-container">
         <Spin size="large" />
-        <p>Đang tải thông tin...</p>
+        <p>Loading information...</p>
       </div>
     );
   }
@@ -124,9 +124,9 @@ function Profile() {
   if (!user) {
     return (
       <div className="error-container">
-        <p>Không thể tải thông tin người dùng. Vui lòng đăng nhập lại.</p>
+        <p>Unable to load user information. Please log in again.</p>
         <Button onClick={() => navigate("/login")} type="primary">
-          Đăng nhập
+          Log in
         </Button>
       </div>
     );
@@ -169,7 +169,7 @@ function Profile() {
             Xem lại
           </Button>
           <Button onClick={() => handleCancelOrder(record.id)} danger>
-            Hủy
+            Cancel
           </Button>
         </>
       ),
@@ -184,7 +184,7 @@ function Profile() {
           title={
             <div className="card-header">
               <h1>
-                <UserOutlined /> Thông tin tài khoản
+                <UserOutlined /> Account information
               </h1>
             </div>
           }
@@ -195,7 +195,7 @@ function Profile() {
               type="primary"
               icon={<EditOutlined />}
             >
-              Chỉnh sửa thông tin
+              Edit information
             </Button>
           }
         >
@@ -220,12 +220,12 @@ function Profile() {
               onChange={handleImageChange}
               accept="image/*"
             >
-              <Button icon={<EditOutlined />}>Chỉnh sửa ảnh</Button>
+              <Button icon={<EditOutlined />}>Photo editing</Button>
             </Upload>
             <InfoItem
               icon={<UserOutlined />}
-              label="Họ và tên"
-              value={user.fullName || "Chưa cập nhật"}
+              label="fullName"
+              value={user.fullName || "Not Updated!"}
             />
             <InfoItem
               icon={<UserOutlined />}
@@ -239,23 +239,23 @@ function Profile() {
             />
             <InfoItem
               icon={<PhoneOutlined />}
-              label="Số điện thoại"
+              label="Phone"
               value={user.phone || "N/A"}
             />
             <InfoItem
               icon={<LockOutlined />}
-              label="Trạng thái tài khoản"
+              label="Status"
               value={user.status || "N/A"}
             />
             <InfoItem
               icon={<UserOutlined />}
-              label="Vai trò"
+              label="Role"
               value={user.roleId ? roleMapping[user.roleId] : "N/A"}
             />
           </div>
         </Card>
 
-        <Card title={<h2><ShoppingOutlined /> Đơn hàng của bạn</h2>}>
+        <Card title={<h2><ShoppingOutlined /> Your Order</h2>}>
           <Table
             columns={columns}
             dataSource={orders}

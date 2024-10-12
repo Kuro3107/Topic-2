@@ -23,44 +23,63 @@ function EditProfile() {
       const response = await api.put(`/accounts/${userInfo.id}`, values, {
         headers: { Authorization: `Bearer ${userInfo.token}` },
       });
-      
+
       console.log("Response data:", response.data); // Kiểm tra giá trị của response.data
 
       // Lưu lại thông tin mới bao gồm token và ID cũ
       const updatedUserInfo = {
         ...userInfo, // Giữ lại ID cũ
-        ...response.data // Cập nhật thông tin mới
+        ...response.data, // Cập nhật thông tin mới
       };
       localStorage.setItem("userInfo", JSON.stringify(updatedUserInfo)); // Đảm bảo response.data chứa thông tin đầy đủ
-      message.success("Cập nhật thông tin thành công");
+      message.success("Information updated successfully");
       navigate("/profile", { replace: true }); // Sử dụng replace để ngăn quay lại trang edit
     } catch (error) {
       console.error(error);
-      message.error("Cập nhật thông tin thất bại");
+      message.error("Update information failed");
     }
   };
-  
+
   return (
     <div className="edit-profile-page">
       <Header />
       <main className="edit-profile-content">
-        <h1>Chỉnh sửa thông tin cá nhân</h1>
+        <h1>Edit personal information</h1>
         <Form form={form} onFinish={handleSave} layout="vertical">
-          <Form.Item name="username" label="Username" rules={[{ required: true, message: 'Vui lòng nhập Username' }]}>
+          <Form.Item
+            name="username"
+            label="Username"
+            rules={[{ required: true, message: "Please enter Username" }]}
+          >
             <Input />
           </Form.Item>
-          <Form.Item name="fullName" label="Họ và tên" rules={[{ required: true, message: 'Vui lòng nhập họ và tên' }]}>
+          <Form.Item
+            name="fullName"
+            label="Fullname"
+            rules={[{ required: true, message: "Please enter your full name" }]}
+          >
             <Input />
           </Form.Item>
-          <Form.Item name="email" label="Email" rules={[{ required: true, message: 'Vui lòng nhập email' }, { type: 'email', message: 'Email không hợp lệ' }]}>
+          <Form.Item
+            name="email"
+            label="Email"
+            rules={[
+              { required: true, message: "Please enter email" },
+              { type: "email", message: "Invalid email" },
+            ]}
+          >
             <Input />
           </Form.Item>
-          <Form.Item name="phone" label="Số điện thoại" rules={[{ required: true, message: 'Vui lòng nhập số điện thoại' }]}>
+          <Form.Item
+            name="phone"
+            label="Phone"
+            rules={[{ required: true, message: "Please enter phone number" }]}
+          >
             <Input />
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">
-              Lưu thay đổi
+              Save changes
             </Button>
           </Form.Item>
         </Form>

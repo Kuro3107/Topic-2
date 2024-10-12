@@ -10,18 +10,18 @@ import { useNavigate } from "react-router-dom";
 const api = "https://6704fc27031fd46a830e2ee2.mockapi.io/BookingForm";
 
 const koiOptions = [
-  { value: "koi1", label: "Koi loại 1" },
-  { value: "koi2", label: "Koi loại 2" },
-  { value: "koi3", label: "Koi loại 3" },
-  { value: "koi4", label: "Koi loại 4" },
+  { value: "koi1", label: "Koi type 1" },
+  { value: "koi2", label: "Koi type 2" },
+  { value: "koi3", label: "Koi type 3" },
+  { value: "koi4", label: "Koi type 4" },
   // Thêm nhiều lựa chọn khác nếu cần
 ];
 
 const farmOptions = [
-  { value: "farm1", label: "Trang trại 1" },
-  { value: "farm2", label: "Trang trại 2" },
-  { value: "farm3", label: "Trang trại 3" },
-  { value: "farm4", label: "Trang trại 4" },
+  { value: "farm1", label: "Farm 1" },
+  { value: "farm2", label: "Farm 2" },
+  { value: "farm3", label: "Farm 3" },
+  { value: "farm4", label: "Farm 4" },
   // Thêm nhiều lựa chọn khác nếu cần
 ];
 
@@ -60,11 +60,11 @@ function BookingForm() {
     try {
       const response = await axios.post(api, formData);
       console.log("Response from server:", response.data);
-      toast.success("Đặt chuyến thành công! Chúng tôi sẽ liên hệ với bạn sớm.");
+      toast.success("Trip booked successfully! We will contact you soon.");
       toast.info(
-        `Thông tin đặt chuyến: Loại cá yêu thích - ${formData.favoriteKoi.join(
+        `Booking information: Favorite fish - ${formData.favoriteKoi.join(
           ", "
-        )}, Trang trại yêu thích - ${formData.favoritefarm.join(", ")}`
+        )}, Favorite farm - ${formData.favoritefarm.join(", ")}`
       );
 
       navigate("/your-orders");
@@ -81,8 +81,8 @@ function BookingForm() {
         note: "",
       });
     } catch (error) {
-      console.error("Lỗi khi gửi dữ liệu:", error);
-      toast.error("Có lỗi xảy ra khi đặt chuyến. Vui lòng thử lại sau.");
+      console.error("Error sending data:", error);
+      toast.error("An error occurred while booking your trip. Please try again later.");
     }
   };
 
@@ -96,7 +96,7 @@ function BookingForm() {
             <div className="form-row">
               <div className="form-column">
                 <div className="form-group">
-                  <label>Họ và tên:</label>
+                  <label>Full Name:</label>
                   <input
                     type="text"
                     name="fullname"
@@ -108,7 +108,7 @@ function BookingForm() {
               </div>
               <div className="form-column">
                 <div className="form-group">
-                  <label>Số điện thoại:</label>
+                  <label>Phone Number:</label>
                   <input
                     type="text"
                     name="phone"
@@ -135,7 +135,7 @@ function BookingForm() {
               </div>
               <div className="form-column">
                 <div className="form-group">
-                  <label>Địa chỉ</label>
+                  <label>Address:</label>
                   <input
                     type="text"
                     name="district"
@@ -150,7 +150,7 @@ function BookingForm() {
             <div className="form-row">
               <div className="form-column">
                 <div className="form-group">
-                  <label>Loại cá yêu thích:</label>
+                  <label>Favorite fish:</label>
                   <Select
                     isMulti
                     name="favoriteKoi"
@@ -170,7 +170,7 @@ function BookingForm() {
               </div>
               <div className="form-column">
                 <div className="form-group">
-                  <label>Trang trại yêu thích:</label>
+                  <label>Favorite farm:</label>
                   <Select
                     isMulti
                     name="favoritefarm"
@@ -193,7 +193,7 @@ function BookingForm() {
             <div className="form-row">
               <div className="form-column">
                 <div className="form-group">
-                  <label>Ngày bắt đầu:</label>
+                  <label>Start Date:</label>
                   <input
                     type="date"
                     name="startDate"
@@ -205,7 +205,7 @@ function BookingForm() {
               </div>
               <div className="form-column">
                 <div className="form-group">
-                  <label>Ngày kết thúc:</label>
+                  <label>End Date:</label>
                   <input
                     type="date"
                     name="endDate"
@@ -219,7 +219,7 @@ function BookingForm() {
 
             <div className="form-full-width">
               <div className="form-group">
-                <label>Ghi chú:</label>
+                <label>Note:</label>
                 <textarea
                   name="note"
                   value={formData.note}
@@ -228,7 +228,7 @@ function BookingForm() {
               </div>
             </div>
 
-            <button type="submit">Gửi yêu cầu</button>
+            <button type="submit">Send Request</button>
           </form>
         </div>
       </main>

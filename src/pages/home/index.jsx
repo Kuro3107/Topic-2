@@ -15,10 +15,10 @@ function HomePage() {
       <main>
         <Banner />
 
-        <h1>Danh sách trang trại nổi tiếng</h1>
+        <h1>List of famous farms</h1>
         <ProductList />
         <div>
-          <h1>Các loại koi phổ biến</h1>
+          <h1>Popular koi varieties</h1>
           <ProductList2 />
         </div>
       </main>

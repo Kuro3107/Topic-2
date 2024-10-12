@@ -14,7 +14,7 @@ const ManageFarm = () => {
       const response = await axios.get(apiFarm);
       setFarms(response.data);
     } catch (error) {
-      message.error("Không thể tải danh sách trang trại");
+      message.error("Can't load Koi Farm!!!");
       console.error("Error fetching farms:", error);
     }
   };
@@ -43,15 +43,15 @@ const ManageFarm = () => {
     try {
       if (editingFarm) {
         await axios.put(`${apiFarm}/${editingFarm.farmId}`, values); // Cập nhật farmId
-        message.success("Cập nhật trang trại thành công");
+        message.success("Updated Farm Success!");
       } else {
         await axios.post(apiFarm, values); // Gửi dữ liệu mới
-        message.success("Thêm trang trại mới thành công");
+        message.success("Add New Farm Success!");
       }
       setIsModalVisible(false);
       fetchFarms();
     } catch (error) {
-      message.error("Có lỗi xảy ra khi lưu trang trại");
+      message.error("There's Error In Save Farm!");
       console.error("Error saving farm:", error);
     }
   };
@@ -59,10 +59,10 @@ const ManageFarm = () => {
   const handleDelete = async (id) => {
     try {
       await axios.delete(`${apiFarm}/${id}`); // Xóa theo farm_id
-      message.success("Xóa trang trại thành công");
+      message.success("Deleted Koi Farm!");
       fetchFarms();
     } catch (error) {
-      message.error("Có lỗi xảy ra khi xóa trang trại");
+      message.error("There's Error In Delete Farm!");
       console.error("Error deleting farm:", error);
     }
   };
@@ -70,12 +70,12 @@ const ManageFarm = () => {
   const columns = [
     // Đã loại bỏ cột ID
     {
-      title: "Tên trang trại",
+      title: "Farm Name",
       dataIndex: "farmName",
       key: "farmName",
     },
     {
-      title: "Hình ảnh",
+      title: "Image",
       dataIndex: "imageUrl",
       key: "imageUrl",
       render: (imageUrl) => (
@@ -88,12 +88,12 @@ const ManageFarm = () => {
       key: "location",
     },
     {
-      title: "Thông tin liên hệ",
+      title: "Contact",
       dataIndex: "contactInfo",
       key: "contactInfo",
     },
     {
-      title: "Hành động",
+      title: "Action",
       key: "action",
       render: (_, record) => (
         <>
@@ -112,18 +112,18 @@ const ManageFarm = () => {
 
   return (
     <div>
-      <h1>Quản lý Trang trại</h1>
+      <h1>Farm Manage</h1>
       <Button
         onClick={() => showModal()}
         type="primary"
         style={{ marginBottom: 16 }}
       >
-        Thêm trang trại mới
+        Add New Farm
       </Button>
       <Table columns={columns} dataSource={farms} rowKey="farm_id" />{" "}
       {/* Cập nhật để sử dụng farm_id */}
       <Modal
-        title={editingFarm ? "Sửa thông tin trang trại" : "Thêm trang trại mới"}
+        title={editingFarm ? "Edit Farm Information" : "Add New Farm"}
         visible = {isModalVisible}
         onCancel={handleCancel}
         footer={null}
@@ -131,33 +131,33 @@ const ManageFarm = () => {
         <Form form={form} onFinish={onFinish} layout="vertical">
           <Form.Item
             name="farmName" // Cập nhật để sử dụng farmName
-            label="Tên trang trại"
+            label="Farm Name"
             rules={[
-              { required: true, message: "Vui lòng nhập tên trang trại!" },
+              { required: true, message: "Please Input Farm Name!" },
             ]}
           >
-            <Input placeholder="Nhập tên trang trại" />
+            <Input placeholder="Input Farm Name" />
           </Form.Item>
-          <Form.Item name="imageUrl" label="URL Hình ảnh">
+          <Form.Item name="imageUrl" label="URL Image">
             {" "}
             {/* Cập nhật để sử dụng imageUrl */}
-            <Input placeholder="Nhập URL hình ảnh" />
+            <Input placeholder="Input URL Image" />
           </Form.Item>
           <Form.Item
             name="location" // Cập nhật để sử dụng location
             label="Location"
-            rules={[{ required: true, message: "Vui lòng nhập location!" }]}
+            rules={[{ required: true, message: "Please input location!" }]}
           >
-            <Input placeholder="Nhập location trang trại" />
+            <Input placeholder="Input location farm" />
           </Form.Item>
           <Form.Item
             name="contactInfo" // Thêm trường cho thông tin liên hệ
-            label="Thông tin liên hệ"
+            label="Contact Information"
             rules={[
-              { required: true, message: "Vui lòng nhập thông tin liên hệ!" },
+              { required: true, message: "Please input contact information!" },
             ]}
           >
-            <Input placeholder="Nhập thông tin liên hệ" />
+            <Input placeholder="Input Contact Information" />
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">

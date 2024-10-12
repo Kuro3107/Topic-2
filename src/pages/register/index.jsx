@@ -26,15 +26,15 @@ function RegisterPage() {
 
       if (response.data && response.data.token) {
         localStorage.setItem('userInfo', JSON.stringify(response.data));
-        toast.success("Đăng ký thành công và đã đăng nhập");
+        toast.success("Registered successfully and logged in");
         navigate("/profile");
       } else {
-        toast.success("Đăng ký thành công");
+        toast.success("Registration successful");
         navigate("/login");
       }
     } catch (error) {
       console.error("Error details:", error.response || error);
-      toast.error(error.response?.data?.message || "Đăng ký thất bại. Vui lòng thử lại.");
+      toast.error(error.response?.data?.message || "Registration failed. Please try again.");
     }
   };
 
@@ -45,21 +45,21 @@ function RegisterPage() {
           <Form.Item
             label="Username"
             name="username"
-            rules={[{ required: true, message: "Vui lòng nhập tên người dùng!" }]}
+            rules={[{ required: true, message: "Please enter username!" }]}
             >
             <Input />
           </Form.Item>
           <Form.Item
             label="Password"
             name="password"
-            rules={[{ required: true, message: "Vui lòng nhập mật khẩu!" }]}
+            rules={[{ required: true, message: "Please enter password!" }]}
           >
             <Input />
           </Form.Item>
           <Form.Item
             label="Re-Password"
             name="re-password"
-            rules={[{ required: true, message: "Vui lòng xác nhận mật khẩu!" }]}
+            rules={[{ required: true, message: "Please confirm password!" }]}
           >
             <Input.Password />
           </Form.Item>
@@ -67,11 +67,11 @@ function RegisterPage() {
             <Input />
           </Form.Item>
           <Form.Item
-            label="Số điện thoại"
+            label="Phone"
             name="phone"
             rules={[
-              { required: true, message: "Vui lòng nhập số điện thoại!" },
-              { pattern: /^0\d{9}$/, message: "Số điện thoại phải có 10 chữ số và bắt đầu bằng 0" },
+              { required: true, message: "Please enter phone number!" },
+              { pattern: /^0\d{9}$/, message: "Phone number must be 10 digits and start with 0" },
             ]}
           >
             <Input />
@@ -83,7 +83,7 @@ function RegisterPage() {
             Đăng ký
           </Button>
           <div>
-            <Link to="/login">Đã có tài khoản?</Link>
+            <Link to="/login">Already have an account?</Link>
           </div>
         </Form>
       </AuthenTemplate>

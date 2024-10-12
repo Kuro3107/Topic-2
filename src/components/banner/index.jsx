@@ -25,30 +25,30 @@ const Banner = () => {
       setIsModalVisible(false);
       form.resetFields();
 
-      // Hiển thị thông báo xác nhận dưới dạng toast
-      toast.success("Đặt chuyến thành công! Chúng tôi sẽ liên hệ với bạn sớm.");
+      // Display confirmation message as a toast
+      toast.success("Booking successful! We will contact you soon.");
 
-      // Hiển thị thông tin đặt chuyến dưới dạng toast
+      // Display booking information as a toast
       toast.info(
-        `Thông tin đặt chuyến: Giống cá - ${Booking.fishType}, Trang trại - ${Booking.farm}`
+        `Booking information: Fish Type - ${Booking.fishType}, Farm - ${Booking.farm}`
       );
     } catch (error) {
-      toast.error("Có lỗi xảy ra khi đặt chuyến. Vui lòng thử lại sau.");
+      toast.error("An error occurred while booking. Please try again later.");
     }
   };
 
   return (
     <div className="banner">
       <div className="banner-content">
-        <h1>Khám phá thế giới Koi</h1>
-        <p>Trải nghiệm vẻ đẹp và sự thanh bình của cá Koi</p>
+        <h1>Explore the World of Koi</h1>
+        <p>Experience the beauty and tranquility of Koi fish</p>
         <Button className="banner-button" onClick={showModal}>
-          Đặt chuyến ngay
+          Book Now
         </Button>
       </div>
 
       <Modal
-        title="Đặt chuyến đi"
+        title="Book a Trip"
         visible={isModalVisible}
         onCancel={handleCancel}
         footer={null}
@@ -56,23 +56,21 @@ const Banner = () => {
         <Form form={form} onFinish={onFinish} layout="vertical">
           <Form.Item
             name="fishType"
-            label="Giống cá"
-            rules={[{ required: true, message: "Vui lòng nhập giống cá!" }]}
+            label="Fish Type"
+            rules={[{ required: true, message: "Please enter the fish type!" }]}
           >
-            <Input placeholder="Nhập giống cá" />
+            <Input placeholder="Enter fish type" />
           </Form.Item>
           <Form.Item
             name="farm"
-            label="Trang trại"
-            rules={[
-              { required: true, message: "Vui lòng nhập tên trang trại!" },
-            ]}
+            label="Farm"
+            rules={[{ required: true, message: "Please enter the farm name!" }]}
           >
-            <Input placeholder="Nhập tên trang trại" />
+            <Input placeholder="Enter farm name" />
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">
-              Xác nhận đặt chuyến
+              Confirm Booking
             </Button>
           </Form.Item>
         </Form>
