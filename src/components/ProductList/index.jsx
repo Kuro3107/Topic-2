@@ -19,13 +19,13 @@ function ProductList() {
     try {
       const response = await fetch("http://localhost:8080/api/farms");
       if (!response.ok) {
-        throw new Error("Không thể lấy dữ liệu Farm");
+        throw new Error("Unable to get Farm data");
       }
       const data = await response.json();
       setFarms(data);
       setLoading(false);
     } catch (error) {
-      setError("Không thể lấy dữ liệu Farm");
+      setError("Unable to get Farm data");
       setLoading(false);
     }
   };
@@ -34,18 +34,17 @@ function ProductList() {
     try {
       const response = await fetch("http://localhost:8080/api/koi_variety");
       if (!response.ok) {
-        throw new Error("Không thể lấy dữ liệu Koi");
+        throw new Error("Unable to get Koi data");
       }
       const data = await response.json();
       setKois(data);
     } catch (error) {
-      setError("Không thể lấy dữ liệu Koi");
       console.error("Không thể lấy dữ liệu Koi", error);
     }
   };
 
-  if (loading) return <div>Đang tải...</div>;
-  if (error) return <div>Lỗi: {error}</div>;
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   // Tính toán farms cho trang hiện tại
   const indexOfLastFarm = currentPage * farmsPerPage;
@@ -75,9 +74,9 @@ function ProductList() {
             alt={selectedFarm.farmName}
             className="farm-avatar"
           />
-          <p>Địa điểm: {selectedFarm.location}</p>
-          <p>Thông tin liên hệ: {selectedFarm.contactInfo}</p> {/* Hiển thị thông tin liên hệ */}
-          <h3>Các giống cá Koi có tại farm:</h3>
+          <p>Loại: {selectedFarm.variety}</p>
+          <p>Ngày: {new Date(selectedFarm.date * 1000).toLocaleDateString()}</p>
+          <h3>Các loại cá Koi:</h3>
           <div className="koi-grid">
             {filteredKois.map((koi) => (
               <div key={koi.id} className="koi-card">
@@ -86,13 +85,13 @@ function ProductList() {
                   alt={koi.variety_name}
                   className="koi-avatar"
                 />
-                <p>Loại: {koi.variety_name}</p>
-                <p>Giá: {koi.koi_price} VNĐ</p>
+                <p>Loại: {koi.variety}</p>
+                <p>Giá: {koi.price} VNĐ</p>
               </div>
             ))}
           </div>
           <button onClick={() => setSelectedFarm(null)}>
-            Quay lại danh sách Farm
+            Back to Farm List
           </button>
         </div>
       ) : (

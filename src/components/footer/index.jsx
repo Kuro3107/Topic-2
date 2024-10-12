@@ -7,20 +7,19 @@ const Footer = () => {
     <footer className="footer">
       <div className="footer-content">
         <div className="footer-section">
-          <h3>Về chúng tôi</h3>
+          <h3>About Us</h3>
           <p>
-            Chúng tôi là công ty chuyên cung cấp các sản phẩm và dịch vụ chất
-            lượng cao.
+            We are a company specializing in providing high-quality products and services.
           </p>
         </div>
         <div className="footer-section">
-          <h3>Liên hệ</h3>
+          <h3>Contact</h3>
           <p><MailOutlined /> Email: info@example.com</p>
-          <p><PhoneOutlined /> Điện thoại: 123-456-7890</p>
-          <p><HomeOutlined /> Địa chỉ: 123 Đường ABC, Thành phố XYZ</p>
+          <p><PhoneOutlined /> Phone: 123-456-7890</p>
+          <p><HomeOutlined /> Address: 123 ABC Street, XYZ City</p>
         </div>
         <div className="footer-section">
-          <h3>Theo dõi chúng tôi</h3>
+          <h3>Follow Us</h3>
           <div className="social-links">
             <a href="#"><FacebookFilled /> Facebook</a>
             <a href="#"><TwitterCircleFilled /> Twitter</a>
@@ -29,7 +28,7 @@ const Footer = () => {
         </div>
       </div>
       <div className="footer-bottom">
-        <p>&copy; 2024 LOOKOI. UY TÍN LUÔN ĐẶT LÊN HÀNG ĐẦU.</p>
+        <p>&copy; 2024 LOOKOI. TRUST ALWAYS COMES FIRST.</p>
       </div>
     </footer>
   );

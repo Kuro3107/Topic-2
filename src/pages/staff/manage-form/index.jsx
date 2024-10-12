@@ -17,7 +17,7 @@ const ManageForm = () => {
       const response = await axios.get(apiBooking);
       setBookings(response.data);
     } catch (error) {
-      message.error("Không thể tải danh sách booking");
+      message.error("Unable to load booking list");
       console.error("Error fetching bookings:", error);
     }
   };
@@ -29,10 +29,10 @@ const ManageForm = () => {
   const handleCancelBooking = async (id) => {
     try {
       await axios.delete(`${apiBooking}/${id}`);
-      message.success("Đã hủy booking thành công");
+      message.success("Booking cancelled successfully");
       fetchBookings();
     } catch (error) {
-      message.error("Có lỗi xảy ra khi hủy booking");
+      message.error("An error occurred while canceling the booking.");
       console.error("Error deleting booking:", error);
     }
   };
@@ -43,31 +43,31 @@ const ManageForm = () => {
 
   const columns = [
     {
-      title: "Số thứ tự",
+      title: "No",
       dataIndex: "orderNumber",
       key: "orderNumber",
       render: (_, __, index) => index + 1, // Automatically assign index as order number
     },
     {
-      title: "Ngày đặt",
+      title: "Booking Date",
       dataIndex: "bookingDate",
       key: "bookingDate",
       render: (text) => new Date(text).toLocaleDateString("vi-VN"), // Format date
     },
     {
-      title: "Trạng thái",
+      title: "Status",
       dataIndex: "status",
       key: "status",
-      render: (status) => (status === "confirmed" ? "Đã xác nhận" : "Chờ xử lý"),
+      render: (status) => (status === "confirmed" ? "Confirmed" : "Pending processing"),
     },
     {
-      title: "Tổng tiền",
+      title: "Total Price",
       dataIndex: "totalPrice",
       key: "totalPrice",
       render: (price) => `${price.toLocaleString("vi-VN")} VND`, // Format price
     },
     {
-      title: "Hành động",
+      title: "Action",
       key: "action",
       render: (_, record) => (
         <>
@@ -86,7 +86,7 @@ const ManageForm = () => {
 
   return (
     <div>
-      <h1>Quản lý Booking</h1>
+      <h1>Booking Management</h1>
       <Table columns={columns} dataSource={bookings} rowKey="id" />
       {/* Modal logic can be added for detailed view, if required */}
     </div>

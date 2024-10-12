@@ -11,7 +11,9 @@ import ManageFarm from "./pages/admin/manage-farm";
 import BookingForm from "./pages/bookingform";
 import ManageForm from "./components/salesdashboard";
 import SalesDashBoard from "./components/salesdashboard";
-
+import ManageTrip from "./pages/admin/manage-trip";
+import Product from "./pages/product";
+import ManageBooking from "./pages/admin/manage-booking";
 function App() {
   const router = createBrowserRouter([
     {
@@ -41,12 +43,20 @@ function App() {
     {
       path: "/dashboard",
       element: <Dashboard />,
-      children: [{ path: "farm", element: <ManageFarm /> }],
+      children: [
+        { path: "farm", element: <ManageFarm /> },
+        { path: "trip", element: <ManageTrip /> },
+        { path: "booking", element: <ManageBooking /> },
+      ],
     },
     {
       path: "/salesdashboard",
       element: <SalesDashBoard />,
       children: [{ path: "form", element: <ManageForm /> }],
+    },
+    {
+      path: "/product",
+      element: <Product />,
     },
   ]);
   return (

@@ -12,11 +12,11 @@ const Header = () => {
       localStorage.removeItem("token");
       localStorage.removeItem("userInfo");
       navigate("/");
-      toast.success("Đăng xuất thành công!");
+      toast.success("Log out successfully!");
       window.location.reload();
     } catch (error) {
-      console.error("Lỗi khi đăng xuất:", error);
-      toast.error("Có lỗi xảy ra khi đăng xuất. Vui lòng thử lại.");
+      console.error("Error when logging out:", error);
+      toast.error("An error occurred while logging out. Please try again.");
     }
   };
     
@@ -31,43 +31,43 @@ const Header = () => {
       <nav className="nav">
         <ul>
           <li>
-            <Link to="/gioi-thieu" className="header-link">
-              Giới thiệu
+            <Link to="/introduce" className="header-link">
+              Introduce
             </Link>
           </li>
           <li>
             <Link to="/" className="header-link">
-              Trang chủ
+              HomePage
             </Link>
           </li>
           <li>
-            <Link to="/san-pham" className="header-link">
-              Sản phẩm
+            <Link to="/product" className="header-link">
+              Product
             </Link>
           </li>
           <li>
             <Link to="/bookingform" className="header-link">
-              Đặt chuyến
+              Book a trip
             </Link>
           </li>
 
           {isLoggedIn && (
             <li>
               <Link to="/profile" className="header-link">
-                Thông tin cá nhân
+                Profile
               </Link>
             </li>
           )}
           {isLoggedIn ? (
             <li>
               <button className="logout-button" onClick={handleLogout}>
-                Đăng xuất
+                Log Out
               </button>
             </li>
           ) : (
             <li>
               <Link to="/login" className="header-link">
-                Đăng nhập
+                Log in
               </Link>
             </li>
           )}
