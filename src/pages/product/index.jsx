@@ -11,7 +11,7 @@ const Product = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const pageSize = 6; // 2 rows x 3 columns
-  const apiTour = "http://localhost:8080/api/tours";
+  const apiTour = "http://localhost:8080/api/trips";
 
   const fetchTours = async () => {
     setLoading(true);

@@ -74,8 +74,8 @@ function ProductList() {
             alt={selectedFarm.farmName}
             className="farm-avatar"
           />
-          <p>Loại: {selectedFarm.variety}</p>
-          <p>Ngày: {new Date(selectedFarm.date * 1000).toLocaleDateString()}</p>
+          <p>Location: {selectedFarm.location}</p>
+          <p>Contact Info: {selectedFarm.contactInfo}</p>
           <h3>Các loại cá Koi:</h3>
           <div className="koi-grid">
             {filteredKois.map((koi) => (
