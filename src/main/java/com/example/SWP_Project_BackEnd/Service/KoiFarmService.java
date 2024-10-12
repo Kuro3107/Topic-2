@@ -29,8 +29,6 @@ public class KoiFarmService {
 
     public KoiFarm updateFarm(Long id, KoiFarm farmDetails) {
         KoiFarm existingFarm = getFarmById(id);
-        existingFarm.setTripDetailId(farmDetails.getTripDetailId());
-        existingFarm.setKoiId(farmDetails.getKoiId());
         existingFarm.setFarmName(farmDetails.getFarmName());
         existingFarm.setLocation(farmDetails.getLocation());
         existingFarm.setContactInfo(farmDetails.getContactInfo());
