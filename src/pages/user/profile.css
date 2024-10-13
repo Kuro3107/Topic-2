@@ -1,0 +1,112 @@
+.profile-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: 20px;
+  background-color: #f0f2f5; /* Màu nền nhẹ nhàng */
+}
+
+.profile-content {
+  flex: 1;
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+  background-color: #ffffff; /* Màu nền trắng cho nội dung */
+  border-radius: 8px; /* Bo tròn góc */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Đổ bóng nhẹ */
+}
+
+.profile-info {
+  background-color: #f5f5f5; /* Màu nền cho thông tin người dùng */
+  padding: 1rem; /* Giảm padding để phần thông tin nhỏ hơn */
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Căn giữa nội dung */
+}
+
+.info-item {
+  margin: 10px 0; /* Khoảng cách giữa các mục thông tin */
+  width: 100%; /* Để các mục thông tin chiếm toàn bộ chiều rộng */
+  display: flex;
+  justify-content: space-between; /* Căn giữa các mục */
+}
+
+.info-item label {
+  font-weight: bold;
+  margin-right: 0.5rem;
+}
+
+.edit-button {
+  margin-left: 20px; /* Tạo khoảng cách giữa tiêu đề và nút */
+  font-size: 14px; /* Giảm kích thước chữ của nút */
+  padding: 5px 10px; /* Giảm padding để nút nhỏ hơn */
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  text-align: center;
+  margin-top: 50px;
+}
+
+.loading-container p {
+  margin-top: 1rem;
+}
+
+.error-container {
+  text-align: center;
+  margin-top: 50px;
+}
+
+.ant-form-item-label > label {
+  font-weight: bold;
+}
+
+.ant-input[disabled] {
+  color: rgba(0, 0, 0, 0.85);
+  background-color: #f5f5f5;
+}
+
+.button-group {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.ant-btn {
+  min-width: 120px;
+}
+
+.profile-image {
+  width: 100px; /* Kích thước hình ảnh */
+  height: 100px; /* Kích thước hình ảnh */
+  border-radius: 50%; /* Để hình ảnh thành hình tròn */
+  margin-bottom: 20px; /* Khoảng cách dưới hình ảnh */
+  border: 2px solid #1890ff; /* Viền cho hình ảnh */
+}
+
+.debug-info {
+  display: none; /* Ẩn phần Debug Information */
+  margin-top: 20px;
+  background-color: #f9f9f9;
+  padding: 10px;
+  border: 1px solid #ddd;
+}
+
+/* Căn chỉnh nút "Chỉnh sửa thông tin" */
+.card-header {
+  display: flex;
+  justify-content: space-between; /* Căn giữa tiêu đề và nút */
+  align-items: center; /* Căn giữa theo chiều dọc */
+}
+
+.card-header h1 {
+  font-size: 1.5rem; /* Tăng kích thước chữ */
+  margin: 0; /* Đảm bảo không có margin */
+  font-weight: bold; /* Để chữ đậm hơn */
+}
