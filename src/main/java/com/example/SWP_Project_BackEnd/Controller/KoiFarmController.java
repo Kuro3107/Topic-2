@@ -21,6 +21,11 @@ public class KoiFarmController {
         return koiFarmService.getAllFarms();
     }
 
+//    @GetMapping("/trips/{tripId}/trip-details/{tripDetailId}")
+//    public List<KoiFarm> getKoiFarms(@PathVariable Long tripDetailId, @PathVariable Long tripId) {
+//        return koiFarmService.findKoiFarmsByTripDetailAndTripId(tripDetailId, tripId);
+//    }
+
     @GetMapping("/{id}")
     public ResponseEntity<KoiFarm> getFarmById(@PathVariable Long id) {
         KoiFarm farm = koiFarmService.getFarmById(id);

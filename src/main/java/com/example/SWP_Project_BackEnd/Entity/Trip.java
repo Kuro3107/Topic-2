@@ -1,5 +1,7 @@
 package com.example.SWP_Project_BackEnd.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,10 +11,7 @@ import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "trip")
@@ -22,31 +21,32 @@ import java.util.Set;
 @NoArgsConstructor
 public class Trip {
     @Id
-    @Column(name = "trip_id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "trip_id",nullable = false)
     private Long tripId;
 
     @Column(name = "trip_name")
     private String tripName;
+
     @Column(name = "price_total")
     private double priceTotal;
+
     @Column(name = "image_url")
     private String imageUrl;
 
-    @OneToMany(mappedBy = "trip")
-    private List<TripDetail> tripDetails;
+    @OneToMany(mappedBy = "trip", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<TripDetail> tripDetails = new ArrayList<>();
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Trip trip = (Trip) o;
-        return Objects.equals(tripId, trip.tripId);
-    }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(tripId);
-    }
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "tripdetail_koifarm", // Bảng nối giữa Trip và KoiFarm
+            joinColumns = @JoinColumn(name = "trip_id"), // Cột trong bảng Trip
+            inverseJoinColumns = @JoinColumn(name = "farm_id") // Cột trong bảng KoiFarm
+    )
+    private List<KoiFarm> koiFarms = new ArrayList<>();
+
 }
+
+
 

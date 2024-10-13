@@ -29,8 +29,15 @@ public class TripDetailController {
     @GetMapping("/{tripDetailId}")
     public ResponseEntity<TripDetail> getTripDetailById(@PathVariable Long tripDetailId) {
         TripDetail tripDetail = tripDetailService.getTripDetailById(tripDetailId);
+
         return new ResponseEntity<>(tripDetail, HttpStatus.OK);
     }
+
+//    @GetMapping("/{tripDetailId}/koifarms")
+//    public ResponseEntity<List<KoiFarm>> getKoiFarmsByTripDetailId(@PathVariable("id") Long tripDetailId) {
+//        List<KoiFarm> koiFarms = tripDetailService.getKoiFarmsByTripDetailId(tripDetailId);
+//        return ResponseEntity.ok(koiFarms);
+//    }
 
     @PostMapping
     public ResponseEntity<TripDetail> createTripDetail(@RequestBody TripDetail tripDetail) {

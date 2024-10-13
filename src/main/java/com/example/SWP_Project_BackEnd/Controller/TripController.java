@@ -1,6 +1,9 @@
 package com.example.SWP_Project_BackEnd.Controller;
 
+import com.example.SWP_Project_BackEnd.Entity.KoiFarm;
 import com.example.SWP_Project_BackEnd.Entity.Trip;
+import com.example.SWP_Project_BackEnd.Entity.TripDetail;
+import com.example.SWP_Project_BackEnd.Service.TripDetailService;
 import com.example.SWP_Project_BackEnd.Service.TripService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,8 +29,7 @@ public class TripController {
     @GetMapping("/{tripId}")
     public ResponseEntity<Trip> getTripById(@PathVariable Long tripId) {
         Trip trip = tripService.getTripById(tripId);
-        // Trả về thông tin trip đã xử lý
-        return ResponseEntity.ok(trip);
+        return new ResponseEntity<>(trip, HttpStatus.OK);
     }
 
     @PostMapping
@@ -45,6 +47,41 @@ public class TripController {
     @DeleteMapping("/{tripId}")
     public ResponseEntity<Void> deleteTrip(@PathVariable Long tripId) {
         tripService.deleteTrip(tripId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    // Thêm farm vào trip
+    @PostMapping("/{tripId}/farms")
+    public ResponseEntity<Trip> addFarmToTrip(@PathVariable Long tripId, @RequestBody KoiFarm koiFarm) {
+        Trip updatedTrip = tripService.addKoiFarmToTrip(tripId, koiFarm);
+        return new ResponseEntity<>(updatedTrip, HttpStatus.OK);
+    }
+
+    // Xóa farm khỏi trip
+    @DeleteMapping("/{tripId}/farms/{farmId}")
+    public ResponseEntity<Trip> removeFarmFromTrip(@PathVariable Long tripId, @PathVariable Long farmId) {
+        Trip updatedTrip = tripService.removeKoiFarmFromTrip(tripId, farmId);
+        return new ResponseEntity<>(updatedTrip, HttpStatus.OK);
+    }
+
+    // Thêm trip detail vào trip
+    @PostMapping("/{tripId}/details")
+    public ResponseEntity<TripDetail> addTripDetail(@PathVariable Long tripId, @RequestBody TripDetail tripDetail) {
+        TripDetail createdTripDetail = tripService.addTripDetail(tripId, tripDetail);
+        return new ResponseEntity<>(createdTripDetail, HttpStatus.CREATED);
+    }
+
+    // Cập nhật trip detail
+    @PutMapping("/{tripId}/details/{detailId}")
+    public ResponseEntity<TripDetail> updateTripDetail(@PathVariable Long tripId, @PathVariable Long detailId, @RequestBody TripDetail tripDetail) {
+        TripDetail updatedTripDetail = tripService.updateTripDetail(tripId, detailId, tripDetail);
+        return new ResponseEntity<>(updatedTripDetail, HttpStatus.OK);
+    }
+
+    // Xóa trip detail
+    @DeleteMapping("/{tripId}/details/{detailId}")
+    public ResponseEntity<Void> deleteTripDetail(@PathVariable Long tripId, @PathVariable Long detailId) {
+        tripService.deleteTripDetail(tripId, detailId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

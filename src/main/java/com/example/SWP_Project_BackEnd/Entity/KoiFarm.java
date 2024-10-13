@@ -7,10 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "koifarm")
@@ -21,11 +18,8 @@ import java.util.Set;
 public class KoiFarm {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "farm_id")
+    @Column(name = "farm_id", nullable = false)
     private Long farmId;
-
-//    @ManyToMany(mappedBy = "koiFarms", fetch = FetchType.LAZY)
-//    private Set<TripDetail> tripDetails = new HashSet<>();
 
     @Column(name = "farm_name")
     private String farmName;
@@ -38,16 +32,24 @@ public class KoiFarm {
 
     @Column(name = "image_url")
     private String imageUrl;
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        KoiFarm koiFarm = (KoiFarm) o;
-        return Objects.equals(farmId, koiFarm.farmId);
-    }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(farmId);
-    }
+    @ManyToMany(mappedBy = "koiFarms",fetch = FetchType.LAZY) // Sử dụng mappedBy để ánh xạ ngược lại quan hệ trong Trip
+    @JsonIgnore // Để tránh vòng lặp tuần hoàn khi trả dữ liệu về
+    private List<Trip> trips = new ArrayList<>();
+//
+//    @ManyToMany(mappedBy = "koiFarms", fetch = FetchType.LAZY)
+//    @JsonIgnore
+//    private List<TripDetail> tripDetails = new ArrayList<>();
+
+//    @ManyToMany
+//    @JsonIgnore
+//    @JoinTable(
+//            name = "tripdetail_koifarm",
+//            joinColumns = @JoinColumn(name = "farm_id"),
+//            inverseJoinColumns = @JoinColumn(name = "trip_id")
+//    )
+//    private List<TripDetail> tripDetails;
+
 }
+
+

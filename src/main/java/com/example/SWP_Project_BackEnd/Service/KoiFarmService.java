@@ -23,6 +23,7 @@ public class KoiFarmService {
                 .orElseThrow(() -> new ResourceNotFoundException("Farm not found with id " + id));
     }
 
+
     public KoiFarm createFarm(KoiFarm farm) {
         return koiFarmRepository.save(farm);
     }
