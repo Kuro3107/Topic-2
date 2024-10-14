@@ -57,7 +57,7 @@ function Profile() {
           navigate("/login");
         }
       } catch (error) {
-        toast.error("An error occurred while loading the information. Please try again.");
+        // toast.error("An error occurred while loading the information. Please try again.");
       } finally {
         setLoading(false);
       }

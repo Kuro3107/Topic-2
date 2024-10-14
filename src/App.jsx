@@ -9,11 +9,12 @@ import Dashboard from "./components/dashboard";
 import "react-toastify/dist/ReactToastify.css";
 import ManageFarm from "./pages/admin/manage-farm";
 import BookingForm from "./pages/bookingform";
-import ManageForm from "./components/salesdashboard";
-import SalesDashBoard from "./components/salesdashboard";
+// import ManageForm from "./components/salesdashboard";
+// import SalesDashBoard from "./components/salesdashboard";
 import ManageTrip from "./pages/admin/manage-trip";
 import Product from "./pages/product";
 import ManageBooking from "./pages/admin/manage-booking";
+import Sales from "./pages/staff/sales";
 function App() {
   const router = createBrowserRouter([
     {
@@ -49,14 +50,18 @@ function App() {
         { path: "booking", element: <ManageBooking /> },
       ],
     },
-    {
-      path: "/salesdashboard",
-      element: <SalesDashBoard />,
-      children: [{ path: "form", element: <ManageForm /> }],
-    },
+    // {
+    //   path: "/salesdashboard",
+    //   element: <SalesDashBoard />,
+    //   children: [{ path: "form", element: <ManageForm /> }],
+    // },
     {
       path: "/product",
       element: <Product />,
+    },
+    {
+      path: "/sales",
+      element: <Sales />,
     },
   ]);
   return (
