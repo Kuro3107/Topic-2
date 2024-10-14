@@ -104,7 +104,7 @@ function LoginPage() {
           </div>
 
           <Button type="primary" htmlType="submit">
-            Đăng nhập
+            Log In
           </Button>
           <Button onClick={handleLoginWithGoogle}>Sign in with Google</Button>
           <div>

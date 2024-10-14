@@ -67,7 +67,7 @@ function BookingForm() {
         )}, Favorite farm - ${formData.favoritefarm.join(", ")}`
       );
 
-      navigate("/your-orders");
+      navigate("/profile");
 
       setFormData({
         startDate: "",
