@@ -69,6 +69,11 @@ function LoginPage() {
         // Giả sử role_id 5 là customer
         navigate("/");
       }
+      else if (role_id === 2) {
+        // Giả sử role_id 2 là  staff
+        navigate("/sales");
+      }
+      
     } catch (error) {
       console.error("Login error:", error);
       toast.error(

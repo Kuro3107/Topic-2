@@ -36,6 +36,7 @@ function BookingForm() {
     favoriteKoi: [],
     favoritefarm: [],
     note: "",
+    status: "pending",
   });
 
   const navigate = useNavigate();
@@ -79,6 +80,7 @@ function BookingForm() {
         favoriteKoi: [],
         favoritefarm: [],
         note: "",
+        status: "pending",
       });
     } catch (error) {
       console.error("Error sending data:", error);
