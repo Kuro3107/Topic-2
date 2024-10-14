@@ -97,25 +97,25 @@ function SalesDashboard() {
             day: 1,
             mainTopic: "",
             subTopic: "",
-            priceNote: 0
-          }
+            priceNote: 0,
+          },
         ],
-        BookingID: bookingId
+        BookingID: bookingId,
       };
       // Cập nhật state trips với trip mới
-      setTrips(prevTrips => ({
+      setTrips((prevTrips) => ({
         ...prevTrips,
-        [bookingId]: trip
+        [bookingId]: trip,
       }));
     }
-    
+
     setEditingTrip(trip);
     tripForm.setFieldsValue({
       ...trip,
-      tripdetailed: trip.tripdetailed.map(detail => ({
+      tripdetailed: trip.tripdetailed.map((detail) => ({
         ...detail,
-        priceNote: Number(detail.priceNote)
-      }))
+        priceNote: Number(detail.priceNote),
+      })),
     });
     setIsTripModalVisible(true);
   };
