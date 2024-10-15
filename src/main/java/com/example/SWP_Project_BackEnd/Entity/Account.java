@@ -1,10 +1,13 @@
 package com.example.SWP_Project_BackEnd.Entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 @Entity
 @Table(name = "account")
@@ -42,6 +45,10 @@ public class Account {
     @Column(name = "status")
     private String status;
 
+    // Liên kết OneToOne với Customer
+    @OneToOne(mappedBy = "account")
+    @JsonManagedReference
+    private Customer customer;
     // Constructors, getters, and setters
 }
 

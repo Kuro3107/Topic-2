@@ -24,7 +24,7 @@ public class BookingController {
     @PostMapping
     public ResponseEntity<Booking> createBooking(@RequestBody BookingDTO bookingDTO) {
         Booking booking = bookingService.saveBooking(bookingDTO);
-        return ResponseEntity.ok(booking);
+        return new ResponseEntity<>(booking, HttpStatus.CREATED);
     }
 
     // READ all bookings
@@ -55,6 +55,13 @@ public class BookingController {
         bookingService.deleteBooking(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/by-account/{accountId}")
+    public ResponseEntity<List<Booking>> getBookingsByAccountId(@PathVariable Long accountId) {
+        List<Booking> bookings = bookingService.findBookingsByAccountId(accountId);
+        return ResponseEntity.ok(bookings);
+    }
+
 }
 
 

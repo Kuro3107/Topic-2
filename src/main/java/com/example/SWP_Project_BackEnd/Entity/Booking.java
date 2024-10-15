@@ -1,5 +1,6 @@
 package com.example.SWP_Project_BackEnd.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -29,8 +30,8 @@ public class Booking {
     private Long bookingPaymentId;
     @Column(name = "feedback_id")
     private Long feedbackId;
-    @Column(name = "customer_id")
-    private Long customerId;
+//    @Column(name = "customer_id")
+//    private Long customerId;
     @Column(name = "quote_sent_date")
     private Date quoteSentDate;
     @Column(name = "quote_approved_date")
@@ -59,4 +60,9 @@ public class Booking {
     private String note;
     @Column(name = "is_active")
     private Boolean isActive;
+    // Liên kết ManyToOne với Customer
+    @ManyToOne
+    @JsonIgnore
+    @JoinColumn(name = "customer_id", nullable = false)
+    private Customer customer;
 }

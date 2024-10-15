@@ -20,6 +20,7 @@ public class BookingService {
     // CREATE booking
     public Booking saveBooking(BookingDTO bookingDTO) {
         Booking booking = new Booking();
+        booking.setBookingId(bookingDTO.getBookingId());
         booking.setFullname(bookingDTO.getFullname());
         booking.setPhone(bookingDTO.getPhone());
         booking.setEmail(bookingDTO.getEmail());
@@ -32,6 +33,7 @@ public class BookingService {
         booking.setStatus(bookingDTO.getStatus());
         booking.setStartDate(bookingDTO.getStartDate());
         booking.setEndDate(bookingDTO.getEndDate());
+        booking.setBookingDate(bookingDTO.getBookingDate());
 
         return bookingRepository.save(booking);
     }
@@ -55,6 +57,7 @@ public class BookingService {
             booking.setFullname(bookingDTO.getFullname());
             booking.setPhone(bookingDTO.getPhone());
             booking.setEmail(bookingDTO.getEmail());
+            booking.setTripId(bookingDTO.getTripId());
 
             // Null check for favoriteFarm and favoriteKoi
             booking.setFavoriteFarm(bookingDTO.getFavoriteFarm() != null ? String.join(", ", bookingDTO.getFavoriteFarm()) : "");
@@ -79,6 +82,10 @@ public class BookingService {
             throw new ResourceNotFoundException("Booking not found with ID: " + bookingId);
         }
     }
+    public List<Booking> findBookingsByAccountId(Long accountId) {
+        return bookingRepository.findByCustomerAccountId(accountId);
+    }
+
 }
 
 
