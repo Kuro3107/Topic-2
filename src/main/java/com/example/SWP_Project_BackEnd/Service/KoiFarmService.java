@@ -1,11 +1,14 @@
 package com.example.SWP_Project_BackEnd.Service;
 
 import com.example.SWP_Project_BackEnd.Entity.KoiFarm;
+import com.example.SWP_Project_BackEnd.Entity.KoiVariety;
 import com.example.SWP_Project_BackEnd.Exception.ResourceNotFoundException;
 import com.example.SWP_Project_BackEnd.Repository.KoiFarmRepository;
+import com.example.SWP_Project_BackEnd.Repository.KoiVarietyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -13,6 +16,9 @@ public class KoiFarmService {
 
     @Autowired
     private KoiFarmRepository koiFarmRepository;
+
+    @Autowired
+    private KoiVarietyRepository koiVarietyRepository;
 
     public List<KoiFarm> getAllFarms() {
         return koiFarmRepository.findAll();
@@ -41,4 +47,12 @@ public class KoiFarmService {
         KoiFarm existingFarm = getFarmById(id);
         koiFarmRepository.delete(existingFarm);
     }
+    public List<KoiVariety> getKoiVarietiesForFarm(Long farmId) {
+        KoiFarm farm = koiFarmRepository.findById(farmId).orElse(null);
+        if (farm != null) {
+            return koiVarietyRepository.findByKoiFarms(farm);
+        }
+        return new ArrayList<>();
+    }
+
 }

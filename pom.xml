@@ -114,8 +114,6 @@
 
 
 
-
-
 	</dependencies>
 
 	<build>
@@ -131,6 +129,22 @@
 						</exclude>
 					</excludes>
 				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>com.github.spotbugs</groupId>
+				<artifactId>spotbugs-maven-plugin</artifactId>
+				<version>4.8.6.4</version> <!-- Adjust to the latest version -->
+				<configuration>
+					<failOnError>false</failOnError> <!-- Set to false to allow the build to succeed -->
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

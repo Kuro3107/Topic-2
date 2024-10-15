@@ -1,6 +1,7 @@
 package com.example.SWP_Project_BackEnd.Controller;
 
 import com.example.SWP_Project_BackEnd.Entity.KoiFarm;
+import com.example.SWP_Project_BackEnd.Entity.KoiVariety;
 import com.example.SWP_Project_BackEnd.Service.KoiFarmService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -48,5 +49,10 @@ public class KoiFarmController {
     public ResponseEntity<Void> deleteFarm(@PathVariable Long id) {
         koiFarmService.deleteFarm(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}/koi-varieties")
+    public List<KoiVariety> getKoiVarietiesForFarm(@PathVariable Long id) {
+        return koiFarmService.getKoiVarietiesForFarm(id);
     }
 }

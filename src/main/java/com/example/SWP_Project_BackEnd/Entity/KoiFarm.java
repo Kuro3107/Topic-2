@@ -36,6 +36,14 @@ public class KoiFarm {
     @ManyToMany(mappedBy = "koiFarms",fetch = FetchType.LAZY) // Sử dụng mappedBy để ánh xạ ngược lại quan hệ trong Trip
     @JsonIgnore // Để tránh vòng lặp tuần hoàn khi trả dữ liệu về
     private List<Trip> trips = new ArrayList<>();
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "farm_variety",
+            joinColumns = @JoinColumn(name = "farm_id"),
+            inverseJoinColumns = @JoinColumn(name = "variety_id")
+    )
+    private List<KoiVariety> koiVarieties = new ArrayList<>();
 //
 //    @ManyToMany(mappedBy = "koiFarms", fetch = FetchType.LAZY)
 //    @JsonIgnore

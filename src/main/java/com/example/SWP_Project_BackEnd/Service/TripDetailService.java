@@ -85,7 +85,7 @@ public class TripDetailService {
         return tripDetailRepository.save(tripDetail);
     }
 
-    public TripDetail updateTripDetail(Long tripId, Long detailId, TripDetail tripDetail) {
+    public TripDetail updateTripDetail1(Long tripId, Long detailId, TripDetail tripDetail) {
         Trip trip = tripRepository.findById(tripId)
                 .orElseThrow(() -> new ResourceNotFoundException("Trip not found with id " + tripId));
 
