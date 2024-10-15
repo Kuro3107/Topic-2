@@ -6,7 +6,7 @@ const { Meta } = Card;
 
 const TripList = () => {
   const [trips, setTrips] = useState([]);
-  const apiTour = "http://localhost:8080/api/tours";
+  const apiTour = "http://localhost:8080/api/trips";
 
   const fetchTrips = async () => {
     try {

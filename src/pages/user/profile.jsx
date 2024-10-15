@@ -27,44 +27,54 @@ function Profile() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    console.log("useEffect is running"); // Kiểm tra useEffect có chạy không
     const fetchUserInfo = async () => {
+      setLoading(true); // Bắt đầu loading
       try {
         const userInfo = localStorage.getItem("userInfo");
         if (userInfo) {
           const parsedUserData = JSON.parse(userInfo);
           setParsedUser(parsedUserData);
-
+  
           if (!parsedUserData.id) {
             toast.error("User ID does not exist.");
             return;
           }
-
+  
+          // Kiểm tra token trước khi gọi API
           if (parsedUserData.token) {
-            const response = await api.get("/accounts", {
-              headers: { Authorization: `Bearer ${parsedUserData.token}` },
-            });
-            setUser(response.data);
+            // Giả sử API đã trả về thông tin account cùng với bookings
+const response = await api.get(`/accounts/${parsedUserData.id}`, {
+  headers: { Authorization: `Bearer ${parsedUserData.token}` },
+});
+
+if (response.data && response.data.customer && response.data.customer.bookings && response.data.customer.bookings.length) {
+  const bookings = response.data.customer.bookings;
+  console.log("Bookings:", bookings);
+  setOrders(bookings);
+  console.log("Orders:", orders); // Kiểm tra giá trị orders
+
+} else {
+  toast.error("No bookings found for this user.");
+}
           } else {
             setUser(parsedUserData);
           }
-
-          const ordersResponse = await api.get("/booking", {
-            headers: { Authorization: `Bearer ${parsedUser.token}` },
-          });
-          setOrders(ordersResponse.data);
         } else {
           toast.warning("Please login to view personal information.");
           navigate("/login");
         }
       } catch (error) {
-        // toast.error("An error occurred while loading the information. Please try again.");
+        console.error("Error fetching user info:", error); // Log lỗi nếu có
+        toast.error("An error occurred while fetching user information.");
       } finally {
-        setLoading(false);
+        setLoading(false); // Kết thúc loading
       }
     };
-
+  
     fetchUserInfo();
   }, [navigate]);
+  
 
   const handleEdit = () => {
     navigate("/edit-profile");
@@ -72,7 +82,7 @@ function Profile() {
 
   const handleCancelOrder = async (tripId) => {
     try {
-      await api.delete(`/booking/${tripId}`, {
+      await api.delete(`/bookings/${tripId}`, {
         headers: { Authorization: `Bearer ${parsedUser.token}` },
       });
       toast.success("Order was canceled successfully.");
@@ -136,14 +146,15 @@ function Profile() {
   const columns = [
     {
       title: "No",
-      dataIndex: "index",
-      key: "index",
-      render: (_, __, index) => index + 1, // Display order index
+      dataIndex: "bookingId",
+      key: "bookingId",
+      // render: (_, __, index) => index + 1, // Display order index
     },
     {
       title: "Booking Date",
-      dataIndex: "bookingDate",
-      key: "bookingDate",
+      dataIndex: "startDate", // Cập nhật để lấy startDate
+      key: "startDate",
+      render: (date) => new Date(date).toLocaleDateString(), // Định dạng ngày
     },
     {
       title: "Status",
@@ -151,10 +162,19 @@ function Profile() {
       key: "status",
     },
     {
-      title: "Total",
-      dataIndex: "total",
-      key: "total",
-      render: (total) => `${total} VND`, // Format as currency
+      title: "Full Name",
+      dataIndex: "fullname", // Cập nhật để lấy fullname
+      key: "fullname",
+    },
+    {
+      title: "Phone",
+      dataIndex: "phone", // Cập nhật để lấy phone
+      key: "phone",
+    },
+    {
+      title: "Email",
+      dataIndex: "email", // Cập nhật để lấy email
+      key: "email",
     },
     {
       title: "Action",
@@ -162,13 +182,13 @@ function Profile() {
       render: (record) => (
         <>
           <Button
-            onClick={() => handleViewBooking(record.id)}
+            onClick={() => handleViewBooking(record.bookingId)} // Sử dụng bookingId
             icon={<ShoppingOutlined />}
             style={{ marginRight: 8 }}
           >
             Xem lại
           </Button>
-          <Button onClick={() => handleCancelOrder(record.id)} danger>
+          <Button onClick={() => handleCancelOrder(record.bookingId)} danger>
             Cancel
           </Button>
         </>
@@ -257,10 +277,9 @@ function Profile() {
 
         <Card title={<h2><ShoppingOutlined /> Your Order</h2>}>
           <Table
-            columns={columns}
-            dataSource={orders}
-            rowKey="id"
-            pagination={false}
+            columns={columns} 
+            dataSource={orders} 
+            rowKey="bookingId" // Sử dụng bookingId làm khóa cho từng dòng
           />
         </Card>
       </main>

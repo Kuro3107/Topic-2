@@ -3,7 +3,7 @@ import "./styles.css";
 
 function ProductList() {
   const [farms, setFarms] = useState([]);
-  const [kois, setKois] = useState([]);
+  const [kois, setKois] = useState([]); // Đảm bảo kois được khởi tạo là mảng
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -12,7 +12,6 @@ function ProductList() {
 
   useEffect(() => {
     fetchFarms();
-    fetchKois(); // Gọi hàm fetchKois để lấy dữ liệu Koi
   }, []);
 
   const fetchFarms = async () => {
@@ -30,16 +29,17 @@ function ProductList() {
     }
   };
 
-  const fetchKois = async () => {
+  const fetchKoiVarieties = async (farmId) => {
     try {
-      const response = await fetch("http://localhost:8080/api/koi_variety");
+      const response = await fetch(`http://localhost:8080/api/farms/${farmId}/koi-varieties`);
       if (!response.ok) {
-        throw new Error("Unable to get Koi data");
+        throw new Error("Unable to get Koi varieties data");
       }
       const data = await response.json();
-      setKois(data);
+      console.log("Dữ liệu Koi nhận được:", data); // Kiểm tra dữ liệu nhận được
+      setKois(data); // Lưu trữ toàn bộ dữ liệu trả về
     } catch (error) {
-      console.error("Không thể lấy dữ liệu Koi", error);
+      console.error("Không thể lấy dữ liệu giống cá Koi", error);
     }
   };
 
@@ -57,12 +57,11 @@ function ProductList() {
   // Xử lý khi nhấp vào farm
   const handleFarmClick = (farm) => {
     setSelectedFarm(farm);
+    fetchKoiVarieties(farm.farmId); // Gọi hàm fetchKoiVarieties với farmId
   };
 
   // Lọc Koi theo variety của farm được chọn
-  const filteredKois = selectedFarm
-    ? kois.filter((koi) => koi.farmId === selectedFarm.farmId) // Giả sử rằng mỗi Koi có farmId
-    : [];
+  const filteredKois = selectedFarm ? kois : []; // Chỉ sử dụng danh sách koiVarieties đã lưu nếu có farm được chọn
 
   return (
     <div className="farm-list">
@@ -78,17 +77,22 @@ function ProductList() {
           <p>Contact Info: {selectedFarm.contactInfo}</p>
           <h3>Các loại cá Koi:</h3>
           <div className="koi-grid">
-            {filteredKois.map((koi) => (
-              <div key={koi.id} className="koi-card">
-                <img
-                  src={koi.imageUrl}
-                  alt={koi.variety_name}
-                  className="koi-avatar"
-                />
-                <p>Loại: {koi.variety}</p>
-                <p>Giá: {koi.price} VNĐ</p>
-              </div>
-            ))}
+            {filteredKois.length > 0 ? (
+              filteredKois.map((koi) => (
+                <div key={koi.varietyId} className="koi-card">
+                  <img
+                    src={koi.imageUrl}
+                    alt={koi.varietyName}
+                    className="koi-avatar"
+                  />
+                  <p>Loại: {koi.varietyName}</p>
+                  <p>Giá: {koi.koiPrice} VNĐ</p>
+                  <p>Mô tả: {koi.description}</p>
+                </div>
+              ))
+            ) : (
+              <p>Không có dữ liệu cá Koi cho trang trại này.</p>
+            )}
           </div>
           <button onClick={() => setSelectedFarm(null)}>
             Back to Farm List
