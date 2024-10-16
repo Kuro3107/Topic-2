@@ -19,6 +19,15 @@ const Header = () => {
       toast.error("An error occurred while logging out. Please try again.");
     }
   };
+
+  const handleBookTripClick = () => {
+    if (!isLoggedIn) {
+      toast.error("You must be logged in to book a trip!");
+      navigate("/login");
+    } else {
+      navigate("/bookingform");
+    }
+  };
     
   return (
     <header className="header">
@@ -46,7 +55,7 @@ const Header = () => {
             </Link>
           </li>
           <li>
-            <Link to="/bookingform" className="header-link">
+            <Link className="header-link" onClick={handleBookTripClick}>
               Book a trip
             </Link>
           </li>

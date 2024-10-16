@@ -111,6 +111,12 @@ function ManageBooking() {
     { title: "ID", dataIndex: "bookingId", key: "bookingId" }, // Cập nhật dataIndex cho bookingId
     { title: "Tên", dataIndex: "fullname", key: "fullname" },
     {
+      title: "Ngày đặt",
+      dataIndex: "bookingDate",
+      key: "bookingDate",
+      render: (date) => dayjs(date).format("DD/MM/YYYY"),
+    },
+    {
       title: "Ngày bắt đầu",
       dataIndex: "startDate",
       key: "startDate",

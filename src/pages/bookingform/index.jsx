@@ -118,7 +118,7 @@ function BookingForm() {
       if (response.status === 201) {
         toast.success("Đặt chỗ thành công! Chúng tôi sẽ liên hệ với bạn sớm.");
         
-        // Quay về trang home sau 3 giây
+        // Quay về trang home sau 1 giây
         setTimeout(() => {
           navigate("/"); // Điều hướng về trang home
         }, 1000);
