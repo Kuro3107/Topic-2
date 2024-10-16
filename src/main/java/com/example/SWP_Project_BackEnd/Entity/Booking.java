@@ -30,8 +30,6 @@ public class Booking {
     private Long bookingPaymentId;
     @Column(name = "feedback_id")
     private Long feedbackId;
-//    @Column(name = "customer_id")
-//    private Long customerId;
     @Column(name = "quote_sent_date")
     private Date quoteSentDate;
     @Column(name = "quote_approved_date")

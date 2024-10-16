@@ -17,8 +17,8 @@ import java.util.*;
 @NoArgsConstructor
 public class KoiFarm {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "farm_id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long farmId;
 
     @Column(name = "farm_name")

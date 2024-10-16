@@ -2,8 +2,10 @@ package com.example.SWP_Project_BackEnd.Service;
 
 import com.example.SWP_Project_BackEnd.Dto.BookingDTO;
 import com.example.SWP_Project_BackEnd.Entity.Booking;
+import com.example.SWP_Project_BackEnd.Entity.Customer;
 import com.example.SWP_Project_BackEnd.Exception.ResourceNotFoundException;
 import com.example.SWP_Project_BackEnd.Repository.BookingRepository;
+import com.example.SWP_Project_BackEnd.Repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +19,9 @@ public class BookingService {
     @Autowired
     private BookingRepository bookingRepository;
 
+    @Autowired
+    private CustomerRepository customerRepository;
+
     // CREATE booking
     public Booking saveBooking(BookingDTO bookingDTO) {
         Booking booking = new Booking();
@@ -24,6 +29,11 @@ public class BookingService {
         booking.setFullname(bookingDTO.getFullname());
         booking.setPhone(bookingDTO.getPhone());
         booking.setEmail(bookingDTO.getEmail());
+
+        // Set the customer
+        Customer customer = customerRepository.findById(bookingDTO.getCustomerId())
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
+        booking.setCustomer(customer);
 
         // Null check for favoriteFarm and favoriteKoi
         booking.setFavoriteFarm(bookingDTO.getFavoriteFarm() != null ? String.join(", ", bookingDTO.getFavoriteFarm()) : "");

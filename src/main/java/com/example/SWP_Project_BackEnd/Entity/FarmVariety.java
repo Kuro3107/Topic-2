@@ -10,6 +10,7 @@ import lombok.Setter;
 @Setter
 public class FarmVariety {
     @Id
+    @Column(name = "farm_variety_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long farmVarietyId;
 

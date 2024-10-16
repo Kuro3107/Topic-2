@@ -3,6 +3,8 @@ package com.example.SWP_Project_BackEnd.Controller;
 import com.example.SWP_Project_BackEnd.Entity.KoiFarm;
 import com.example.SWP_Project_BackEnd.Entity.Trip;
 import com.example.SWP_Project_BackEnd.Entity.TripDetail;
+import com.example.SWP_Project_BackEnd.Repository.TripDetailRepository;
+import com.example.SWP_Project_BackEnd.Service.KoiFarmService;
 import com.example.SWP_Project_BackEnd.Service.TripDetailService;
 import com.example.SWP_Project_BackEnd.Service.TripService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,15 @@ public class TripController {
     @Autowired
     private TripService tripService;
 
+    @Autowired
+    private KoiFarmService koiFarmService;
+
+    @Autowired
+    private TripDetailService tripDetailService;
+
+    @Autowired
+    private TripDetailRepository tripDetailRepository;
+
     @GetMapping
     public ResponseEntity<List<Trip>> getAllTrips() {
         List<Trip> trips = tripService.getAllTrips();
@@ -35,6 +46,14 @@ public class TripController {
     @PostMapping
     public ResponseEntity<Trip> createTrip(@RequestBody Trip trip) {
         Trip createdTrip = tripService.createTrip(trip);
+
+        // Nếu có tripDetails, hãy lưu chúng
+        if (trip.getTripDetails() != null && !trip.getTripDetails().isEmpty()) {
+            for (TripDetail detail : trip.getTripDetails()) {
+                detail.setTrip(createdTrip); // Gán trip cho tripDetail
+                tripDetailRepository.save(detail); // Lưu tripDetail
+            }
+        }
         return new ResponseEntity<>(createdTrip, HttpStatus.CREATED);
     }
 

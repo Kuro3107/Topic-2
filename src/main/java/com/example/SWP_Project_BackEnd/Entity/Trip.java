@@ -21,8 +21,8 @@ import java.util.*;
 @NoArgsConstructor
 public class Trip {
     @Id
+    @Column(name = "trip_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "trip_id",nullable = false)
     private Long tripId;
 
     @Column(name = "trip_name")

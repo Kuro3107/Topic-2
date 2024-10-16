@@ -29,8 +29,20 @@ public class TripService {
     }
 
     public Trip createTrip(Trip trip) {
-        return tripRepository.save(trip);
+        // Lưu trip trước để có tripId
+        Trip createdTrip = tripRepository.save(trip);
+
+        // Nếu có tripDetails, hãy lưu chúng
+        if (trip.getTripDetails() != null) {
+            for (TripDetail detail : trip.getTripDetails()) {
+                detail.setTrip(createdTrip); // Gán tripId cho tripDetail
+                tripDetailRepository.save(detail); // Lưu tripDetail
+            }
+        }
+
+        return createdTrip;
     }
+
 
     public Trip updateTrip(Long tripId, Trip tripDetails) {
         Trip trip = tripRepository.findById(tripId)

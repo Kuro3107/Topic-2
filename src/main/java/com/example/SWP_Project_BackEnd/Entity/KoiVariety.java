@@ -14,6 +14,7 @@ import java.util.List;
 @Setter
 public class KoiVariety {
     @Id
+    @Column(name = "variety_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long varietyId;
 

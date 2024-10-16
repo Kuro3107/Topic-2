@@ -22,8 +22,8 @@ import java.util.Set;
 @NoArgsConstructor
 public class TripDetail {
     @Id
+    @Column(name = "trip_detail_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "trip_detail_id",nullable = false)
     private Long tripDetailId;
 
     @Column(name = "main_topic")
