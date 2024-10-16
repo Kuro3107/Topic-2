@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
-import { Button, Spin, Card, Table } from "antd";
+import { Button, Spin, Card, Table, Modal } from "antd";
 import PropTypes from "prop-types";
 import {
   UserOutlined,
@@ -18,6 +18,7 @@ import api from "../../config/axios";
 import { Upload, message } from "antd"; // Thêm import cho Upload
 
 const defaultImageUrl = "/istockphoto-1495088043-612x612.jpg"; // Đường dẫn đến hình ảnh mặc định
+// Thêm state cho modal
 
 function Profile() {
   const [user, setUser] = useState(null);
@@ -25,76 +26,105 @@ function Profile() {
   const [parsedUser, setParsedUser] = useState(null);
   const [orders, setOrders] = useState([]);
   const navigate = useNavigate();
+  const apiAccountBaseUrl = "http://localhost:8080/api/accounts/"; // Địa chỉ API
+  const [isModalVisible, setIsModalVisible] = useState(false);
+const [selectedBooking, setSelectedBooking] = useState(null);
+
+  
 
   useEffect(() => {
-    console.log("useEffect is running"); // Kiểm tra useEffect có chạy không
     const fetchUserInfo = async () => {
-      setLoading(true); // Bắt đầu loading
-      try {
-        const userInfo = localStorage.getItem("userInfo");
-        if (userInfo) {
-          const parsedUserData = JSON.parse(userInfo);
-          setParsedUser(parsedUserData);
-  
-          if (!parsedUserData.id) {
-            toast.error("User ID does not exist.");
-            return;
-          }
-  
-          // Kiểm tra token trước khi gọi API
-          if (parsedUserData.token) {
-            // Giả sử API đã trả về thông tin account cùng với bookings
-const response = await api.get(`/accounts/${parsedUserData.id}`, {
-  headers: { Authorization: `Bearer ${parsedUserData.token}` },
-});
+      setLoading(true);
+  try {
+    const userInfo = localStorage.getItem("userInfo");
 
-if (response.data && response.data.customer && response.data.customer.bookings && response.data.customer.bookings.length) {
-  const bookings = response.data.customer.bookings;
-  console.log("Bookings:", bookings);
-  setOrders(bookings);
-  console.log("Orders:", orders); // Kiểm tra giá trị orders
+    if (userInfo) {
+      const parsedUserData = JSON.parse(userInfo);
+      setParsedUser(parsedUserData); // Cập nhật trạng thái parsedUser
 
-} else {
-  toast.error("No bookings found for this user.");
-}
-          } else {
-            setUser(parsedUserData);
-          }
-        } else {
-          toast.warning("Please login to view personal information.");
-          navigate("/login");
-        }
-      } catch (error) {
-        console.error("Error fetching user info:", error); // Log lỗi nếu có
-        toast.error("An error occurred while fetching user information.");
-      } finally {
-        setLoading(false); // Kết thúc loading
+      if (!parsedUserData.id) {
+        toast.error("User ID does not exist.");
+        return;
       }
+
+      const apiAccount = `${apiAccountBaseUrl}${parsedUserData.id}`;
+      console.log("Calling API with URL:", apiAccount);
+      
+      const response = await api.get(apiAccount);
+      console.log("API Response:", response.data);
+
+      if (response.data) {
+        const customerData = response.data.customer; // Trích xuất thông tin khách hàng
+
+        // Cập nhật user với thông tin từ API
+        setUser({
+          fullName: response.data.fullName || "Not Updated!",
+          username: response.data.username || "N/A",
+          email: response.data.email || "N/A",
+          phone: response.data.phone || "N/A",
+          status: response.data.status || "N/A",
+          roleId: response.data.roleId || "N/A",
+          imageUrl: response.data.imageUrl || defaultImageUrl, // Dùng hình ảnh mặc định nếu không có
+        });
+        
+        const bookings = customerData.bookings || []; // Lấy danh sách booking từ phản hồi
+        console.log("Bookings:", bookings);
+        setOrders(bookings); // Cập nhật orders với bookings
+        console.log("Updated Orders:", bookings); // Xem giá trị orders sau khi cập nhật
+      } else {
+        toast.error("No bookings found for this user.");
+      }
+    } else {
+      toast.warning("Please login to view personal information.");
+      navigate("/login");
+    }
+  } catch (error) {
+    console.error("Error fetching user info:", error);
+    toast.error("An error occurred while fetching user information.");
+  } finally {
+    setLoading(false);
+  }
     };
   
     fetchUserInfo();
   }, [navigate]);
+  
+  console.log("Rendering Orders:", orders); // Log để kiểm tra orders
+  
+
+  useEffect(() => {
+    console.log("Orders:", orders); // Kiểm tra giá trị orders sau khi cập nhật
+  }, [orders]);
+  
   
 
   const handleEdit = () => {
     navigate("/edit-profile");
   };
 
-  const handleCancelOrder = async (tripId) => {
+  const handleCancelOrder = async (bookingId) => {
     try {
-      await api.delete(`/bookings/${tripId}`, {
+      await api.delete(`/bookings/${bookingId}`, {
         headers: { Authorization: `Bearer ${parsedUser.token}` },
       });
       toast.success("Order was canceled successfully.");
-      setOrders(orders.filter((trip) => trip.id !== tripId));
+      setOrders(orders.filter((order) => order.bookingId !== bookingId)); // Cập nhật lại danh sách orders
     } catch (error) {
       toast.error("An error occurred while canceling the order.");
     }
   };
 
   const handleViewBooking = (orderId) => {
-    navigate(`/booking/${orderId}`); // Điều hướng đến trang xem chi tiết booking
+    const bookingDetails = orders.find((order) => order.bookingId === orderId);
+    setSelectedBooking(bookingDetails); // Lưu thông tin booking vào state
+    setIsModalVisible(true); // Hiển thị modal
   };
+
+  // Hàm để đóng modal
+const handleCloseModal = () => {
+  setIsModalVisible(false);
+  setSelectedBooking(null); // Đặt lại state khi đóng modal
+};
 
   const roleMapping = {
     1: "Manager",
@@ -148,13 +178,13 @@ if (response.data && response.data.customer && response.data.customer.bookings &
       title: "No",
       dataIndex: "bookingId",
       key: "bookingId",
-      // render: (_, __, index) => index + 1, // Display order index
+      render: (_, __, index) => index + 1, // Hiển thị số thứ tự
     },
     {
       title: "Booking Date",
-      dataIndex: "startDate", // Cập nhật để lấy startDate
-      key: "startDate",
-      render: (date) => new Date(date).toLocaleDateString(), // Định dạng ngày
+      dataIndex: "bookingDate",
+      key: "bookingDate",
+      render: (date) => date ? new Date(date).toLocaleDateString() : 'N/A', // Định dạng ngày, kiểm tra null
     },
     {
       title: "Status",
@@ -163,17 +193,17 @@ if (response.data && response.data.customer && response.data.customer.bookings &
     },
     {
       title: "Full Name",
-      dataIndex: "fullname", // Cập nhật để lấy fullname
+      dataIndex: "fullname",
       key: "fullname",
     },
     {
       title: "Phone",
-      dataIndex: "phone", // Cập nhật để lấy phone
+      dataIndex: "phone",
       key: "phone",
     },
     {
       title: "Email",
-      dataIndex: "email", // Cập nhật để lấy email
+      dataIndex: "email",
       key: "email",
     },
     {
@@ -182,7 +212,7 @@ if (response.data && response.data.customer && response.data.customer.bookings &
       render: (record) => (
         <>
           <Button
-            onClick={() => handleViewBooking(record.bookingId)} // Sử dụng bookingId
+            onClick={() => handleViewBooking(record.bookingId)}
             icon={<ShoppingOutlined />}
             style={{ marginRight: 8 }}
           >
@@ -195,6 +225,7 @@ if (response.data && response.data.customer && response.data.customer.bookings &
       ),
     },
   ];
+  
 
   return (
     <div className="profile-page">
@@ -276,12 +307,44 @@ if (response.data && response.data.customer && response.data.customer.bookings &
         </Card>
 
         <Card title={<h2><ShoppingOutlined /> Your Order</h2>}>
-          <Table
-            columns={columns} 
-            dataSource={orders} 
-            rowKey="bookingId" // Sử dụng bookingId làm khóa cho từng dòng
-          />
+        <div>
+      {loading ? (
+        <Spin />
+      ) : (
+        <Table
+          columns={columns}
+          dataSource={orders} // Đảm bảo sử dụng orders ở đây
+          rowKey="bookingId"
+        />
+      )}
+    </div>
         </Card>
+<Modal
+  title="Booking Details"
+  visible={isModalVisible}
+  onCancel={handleCloseModal}
+  footer={[
+    <Button key="close" onClick={handleCloseModal}>
+      Đóng
+    </Button>,
+  ]}
+>
+  {selectedBooking && (
+    <div>
+      <p><strong>Booking ID:</strong> {selectedBooking.bookingId}</p>
+      <p><strong>Booking Date:</strong> {new Date(selectedBooking.bookingDate).toLocaleDateString()}</p>
+      <p><strong>Full Name:</strong> {selectedBooking.fullname}</p>
+      <p><strong>Email:</strong> {selectedBooking.email}</p>
+      <p><strong>Phone:</strong> {selectedBooking.phone}</p>
+      <p><strong>Start Date:</strong> {new Date(selectedBooking.startDate).toLocaleDateString()}</p>
+      <p><strong>End Date:</strong> {new Date(selectedBooking.endDate).toLocaleDateString()}</p>
+      <p><strong>Status:</strong> {selectedBooking.status}</p>
+      <p><strong>Favorite Farms:</strong> {selectedBooking.favoriteFarm}</p>
+      <p><strong>Favorite Koi:</strong> {selectedBooking.favoriteKoi}</p>
+      <p><strong>Note:</strong> {selectedBooking.note}</p>
+    </div>
+  )}
+</Modal>
       </main>
       <Footer />
     </div>

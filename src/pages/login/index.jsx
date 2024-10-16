@@ -37,15 +37,15 @@ function LoginPage() {
           },
         }
       );
-
+  
       // Nhận user từ response
       const { role_id, token, user } = response.data;
-
+  
       // Kiểm tra xem token và accountId có tồn tại không
       if (!token || !user || !user.accountId) {
         throw new Error("Unable to get user ID.");
       }
-
+  
       // Lưu token và userInfo vào localStorage
       const userInfo = {
         id: user.accountId,
@@ -55,32 +55,31 @@ function LoginPage() {
         phone: user.phone,
         roleId: user.roleId,
         status: user.status,
+        token: token, // Thêm token vào userInfo
       };
+      localStorage.setItem("userInfo", JSON.stringify(userInfo)); // Lưu toàn bộ userInfo bao gồm token
       localStorage.setItem("token", token);
-      localStorage.setItem("userInfo", JSON.stringify(userInfo));
 
+      console.log("Stored userInfo:", localStorage.getItem("userInfo"));
+
+  
       toast.success("Login successful!");
-
+  
       // Điều hướng dựa trên vai trò người dùng
       if (role_id === 1) {
-        // Giả sử role_id 1 là manager
-        navigate("/dashboard");
+        navigate("/dashboard"); // Manager
       } else if (role_id === 5) {
-        // Giả sử role_id 5 là customer
-        navigate("/");
-      }
-      else if (role_id === 2) {
-        // Giả sử role_id 2 là  staff
-        navigate("/sales");
+        navigate("/"); // Customer
+      } else if (role_id === 2) {
+        navigate("/sales"); // Staff
       }
       
     } catch (error) {
       console.error("Login error:", error);
-      toast.error(
-        "Login failed. Please check your login information again."
-      );
+      toast.error("Login failed. Please check your login information again.");
     }
   };
+  
 
   return (
     <div className="wrapper">
