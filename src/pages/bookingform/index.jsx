@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import Select from "react-select";
@@ -7,39 +7,61 @@ import Footer from "../../components/Footer";
 import "./index.css";
 import { useNavigate } from "react-router-dom";
 
-const api = "https://6704fc27031fd46a830e2ee2.mockapi.io/BookingForm";
-
-const koiOptions = [
-  { value: "koi1", label: "Koi type 1" },
-  { value: "koi2", label: "Koi type 2" },
-  { value: "koi3", label: "Koi type 3" },
-  { value: "koi4", label: "Koi type 4" },
-  // Thêm nhiều lựa chọn khác nếu cần
-];
-
-const farmOptions = [
-  { value: "farm1", label: "Farm 1" },
-  { value: "farm2", label: "Farm 2" },
-  { value: "farm3", label: "Farm 3" },
-  { value: "farm4", label: "Farm 4" },
-  // Thêm nhiều lựa chọn khác nếu cần
-];
+const api = "http://localhost:8080/api/bookings";
 
 function BookingForm() {
   const [formData, setFormData] = useState({
-    startDate: "",
-    endDate: "",
-    fullname: "",
-    phone: "",
-    email: "",
-    district: "",
-    favoriteKoi: [],
-    favoritefarm: [],
-    note: "",
-    status: "pending",
+    startDate: "", // Đảm bảo rằng tên trường khớp với DTO
+    endDate: "", // Đảm bảo rằng tên trường khớp với DTO
+    fullname: "", // Đảm bảo rằng tên trường khớp với DTO
+    phone: "", // Đảm bảo rằng tên trường khớp với DTO
+    email: "", // Đảm bảo rằng tên trường khớp với DTO
+    favoriteKoi: [], // Đảm bảo rằng tên trường khớp với DTO
+    favoriteFarm: [], // Đảm bảo rằng tên trường khớp với DTO
+    note: "", // Đảm bảo rằng tên trường khớp với DTO
+    status: "pending", // Đảm bảo rằng tên trường khớp với DTO
   });
 
+  const [koiOptions, setKoiOptions] = useState([]);
+  const [farmOptions, setFarmOptions] = useState([]);
+  const [filteredFarmOptions, setFilteredFarmOptions] = useState([]); // State cho farm đã lọc
+
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchKoiOptions = async () => {
+      try {
+        const response = await axios.get("http://localhost:8080/api/koi-varieties");
+        const options = response.data.map(koi => ({
+          value: koi.varietyId,
+          label: `${koi.varietyName || "Tên không xác định"} - ${koi.koiPrice ? `${koi.koiPrice} VNĐ` : "Giá không xác định"}`,
+        }));
+        setKoiOptions(options);
+      } catch (error) {
+        console.error("Lỗi khi tải dữ liệu cá koi:", error);
+        toast.error("Không thể tải dữ liệu cá koi.");
+      }
+    };
+
+    const fetchFarmOptions = async () => {
+      try {
+        const response = await axios.get("http://localhost:8080/api/farms");
+        const options = response.data.map(farm => ({
+          value: farm.farmId,
+          label: `${farm.farmName || "Tên không xác định"} - ${farm.location || "Địa điểm không xác định"}`,
+          koiVarieties: farm.koiVarieties, // Lưu trữ thông tin về các loại cá trong farm
+        }));
+        setFarmOptions(options);
+        setFilteredFarmOptions(options); // Khởi tạo danh sách farm đã lọc
+      } catch (error) {
+        console.error("Lỗi khi tải dữ liệu farm:", error);
+        toast.error("Không thể tải dữ liệu farm.");
+      }
+    };
+
+    fetchKoiOptions();
+    fetchFarmOptions();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -54,37 +76,69 @@ function BookingForm() {
       ...prevData,
       [actionMeta.name]: selectedOptions.map((option) => option.value),
     }));
+
+    // Nếu người dùng chọn cá koi, lọc farm
+    if (actionMeta.name === "favoriteKoi") {
+      const selectedKoiIds = selectedOptions.map(option => option.value);
+      const filteredFarms = farmOptions.filter(farm =>
+        farm.koiVarieties.some(koi => selectedKoiIds.includes(koi.varietyId))
+      );
+      setFilteredFarmOptions(filteredFarms); // Cập nhật danh sách farm đã lọc
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("Gửi yêu cầu..."); // Thêm log để kiểm tra
+    if (!formData.fullname || !formData.phone || !formData.email) {
+      toast.error("Vui lòng điền đầy đủ thông tin.");
+      return;
+    }
     try {
-      const response = await axios.post(api, formData);
-      console.log("Response from server:", response.data);
-      toast.success("Trip booked successfully! We will contact you soon.");
-      toast.info(
-        `Booking information: Favorite fish - ${formData.favoriteKoi.join(
-          ", "
-        )}, Favorite farm - ${formData.favoritefarm.join(", ")}`
-      );
+      // Chuyển đổi favoriteKoi và favoriteFarm từ ID sang tên
+      const favoriteKoiNames = formData.favoriteKoi.map(id => {
+        const koi = koiOptions.find(option => option.value === id);
+        return koi ? koi.label.split(" - ")[0] : null; // Lấy tên cá koi
+      }).filter(name => name); // Lọc các giá trị null
 
-      navigate("/profile");
+      const favoriteFarmNames = formData.favoriteFarm.map(id => {
+        const farm = filteredFarmOptions.find(option => option.value === id);
+        return farm ? farm.label.split(" - ")[0] : null; // Lấy tên farm
+      }).filter(name => name); // Lọc các giá trị null
 
-      setFormData({
-        startDate: "",
-        endDate: "",
-        fullname: "",
-        phone: "",
-        email: "",
-        district: "",
-        favoriteKoi: [],
-        favoritefarm: [],
-        note: "",
-        status: "pending",
-      });
+      const dataToSend = {
+        ...formData,
+        favoriteKoi: favoriteKoiNames, // Gửi mảng tên cá koi
+        favoriteFarm: favoriteFarmNames, // Gửi mảng tên farm
+      };
+
+      console.log("Dữ liệu gửi đi:", dataToSend); // In ra dữ liệu gửi đi
+
+      const response = await axios.post(api, dataToSend);
+      if (response.status === 201) {
+        toast.success("Đặt chỗ thành công! Chúng tôi sẽ liên hệ với bạn sớm.");
+        
+        // Quay về trang home sau 1 giây
+        setTimeout(() => {
+          navigate("/"); // Điều hướng về trang home
+        }, 1000);
+
+        setFormData({
+          startDate: "",
+          endDate: "",
+          fullname: "",
+          phone: "",
+          email: "",
+          district: "",
+          favoriteKoi: [],
+          favoriteFarm: [],
+          note: "",
+          status: "pending",
+        });
+      }
     } catch (error) {
-      console.error("Error sending data:", error);
-      toast.error("An error occurred while booking your trip. Please try again later.");
+      console.error("Lỗi khi gửi dữ liệu:", error.response ? error.response.data : error.message);
+      toast.error("Đã xảy ra lỗi trong quá trình đặt chỗ. Vui lòng thử lại sau.");
     }
   };
 
@@ -143,8 +197,8 @@ function BookingForm() {
                     name="district"
                     value={formData.district}
                     onChange={handleChange}
-                    required
-                  ></input>
+                    // Xóa thuộc tính required để không bắt buộc
+                  />
                 </div>
               </div>
             </div>
@@ -175,17 +229,17 @@ function BookingForm() {
                   <label>Favorite farm:</label>
                   <Select
                     isMulti
-                    name="favoritefarm"
-                    options={farmOptions}
+                    name="favoriteFarm"
+                    options={filteredFarmOptions} // Sử dụng danh sách farm đã lọc
                     className="basic-multi-select"
                     classNamePrefix="select"
                     onChange={(selectedOptions) =>
                       handleSelectChange(selectedOptions, {
-                        name: "favoritefarm",
+                        name: "favoriteFarm",
                       })
                     }
-                    value={farmOptions.filter((option) =>
-                      formData.favoritefarm.includes(option.value)
+                    value={filteredFarmOptions.filter((option) =>
+                      formData.favoriteFarm.includes(option.value)
                     )}
                   />
                 </div>

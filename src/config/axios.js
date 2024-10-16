@@ -15,7 +15,8 @@ const handleBefore = (config) => {
 };
 
 const handleError = (error) => {
-  console.log(error);
+  console.error("API Request Error:", error); // Thêm log để kiểm tra lỗi
+  return Promise.reject(error);
 };
 
 api.interceptors.request.use(handleBefore, handleError);

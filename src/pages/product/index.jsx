@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Card, Col, Row, Button, message, Pagination, Spin } from "antd";
+import { Card, Col, Row, Button, message, Pagination, Spin, Modal } from "antd";
 import axios from "axios";
 import "./index.css";
 import Header from "../../components/Header";
@@ -10,6 +10,7 @@ const Product = () => {
   const [tours, setTours] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [selectedTour, setSelectedTour] = useState(null);
   const pageSize = 6; // 2 rows x 3 columns
   const apiTour = "http://localhost:8080/api/trips";
 
@@ -33,6 +34,14 @@ const Product = () => {
 
   const handleBooking = (tripId) => {
     message.success(`Booked tour with ID: ${tripId}`);
+  };
+
+  const handleViewTour = (tour) => {
+    setSelectedTour(tour);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedTour(null);
   };
 
   const paginatedTours = tours.slice((currentPage - 1) * pageSize, currentPage * pageSize);
@@ -71,6 +80,13 @@ const Product = () => {
                     >
                       Book Tour
                     </Button>
+                    <Button 
+                      type="default" 
+                      className="view-button"
+                      onClick={() => handleViewTour(tour)}
+                    >
+                      View
+                    </Button>
                   </Card>
                 </Col>
               ))}
@@ -88,6 +104,22 @@ const Product = () => {
         )}
       </div>
       <Footer />
+
+      {/* Modal hiển thị thông tin chi tiết của tour */}
+      <Modal
+        title={selectedTour ? selectedTour.tripName : ''}
+        visible={!!selectedTour}
+        onCancel={handleCloseModal}
+        footer={null}
+      >
+        {selectedTour && (
+          <div>
+            <p><strong>Price:</strong> {selectedTour.priceTotal?.toLocaleString()} VND</p>
+            <p><strong>Description:</strong> {selectedTour.description || 'No description available.'}</p>
+            {/* Thêm thông tin chi tiết khác nếu cần */}
+          </div>
+        )}
+      </Modal>
     </div>
   );
 };

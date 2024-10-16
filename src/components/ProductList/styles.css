@@ -176,30 +176,35 @@ tr:nth-child(even) {
   margin-top: 20px;
 }
 
+.koi-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.koi-grid {
+  display: flex;
+  justify-content: center; /* Căn giữa các thẻ Koi */
+  flex-wrap: nowrap; /* Không cho phép xuống dòng */
+  overflow: hidden; /* Ẩn các phần không cần thiết */
+  max-width: 100%; /* Giới hạn chiều rộng */
+}
+
 .koi-card {
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 15px;
+  margin: 10px;
   text-align: center;
-  background-color: #fff; /* Màu nền trắng cho các giống cá */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
+  flex: 0 0 auto; /* Không cho phép thẻ Koi co giãn */
+  width: 150px; /* Đặt chiều rộng cố định cho thẻ Koi */
+  transition: transform 0.2s; /* Hiệu ứng chuyển động khi hover */
 }
 
 .koi-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transform: scale(1.05); /* Phóng to khi hover */
 }
 
-.koi-card img {
-  width: 100%; /* Đảm bảo hình ảnh chiếm toàn bộ chiều rộng */
-  height: auto;
-  border-radius: 8px;
-}
-
-.koi-card p {
-  margin: 5px 0;
-  color: #333; /* Màu chữ tối cho dễ đọc */
+.koi-avatar {
+  width: 100%; /* Đảm bảo hình ảnh chiếm toàn bộ chiều rộng của thẻ */
+  height: auto; /* Giữ tỷ lệ hình ảnh */
 }
 
 button {

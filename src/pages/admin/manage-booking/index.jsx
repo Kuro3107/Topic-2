@@ -19,7 +19,7 @@ function ManageBooking() {
   const [form] = Form.useForm();
   const [editingBooking, setEditingBooking] = useState(null);
 
-  const api = "https://6704fc27031fd46a830e2ee2.mockapi.io/BookingForm";
+  const api = "http://localhost:8080/api/bookings"; // Cập nhật URL API
 
   useEffect(() => {
     fetchBookings();
@@ -27,7 +27,7 @@ function ManageBooking() {
 
   const fetchBookings = async () => {
     try {
-      const response = await axios.get(api);
+      const response = await axios.get(api); // Lấy dữ liệu từ API
       const updatedBookings = response.data.map((booking) => ({
         ...booking,
         isActive: booking.status !== "delivered",
@@ -108,8 +108,14 @@ function ManageBooking() {
   };
 
   const columns = [
-    { title: "ID", dataIndex: "BookingID", key: "BookingID", hidden: true },
+    { title: "ID", dataIndex: "bookingId", key: "bookingId" }, // Cập nhật dataIndex cho bookingId
     { title: "Tên", dataIndex: "fullname", key: "fullname" },
+    {
+      title: "Ngày đặt",
+      dataIndex: "bookingDate",
+      key: "bookingDate",
+      render: (date) => dayjs(date).format("DD/MM/YYYY"),
+    },
     {
       title: "Ngày bắt đầu",
       dataIndex: "startDate",
@@ -125,8 +131,8 @@ function ManageBooking() {
     { title: "Koi yêu thích", dataIndex: "favoriteKoi", key: "favoriteKoi" },
     {
       title: "Trang trại yêu thích",
-      dataIndex: "favoritefarm",
-      key: "favoritefarm",
+      dataIndex: "favoriteFarm",
+      key: "favoriteFarm",
     },
     {
       title: "Hoạt động",
@@ -230,7 +236,7 @@ function ManageBooking() {
           <Form.Item name="favoriteKoi" label="Koi yêu thích">
             <Input />
           </Form.Item>
-          <Form.Item name="favoritefarm" label="Trang trại yêu thích">
+          <Form.Item name="favoriteFarm" label="Trang trại yêu thích">
             <Input />
           </Form.Item>
           <Form.Item name="note" label="Ghi chú">

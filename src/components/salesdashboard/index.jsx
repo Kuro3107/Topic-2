@@ -52,14 +52,29 @@
 //       key: 'bookingDate',
 //     },
 //     {
-//       title: 'Customer',
-//       dataIndex: 'customer',
-//       key: 'customer',
+//       title: 'Customer Name',
+//       dataIndex: 'fullname',
+//       key: 'fullname',
 //     },
 //     {
-//       title: 'Trip Name',
-//       dataIndex: 'tripName',
-//       key: 'tripName',
+//       title: 'Phone',
+//       dataIndex: 'phone',
+//       key: 'phone',
+//     },
+//     {
+//       title: 'Email',
+//       dataIndex: 'email',
+//       key: 'email',
+//     },
+//     {
+//       title: 'Start Date',
+//       dataIndex: 'startDate',
+//       key: 'startDate',
+//     },
+//     {
+//       title: 'End Date',
+//       dataIndex: 'endDate',
+//       key: 'endDate',
 //     },
 //     {
 //       title: 'Price',
@@ -114,7 +129,8 @@
 //   useEffect(() => {
 //     const fetchBookingData = async () => {
 //       try {
-//         const response = await axios.get('https://api.example.com/bookings');
+//         const response = await axios.get('http://localhost:8080/api/bookings');
+//         console.log('Fetched booking data:', response.data); // Thêm dòng này để kiểm tra dữ liệu
 //         setBookingData(response.data);
 //       } catch (error) {
 //         console.error('Error fetching booking data:', error);

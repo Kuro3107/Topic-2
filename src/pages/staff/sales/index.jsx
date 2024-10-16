@@ -12,7 +12,6 @@ import {
   Row,
   Col,
   Statistic,
-  List,
   InputNumber,
 } from "antd";
 import {
@@ -25,19 +24,20 @@ import axios from "axios";
 
 function SalesDashboard() {
   const [bookings, setBookings] = useState([]);
-  const [trips, setTrips] = useState({});
+  const [koiFarms, setKoiFarms] = useState([]); // State để lưu danh sách Koi Farms
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isTripModalVisible, setIsTripModalVisible] = useState(false);
   const [form] = Form.useForm();
   const [tripForm] = Form.useForm();
   const [viewingBooking, setViewingBooking] = useState(null);
-  const [editingTrip, setEditingTrip] = useState(null);
 
-  const bookingApi = "https://6704fc27031fd46a830e2ee2.mockapi.io/BookingForm";
-  const tripApi = "https://6704fc27031fd46a830e2ee2.mockapi.io/Trip";
+  const bookingApi = "http://localhost:8080/api/bookings";
+  const tripApi = "http://localhost:8080/api/trips";
+  const farmApi = "http://localhost:8080/api/farms"; // API cho Koi Farms
 
   useEffect(() => {
     fetchBookings();
+    fetchKoiFarms(); // Lấy danh sách Koi Farms khi component mount
   }, []);
 
   const fetchBookings = async () => {
@@ -50,144 +50,135 @@ function SalesDashboard() {
           booking.status === "detailed"
       );
       setBookings(filteredBookings);
-
-      filteredBookings.forEach((booking) =>
-        fetchTripDetails(booking.BookingID)
-      );
     } catch (error) {
       console.error("Error fetching bookings:", error);
       message.error("Unable to fetch bookings");
     }
   };
 
-  const fetchTripDetails = async (bookingId) => {
+  const fetchKoiFarms = async () => {
     try {
-      const response = await axios.get(`${tripApi}?BookingID=${bookingId}`);
-      setTrips((prevTrips) => ({
-        ...prevTrips,
-        [bookingId]: response.data[0], // Assuming one trip per booking
-      }));
+      const response = await axios.get(farmApi);
+      setKoiFarms(response.data); // Lưu danh sách Koi Farms vào state
     } catch (error) {
-      console.error(
-        `Error fetching trip details for booking ${bookingId}:`,
-        error
-      );
+      console.error("Error fetching Koi Farms:", error);
+      message.error("Unable to fetch Koi Farms");
     }
   };
 
   const showModal = (booking) => {
-    setViewingBooking(booking);
+    setViewingBooking(booking); // Đảm bảo rằng booking được truyền đúng
     form.setFieldsValue({
-      ...booking,
-      startDate: dayjs(booking.startDate),
-      endDate: dayjs(booking.endDate),
+        customerId: booking.customerId,
+        tripId: booking.tripId, // Thêm tripId
+        fullname: booking.fullname,
+        phone: booking.phone,
+        email: booking.email,
+        favoriteKoi: booking.favoriteKoi || [], // Khởi tạo là mảng nếu không có giá trị
+        favoriteFarm: booking.favoriteFarm || [], // Khởi tạo là mảng nếu không có giá trị
+        note: booking.note,
+        status: booking.status,
+        startDate: dayjs(booking.startDate),
+        endDate: dayjs(booking.endDate),
+        bookingDate: dayjs(booking.bookingDate),
     });
     setIsModalVisible(true);
   };
 
-  const showTripModal = (bookingId) => {
-    let trip = trips[bookingId];
-    if (!trip) {
-      // Tạo một trip mới nếu không tồn tại
-      trip = {
-        tripName: `Trip for Booking ${bookingId}`,
-        priceTotal: 0,
-        tripdetailed: [
-          {
-            day: 1,
-            mainTopic: "",
-            subTopic: "",
-            priceNote: 0,
-          },
-        ],
-        BookingID: bookingId,
-      };
-      // Cập nhật state trips với trip mới
-      setTrips((prevTrips) => ({
-        ...prevTrips,
-        [bookingId]: trip,
-      }));
-    }
-
-    setEditingTrip(trip);
+  const showTripModal = (booking) => {
+    setViewingBooking(booking); // Lưu toàn bộ đối tượng booking, bao gồm cả tripId nếu có
     tripForm.setFieldsValue({
-      ...trip,
-      tripdetailed: trip.tripdetailed.map((detail) => ({
-        ...detail,
-        priceNote: Number(detail.priceNote),
-      })),
+        tripName: booking.tripName, // Giả sử tripName có trong booking
+        koiFarmIds: booking.koiFarmIds || [], // Giả sử koiFarmIds có trong booking
+        // Thêm các trường khác của trip nếu cần
     });
-    setIsTripModalVisible(true);
+    setIsTripModalVisible(true); // Mở modal để xem và chỉnh sửa
   };
 
   const handleOk = () => {
     form.validateFields().then((values) => {
-      const bookingData = {
-        ...values,
-        startDate: values.startDate.format(),
-        endDate: values.endDate.format(),
-      };
-      updateBooking(viewingBooking.BookingID, bookingData);
-      setIsModalVisible(false);
+        const bookingData = {
+            ...values,
+            startDate: values.startDate.format(),
+            endDate: values.endDate.format(),
+            favoriteKoi: values.favoriteKoi ? values.favoriteKoi.split(',').map(koi => koi.trim()) : [], // Chuyển đổi thành mảng
+            favoriteFarm: values.favoriteFarm ? values.favoriteFarm.split(',').map(farm => farm.trim()) : [], // Chuyển đổi thành mảng
+        };
+        updateBooking(viewingBooking.bookingId, bookingData); // Cập nhật booking
+        setIsModalVisible(false);
     });
   };
 
-  const handleTripOk = () => {
-    tripForm.validateFields().then((values) => {
-      const tripData = {
-        ...values,
-        priceTotal: values.tripdetailed.reduce(
-          (sum, detail) => sum + detail.priceNote,
-          0
-        ),
-      };
+  // Hàm xử lý khi nhấn nút "OK" (Update trip)
+const handleTripOk = () => {
+  tripForm.validateFields().then(async (values) => {
+    if (!viewingBooking || !viewingBooking.bookingId) {
+      console.error("Viewing booking is not set or bookingId is undefined");
+      message.error("Unable to process: bookingId is undefined");
+      return;
+    }
 
-      if (editingTrip.id) {
-        // Cập nhật trip hiện có
-        updateTrip(editingTrip.id, tripData);
+    const tripData = {
+      ...values,
+      bookingId: viewingBooking.bookingId,
+    };
+
+    try {
+      if (viewingBooking.tripId) {
+        // Nếu đã có tripId, thì chỉnh sửa trip
+        await axios.put(`${tripApi}/${viewingBooking.tripId}`, tripData);
+        message.success("Trip updated successfully");
       } else {
-        // Tạo mới trip
-        createTrip(tripData);
+        // Nếu chưa có tripId, thì tạo mới trip
+        const response = await axios.post(tripApi, tripData);
+        const tripId = response.data.tripId;
+        await updateTripId(viewingBooking.bookingId, tripId);
+        message.success("Trip created successfully");
       }
-      setIsTripModalVisible(false);
-    });
-  };
 
-  const createTrip = async (tripData) => {
-    try {
-      const response = await axios.post(tripApi, tripData);
-      message.success("Trip created successfully");
-      fetchBookings(); // Refresh data after creating new trip
+      fetchBookings(); // Làm mới danh sách bookings sau khi cập nhật
     } catch (error) {
-      console.error("Error creating trip:", error);
-      message.error("Unable to create trip");
+      console.error("Error processing trip:", error);
+      message.error("Unable to process trip");
+    }
+
+    setIsTripModalVisible(false); // Đóng modal sau khi hoàn thành
+  });
+};
+
+  const updateTripId = async (bookingId, tripId) => {
+    try {
+      // Giả sử bạn có đầy đủ dữ liệu booking hiện tại trong state `viewingBooking`
+      const updatedBooking = { ...viewingBooking, tripId }; // Giữ nguyên các trường khác, ch cập nhật tripId
+  
+      console.log("Updating booking with tripId:", bookingId, tripId);
+      await axios.put(`${bookingApi}/${bookingId}`, updatedBooking); // Gửi toàn bộ dữ liệu booking đã cập nhật
+      message.success("Booking updated with tripId successfully");
+    } catch (error) {
+      console.error("Error updating booking with tripId:", error);
+      message.error("Unable to update booking with tripId");
     }
   };
-
-  const updateTrip = async (tripId, tripData) => {
-    try {
-      await axios.put(`${tripApi}/${tripId}`, tripData);
-      message.success("Trip updated successfully");
-      fetchBookings(); // Refresh data after updating trip
-    } catch (error) {
-      console.error("Error updating trip:", error);
-      message.error("Unable to update trip");
-    }
-  };
+  
 
   const updateBooking = async (BookingID, bookingData) => {
     try {
+      console.log("Updating booking with ID:", BookingID);
+      console.log("Booking data to update:", bookingData); // Kiểm tra dữ liệu gửi đi
+      
+  
       await axios.put(`${bookingApi}/${BookingID}`, bookingData);
       message.success("Booking updated successfully");
-      fetchBookings();
+      fetchBookings(); // Refresh bookings sau khi cập nhật
     } catch (error) {
       console.error("Error updating booking:", error);
       message.error("Unable to update booking");
     }
   };
+  
 
   const columns = [
-    { title: "ID", dataIndex: "BookingID", key: "BookingID" },
+    { title: "ID", dataIndex: "bookingId", key: "bookingId" },
     { title: "Name", dataIndex: "fullname", key: "fullname" },
     {
       title: "Start Date",
@@ -212,31 +203,31 @@ function SalesDashboard() {
     {
       title: "Trip Details",
       key: "tripDetail",
-      render: (_, record) => (
-        <Button onClick={() => showTripModal(record.BookingID)}>
-          Edit Trip
-        </Button>
-      ),
+      render: (_, record) => {
+        if (record.tripId) {
+          return (
+            <>
+              <Button onClick={() => showTripModal(record)}>
+                View & Edit Trip
+              </Button>
+              {/* Hiển thị thông tin trip nếu cần */}
+              {viewingBooking && viewingBooking.tripId === record.tripId && (
+                <div>
+                  {/* Hiển thị thông tin trip ở đây */}
+                  <p>Trip ID: {record.tripId}</p>
+                  {/* Thêm các thông tin khác của trip nếu cần */}
+                </div>
+              )}
+            </>
+          );
+        }
+        return (
+          <Button onClick={() => showTripModal(record)}>Create Trip</Button>
+        );
+      },
     },
   ];
-
-  const getStatistics = () => {
-    const totalBookings = bookings.length;
-    const pendingBookings = bookings.filter(
-      (b) => b.status === "pending"
-    ).length;
-    const rejectedBookings = bookings.filter(
-      (b) => b.status === "rejected"
-    ).length;
-
-    return {
-      totalBookings,
-      pendingBookings,
-      rejectedBookings,
-    };
-  };
-
-  const stats = getStatistics();
+  
 
   return (
     <div>
@@ -247,7 +238,7 @@ function SalesDashboard() {
           <Card>
             <Statistic
               title="Total Bookings"
-              value={stats.totalBookings}
+              value={bookings.length}
               prefix={<ShoppingCartOutlined />}
             />
           </Card>
@@ -256,7 +247,7 @@ function SalesDashboard() {
           <Card>
             <Statistic
               title="Pending Bookings"
-              value={stats.pendingBookings}
+              value={bookings.filter(b => b.status === "pending").length}
               prefix={<UserOutlined />}
             />
           </Card>
@@ -265,14 +256,14 @@ function SalesDashboard() {
           <Card>
             <Statistic
               title="Rejected Bookings"
-              value={stats.rejectedBookings}
+              value={bookings.filter(b => b.status === "rejected").length}
               prefix={<CheckOutlined />}
             />
           </Card>
         </Col>
       </Row>
 
-      <Table columns={columns} dataSource={bookings} rowKey="BookingID" />
+      <Table columns={columns} dataSource={bookings} rowKey="bookingId" />
 
       <Modal
         title="Update Booking"
@@ -281,8 +272,35 @@ function SalesDashboard() {
         onCancel={() => setIsModalVisible(false)}
       >
         <Form form={form} layout="vertical">
+          <Form.Item name="tripId" label="Trip ID">
+            <Input disabled />
+          </Form.Item>
           <Form.Item name="fullname" label="Customer Name">
             <Input disabled />
+          </Form.Item>
+          <Form.Item name="phone" label="Phone">
+            <Input disabled />
+          </Form.Item>
+          <Form.Item name="email" label="Email">
+            <Input disabled />
+          </Form.Item>
+          <Form.Item name="favoriteKoi" label="Favorite Koi">
+            <Select mode="multiple" disabled>
+                {Array.isArray(form.getFieldValue('favoriteKoi')) ? form.getFieldValue('favoriteKoi').map(koi => (
+                    <Select.Option key={koi} value={koi}>
+                        {koi}
+                    </Select.Option>
+                )) : null}
+            </Select>
+          </Form.Item>
+          <Form.Item name="favoriteFarm" label="Favorite Farm">
+            <Select mode="multiple" disabled>
+                {Array.isArray(form.getFieldValue('favoriteFarm')) ? form.getFieldValue('favoriteFarm').map(farm => (
+                    <Select.Option key={farm} value={farm}>
+                        {farm}
+                    </Select.Option>
+                )) : null}
+            </Select>
           </Form.Item>
           <Form.Item name="status" label="Status" rules={[{ required: true }]}>
             <Select>
@@ -298,13 +316,13 @@ function SalesDashboard() {
             <DatePicker disabled />
           </Form.Item>
           <Form.Item name="note" label="Note">
-            <Input.TextArea />
+            <Input.TextArea disabled />
           </Form.Item>
         </Form>
       </Modal>
 
       <Modal
-        title="Edit Trip"
+        title="Create Trip"
         visible={isTripModalVisible}
         onOk={handleTripOk}
         onCancel={() => setIsTripModalVisible(false)}
@@ -317,6 +335,19 @@ function SalesDashboard() {
             rules={[{ required: true }]}
           >
             <Input />
+          </Form.Item>
+          <Form.Item
+            name="koiFarmIds"
+            label="Select Koi Farms"
+            rules={[{ required: true, message: "Please select at least one Koi Farm" }]}
+          >
+            <Select mode="multiple" placeholder="Select Koi Farms">
+              {koiFarms.map(farm => (
+                <Select.Option key={farm.farmId} value={farm.farmId}>
+                  {farm.farmName}
+                </Select.Option>
+              ))}
+            </Select>
           </Form.Item>
           <Form.List name="tripdetailed">
             {(fields, { add, remove }) => (
@@ -341,9 +372,7 @@ function SalesDashboard() {
                         <Form.Item
                           {...restField}
                           name={[name, "mainTopic"]}
-                          rules={[
-                            { required: true, message: "Missing main topic" },
-                          ]}
+                          rules={[{ required: true, message: "Missing main topic" }]}
                         >
                           <Input placeholder="Main Topic" />
                         </Form.Item>
@@ -357,10 +386,6 @@ function SalesDashboard() {
                           <InputNumber
                             min={0}
                             placeholder="Price"
-                            formatter={(value) =>
-                              `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                            }
-                            parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
                             style={{ width: "100%" }}
                           />
                         </Form.Item>
@@ -375,13 +400,6 @@ function SalesDashboard() {
                         </Button>
                       </Col>
                     </Row>
-                    <Form.Item
-                      {...restField}
-                      name={[name, "subTopic"]}
-                      label="Sub Topic"
-                    >
-                      <Input.TextArea rows={3} />
-                    </Form.Item>
                   </Card>
                 ))}
                 <Form.Item>
