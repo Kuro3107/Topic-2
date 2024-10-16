@@ -95,6 +95,18 @@ function BookingForm() {
       return;
     }
     try {
+      // Lấy thông tin người dùng từ localStorage
+      const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+      const customerId = userInfo?.customerId; // Lấy customerId từ thông tin người dùng
+      console.log("Customer ID:", customerId); // Thêm log để kiểm tra customerId
+
+      // Kiểm tra xem customerId có phải là undefined không
+      if (!customerId) {
+        console.error("Customer ID is undefined. Please check the userInfo in localStorage.");
+        toast.error("Không tìm thấy thông tin khách hàng.");
+        return;
+      }
+
       // Chuyển đổi favoriteKoi và favoriteFarm từ ID sang tên
       const favoriteKoiNames = formData.favoriteKoi.map(id => {
         const koi = koiOptions.find(option => option.value === id);
@@ -108,6 +120,7 @@ function BookingForm() {
 
       const dataToSend = {
         ...formData,
+        customerId: customerId, // Thêm customerId vào dữ liệu gửi đi
         favoriteKoi: favoriteKoiNames, // Gửi mảng tên cá koi
         favoriteFarm: favoriteFarmNames, // Gửi mảng tên farm
       };

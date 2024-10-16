@@ -55,6 +55,7 @@ function LoginPage() {
         phone: user.phone,
         roleId: user.roleId,
         status: user.status,
+        customerId: user.customer.customerId, // Lưu customerId
         token: token, // Thêm token vào userInfo
       };
       localStorage.setItem("userInfo", JSON.stringify(userInfo)); // Lưu toàn bộ userInfo bao gồm token
