@@ -4,6 +4,7 @@ import com.example.SWP_Project_BackEnd.Entity.KoiFarm;
 import com.example.SWP_Project_BackEnd.Entity.Trip;
 import com.example.SWP_Project_BackEnd.Entity.TripDetail;
 import com.example.SWP_Project_BackEnd.Exception.ResourceNotFoundException;
+import com.example.SWP_Project_BackEnd.Repository.KoiFarmRepository;
 import com.example.SWP_Project_BackEnd.Repository.TripDetailRepository;
 import com.example.SWP_Project_BackEnd.Repository.TripRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,12 @@ public class TripService {
 
     @Autowired
     private TripRepository tripRepository;
+
+    @Autowired
     private TripDetailRepository tripDetailRepository;
+
+    @Autowired
+    private KoiFarmRepository koiFarmRepository;
 
     public List<Trip> getAllTrips() {
         return tripRepository.findAll();
@@ -65,9 +71,10 @@ public class TripService {
         Trip trip = tripRepository.findById(tripId)
                 .orElseThrow(() -> new ResourceNotFoundException("Trip not found with id " + tripId));
 
+
+        // Thêm KoiFarm đã lưu vào Trip
         trip.getKoiFarms().add(koiFarm);
-        tripRepository.save(trip); // Lưu trip để cập nhật
-        return trip;
+        return tripRepository.save(trip); // Lưu trip để cập nhật
     }
 
     public Trip removeKoiFarmFromTrip(Long tripId, Long farmId) {
@@ -80,8 +87,8 @@ public class TripService {
                 .orElseThrow(() -> new ResourceNotFoundException("Farm not found with id " + farmId));
 
         trip.getKoiFarms().remove(farmToRemove);
-        tripRepository.save(trip); // Lưu trip để cập nhật
-        return trip;
+        return tripRepository.save(trip); // Lưu trip để cập nhật
+
     }
 
     public TripDetail addTripDetail(Long tripId, TripDetail tripDetail) {
@@ -93,28 +100,30 @@ public class TripService {
         return tripDetailRepository.save(tripDetail);
     }
 
-    public TripDetail updateTripDetail(Long tripId, Long detailId, TripDetail tripDetail) {
-        Trip trip = tripRepository.findById(tripId)
-                .orElseThrow(() -> new ResourceNotFoundException("Trip not found with id " + tripId));
+    public TripDetail updateTripDetail(Long tripId, Long tripDetailId, TripDetail tripDetail) {
+        // Tìm trip detail dựa trên tripId và tripDetailId
+        TripDetail existingDetail = tripDetailRepository.findByTrip_TripIdAndTripDetailId(tripId, tripDetailId)
+                .orElseThrow(() -> new ResourceNotFoundException("Trip detail not found for this trip and detail id"));
 
-        TripDetail existingDetail = tripDetailRepository.findById(detailId)
-                .orElseThrow(() -> new ResourceNotFoundException("Trip detail not found with id " + detailId));
+        // Kiểm tra xem dữ liệu có thay đổi không trước khi cập nhật
+        if (!existingDetail.equals(tripDetail)) {
+            existingDetail.setMainTopic(tripDetail.getMainTopic());
+            existingDetail.setSubTopic(tripDetail.getSubTopic());
+            existingDetail.setNotePrice(tripDetail.getNotePrice());
+            existingDetail.setDay(tripDetail.getDay());
+        }
 
-        // Cập nhật các trường của trip detail
-        existingDetail.setMainTopic(tripDetail.getMainTopic());
-        existingDetail.setSubTopic(tripDetail.getSubTopic());
-        existingDetail.setNotePrice(tripDetail.getNotePrice());
-        existingDetail.setDay(tripDetail.getDay());
+            return tripDetailRepository.save(existingDetail);
 
-        return tripDetailRepository.save(existingDetail);
     }
 
-    public void deleteTripDetail(Long tripId, Long detailId) {
+
+    public void deleteTripDetail(Long tripId, Long tripDetailId) {
         Trip trip = tripRepository.findById(tripId)
                 .orElseThrow(() -> new ResourceNotFoundException("Trip not found with id " + tripId));
 
-        TripDetail detailToDelete = tripDetailRepository.findById(detailId)
-                .orElseThrow(() -> new ResourceNotFoundException("Trip detail not found with id " + detailId));
+        TripDetail detailToDelete = tripDetailRepository.findById(tripDetailId)
+                .orElseThrow(() -> new ResourceNotFoundException("Trip detail not found with id " + tripDetailId));
 
         tripDetailRepository.delete(detailToDelete);
     }

@@ -111,6 +111,11 @@
 			<artifactId>jaxb-runtime</artifactId>
 			<version>2.3.1</version> <!-- Use a compatible version -->
 		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+		</dependency>
+
 
 
 
@@ -136,7 +141,7 @@
 				<artifactId>spotbugs-maven-plugin</artifactId>
 				<version>4.8.6.4</version> <!-- Adjust to the latest version -->
 				<configuration>
-					<failOnError>false</failOnError> <!-- Set to false to allow the build to succeed -->
+					<failOnError>false</failOnError> <!-- Set false to allow the build to succeed -->
 				</configuration>
 				<executions>
 					<execution>

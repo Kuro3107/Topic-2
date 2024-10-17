@@ -33,11 +33,6 @@ public class TripDetailController {
         return new ResponseEntity<>(tripDetail, HttpStatus.OK);
     }
 
-//    @GetMapping("/{tripDetailId}/koifarms")
-//    public ResponseEntity<List<KoiFarm>> getKoiFarmsByTripDetailId(@PathVariable("id") Long tripDetailId) {
-//        List<KoiFarm> koiFarms = tripDetailService.getKoiFarmsByTripDetailId(tripDetailId);
-//        return ResponseEntity.ok(koiFarms);
-//    }
 
     @PostMapping
     public ResponseEntity<TripDetail> createTripDetail(@RequestBody TripDetail tripDetail) {

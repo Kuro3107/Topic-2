@@ -47,11 +47,21 @@ public class TripController {
     public ResponseEntity<Trip> createTrip(@RequestBody Trip trip) {
         Trip createdTrip = tripService.createTrip(trip);
 
+        // Log to check the received data
+        System.out.println("Received TripDetails: " + trip.getTripDetails());
+
         // Nếu có tripDetails, hãy lưu chúng
         if (trip.getTripDetails() != null && !trip.getTripDetails().isEmpty()) {
             for (TripDetail detail : trip.getTripDetails()) {
                 detail.setTrip(createdTrip); // Gán trip cho tripDetail
                 tripDetailRepository.save(detail); // Lưu tripDetail
+            }
+        }
+
+        // Nếu có KoiFarms, hãy thêm chúng vào trip
+        if (trip.getKoiFarms() != null && !trip.getKoiFarms().isEmpty()) {
+            for (KoiFarm farm : trip.getKoiFarms()) {
+                tripService.addKoiFarmToTrip(createdTrip.getTripId(), farm);
             }
         }
         return new ResponseEntity<>(createdTrip, HttpStatus.CREATED);
@@ -71,16 +81,20 @@ public class TripController {
 
     // Thêm farm vào trip
     @PostMapping("/{tripId}/farms")
-    public ResponseEntity<Trip> addFarmToTrip(@PathVariable Long tripId, @RequestBody KoiFarm koiFarm) {
-        Trip updatedTrip = tripService.addKoiFarmToTrip(tripId, koiFarm);
-        return new ResponseEntity<>(updatedTrip, HttpStatus.OK);
+    public ResponseEntity<Void> addFarmToTrip(@PathVariable Long tripId, @RequestBody KoiFarm koiFarm) {
+
+        // Thêm farm vào trip thông qua bảng trung gian
+        tripService.addKoiFarmToTrip(tripId, koiFarm);
+        return ResponseEntity.ok().build();
     }
 
     // Xóa farm khỏi trip
     @DeleteMapping("/{tripId}/farms/{farmId}")
-    public ResponseEntity<Trip> removeFarmFromTrip(@PathVariable Long tripId, @PathVariable Long farmId) {
-        Trip updatedTrip = tripService.removeKoiFarmFromTrip(tripId, farmId);
-        return new ResponseEntity<>(updatedTrip, HttpStatus.OK);
+    public ResponseEntity<Void> removeFarmFromTrip(@PathVariable Long tripId, @PathVariable Long farmId) {
+
+        // Xóa farm khỏi trip
+        tripService.removeKoiFarmFromTrip(tripId, farmId);
+        return ResponseEntity.ok().build();
     }
 
     // Thêm trip detail vào trip
@@ -92,15 +106,15 @@ public class TripController {
 
     // Cập nhật trip detail
     @PutMapping("/{tripId}/trip-details/{tripDetailId}")
-    public ResponseEntity<TripDetail> updateTripDetail1(@PathVariable Long tripId, @PathVariable Long detailId, @RequestBody TripDetail tripDetail) {
-        TripDetail updatedTripDetail = tripService.updateTripDetail(tripId, detailId, tripDetail);
+    public ResponseEntity<TripDetail> updateTripDetail(@PathVariable Long tripId, @PathVariable Long tripDetailId, @RequestBody TripDetail tripDetail) {
+        TripDetail updatedTripDetail = tripService.updateTripDetail(tripId, tripDetailId, tripDetail);
         return new ResponseEntity<>(updatedTripDetail, HttpStatus.OK);
     }
 
     // Xóa trip detail
     @DeleteMapping("/{tripId}/trip-details/{tripDetailId}")
-    public ResponseEntity<Void> deleteTripDetail(@PathVariable Long tripId, @PathVariable Long detailId) {
-        tripService.deleteTripDetail(tripId, detailId);
+    public ResponseEntity<Void> deleteTripDetail(@PathVariable Long tripId, @PathVariable Long tripDetailId) {
+        tripService.deleteTripDetail(tripId, tripDetailId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

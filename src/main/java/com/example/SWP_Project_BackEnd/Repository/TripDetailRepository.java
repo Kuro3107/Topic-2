@@ -12,5 +12,13 @@ import java.util.Optional;
 
 @Repository
 public interface TripDetailRepository extends JpaRepository<TripDetail, Long> {
+    // Phương thức tìm kiếm tất cả TripDetail theo tripId
+    List<TripDetail> findByTrip_TripId(Long tripId);
+
+    // Phương thức tìm kiếm TripDetail theo tripId và mainTopic
+    Optional<TripDetail> findByTrip_TripIdAndMainTopic(Long tripId, String mainTopic);
+
+    // Phương thức tìm kiếm TripDetail theo tripId và tripDetailId
+    Optional<TripDetail> findByTrip_TripIdAndTripDetailId(Long tripId, Long tripDetailId);
 }
 

@@ -22,8 +22,8 @@ public class BookingDTO {
     private String fullname;
     private String phone;
     private String email;
-    private List<String> favoriteKoi;
-    private List<String> favoriteFarm;
+    private String favoriteKoi;
+    private String favoriteFarm;
     private String note;
     private String status;
     private Date startDate;
