@@ -111,18 +111,18 @@ function BookingForm() {
       const favoriteKoiNames = formData.favoriteKoi.map(id => {
         const koi = koiOptions.find(option => option.value === id);
         return koi ? koi.label.split(" - ")[0] : null; // Lấy tên cá koi
-      }).filter(name => name); // Lọc các giá trị null
+      }).filter(name => name).join(", "); // Chuyển đổi thành chuỗi
 
       const favoriteFarmNames = formData.favoriteFarm.map(id => {
         const farm = filteredFarmOptions.find(option => option.value === id);
         return farm ? farm.label.split(" - ")[0] : null; // Lấy tên farm
-      }).filter(name => name); // Lọc các giá trị null
+      }).filter(name => name).join(", "); // Chuyển đổi thành chuỗi
 
       const dataToSend = {
         ...formData,
         customerId: customerId, // Thêm customerId vào dữ liệu gửi đi
-        favoriteKoi: favoriteKoiNames, // Gửi mảng tên cá koi
-        favoriteFarm: favoriteFarmNames, // Gửi mảng tên farm
+        favoriteKoi: favoriteKoiNames, // Gửi chuỗi tên cá koi
+        favoriteFarm: favoriteFarmNames, // Gửi chuỗi tên farm
       };
 
       console.log("Dữ liệu gửi đi:", dataToSend); // In ra dữ liệu gửi đi

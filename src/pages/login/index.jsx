@@ -55,17 +55,21 @@ function LoginPage() {
         phone: user.phone,
         roleId: user.roleId,
         status: user.status,
-        customerId: user.customer.customerId, // Lưu customerId
         token: token, // Thêm token vào userInfo
       };
+
+      // Chỉ thêm customerId nếu role là customer
+      if (role_id === 5) { // Giả sử role_id 5 là customer
+        userInfo.customerId = user.customer ? user.customer.customerId : null; // Kiểm tra user.customer có tồn tại không
+      }
+
       localStorage.setItem("userInfo", JSON.stringify(userInfo)); // Lưu toàn bộ userInfo bao gồm token
       localStorage.setItem("token", token);
 
       console.log("Stored userInfo:", localStorage.getItem("userInfo"));
 
-  
       toast.success("Login successful!");
-  
+
       // Điều hướng dựa trên vai trò người dùng
       if (role_id === 1) {
         navigate("/dashboard"); // Manager
