@@ -29,6 +29,7 @@ function Profile() {
   const apiAccountBaseUrl = "http://localhost:8080/api/accounts/"; // Địa chỉ API
   const [isModalVisible, setIsModalVisible] = useState(false);
 const [selectedBooking, setSelectedBooking] = useState(null);
+const bookingApi = "http://localhost:8080/api/bookings";
 
   
 
