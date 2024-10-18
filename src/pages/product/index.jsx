@@ -18,7 +18,9 @@ const Product = () => {
     setLoading(true);
     try {
       const response = await axios.get(apiTour);
-      setTours(response.data);
+      // Lọc các tours có imageUrl
+      const toursWithImage = response.data.filter(tour => tour.imageUrl);
+      setTours(toursWithImage);
     } catch (error) {
       message.error("Unable to load the list of tours");
       console.error("Error loading tours:", error);
@@ -36,8 +38,17 @@ const Product = () => {
     message.success(`Booked tour with ID: ${tripId}`);
   };
 
-  const handleViewTour = (tour) => {
-    setSelectedTour(tour);
+  const handleViewTour = async (tour) => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`${apiTour}/${tour.tripId}`); // Lấy thông tin chi tiết của tour
+      setSelectedTour(response.data); // Cập nhật selectedTour với dữ liệu chi tiết
+    } catch (error) {
+      message.error("Unable to load tour details");
+      console.error("Error loading tour details:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCloseModal = () => {
@@ -116,7 +127,33 @@ const Product = () => {
           <div>
             <p><strong>Price:</strong> {selectedTour.priceTotal?.toLocaleString()} VND</p>
             <p><strong>Description:</strong> {selectedTour.description || 'No description available.'}</p>
-            {/* Thêm thông tin chi tiết khác nếu cần */}
+            <h3>Trip Details:</h3>
+            {selectedTour.tripDetails.map(detail => (
+              <div key={detail.tripDetailId}>
+                <p><strong>Main Topic:</strong> {detail.mainTopic}</p>
+                <p><strong>Sub Topic:</strong> {detail.subTopic}</p>
+                <p><strong>Note Price:</strong> {detail.notePrice}</p>
+                <p><strong>Day:</strong> {detail.day}</p>
+              </div>
+            ))}
+            <h3>Koi Farms:</h3>
+            {selectedTour.koiFarms.map(farm => (
+              <div key={farm.farmId}>
+                <p><strong>Farm Name:</strong> {farm.farmName}</p>
+                <p><strong>Location:</strong> {farm.location}</p>
+                <p><strong>Contact Info:</strong> {farm.contactInfo}</p>
+                <img src={farm.imageUrl} alt={farm.farmName} style={{ width: '100px' }} />
+                <h4>Koi Varieties:</h4>
+                {farm.koiVarieties.map(variety => (
+                  <div key={variety.varietyId}>
+                    <p><strong>Variety Name:</strong> {variety.varietyName}</p>
+                    <p><strong>Description:</strong> {variety.description}</p>
+                    <p><strong>Price:</strong> {variety.koiPrice?.toLocaleString()} VND</p>
+                    <img src={variety.imageUrl} alt={variety.varietyName} style={{ width: '100px' }} />
+                  </div>
+                ))}
+              </div>
+            ))}
           </div>
         )}
       </Modal>

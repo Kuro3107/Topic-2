@@ -116,9 +116,28 @@ const [selectedBooking, setSelectedBooking] = useState(null);
     }
   };
 
-  const handleViewBooking = (orderId) => {
+  const handleViewBooking = async (orderId) => {
     const bookingDetails = orders.find((order) => order.bookingId === orderId);
     setSelectedBooking(bookingDetails); // Lưu thông tin booking vào state
+
+    // Kiểm tra tripId và lấy thông tin trip nếu có
+    if (bookingDetails.tripId) { // Sử dụng tripId thay vì trip_id
+        try {
+            const tripResponse = await api.get(`http://localhost:8080/api/trips/${bookingDetails.tripId}`);
+            if (tripResponse.data) {
+                setSelectedBooking((prev) => ({
+                    ...prev,
+                    tripDetails: tripResponse.data, // Thêm thông tin trip vào booking
+                }));
+            } else {
+                toast.error("No trip details found.");
+            }
+        } catch (error) {
+            console.error("Error fetching trip details:", error);
+            toast.error("An error occurred while fetching trip details.");
+        }
+    }
+
     setIsModalVisible(true); // Hiển thị modal
   };
 
@@ -131,7 +150,7 @@ const [selectedBooking, setSelectedBooking] = useState(null);
   const roleMapping = {
     1: "Manager",
     2: "Sale Staff",
-    3: "Consultant Staff",
+     3: "Consultant Staff",
     4: "Delivery Staff",
     5: "Customer",
   };
@@ -393,6 +412,46 @@ const [selectedBooking, setSelectedBooking] = useState(null);
               <p>
                 <strong>Note:</strong> {selectedBooking.note}
               </p>
+              {selectedBooking.tripDetails && (
+                <div>
+                  <h3>Trip Details</h3>
+                  <p>
+                    <strong>Trip ID:</strong> {selectedBooking.tripDetails.tripId}
+                  </p>
+                  <p>
+                    <strong>Trip Name:</strong> {selectedBooking.tripDetails.tripName}
+                  </p>
+                  <p>
+                    <strong>Total Price:</strong> ${selectedBooking.tripDetails.priceTotal}
+                  </p>
+                  <img src={selectedBooking.tripDetails.imageUrl} alt="Trip" style={{ width: '100%', height: 'auto' }} />
+                  <h4>Trip Itinerary:</h4>
+                  {selectedBooking.tripDetails.tripDetails.map(detail => (
+                    <div key={detail.tripDetailId}>
+                      <p>
+                        <strong>Day {detail.day}:</strong> {detail.mainTopic} - {detail.subTopic} (Price: ${detail.notePrice})
+                      </p>
+                    </div>
+                  ))}
+                  <h4>Koi Farms:</h4>
+                  {selectedBooking.tripDetails.koiFarms.map(farm => (
+                    <div key={farm.farmId}>
+                      <h5>{farm.farmName} ({farm.location})</h5>
+                      <p>Contact: {farm.contactInfo}</p>
+                      <img src={farm.imageUrl} alt={farm.farmName} style={{ width: '100%', height: 'auto' }} />
+                      <h6>Koi Varieties:</h6>
+                      {farm.koiVarieties.map(variety => (
+                        <div key={variety.varietyId}>
+                          <p>
+                            <strong>{variety.varietyName}:</strong> {variety.description} (Price: ${variety.koiPrice})
+                          </p>
+                          <img src={variety.imageUrl} alt={variety.varietyName} style={{ width: '100%', height: 'auto' }} />
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </Modal>
