@@ -84,6 +84,19 @@ public class BookingService {
         }
     }
 
+    // Phương thức để cập nhật PO_ID cho Booking
+    public Booking updatePoId(Long bookingId, Long poId) {
+        Optional<Booking> optionalBooking = bookingRepository.findById(bookingId);
+
+        if (optionalBooking.isPresent()) {
+            Booking booking = optionalBooking.get();
+            booking.setPoId(poId);  // Cập nhật PO_ID
+            return bookingRepository.save(booking);  // Lưu Booking đã cập nhật
+        } else {
+            throw new ResourceNotFoundException("Booking not found with ID: " + bookingId);
+        }
+    }
+
     // DELETE booking
     public void deleteBooking(Long bookingId) {
         if (bookingRepository.existsById(bookingId)) {

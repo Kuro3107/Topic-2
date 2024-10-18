@@ -1,5 +1,6 @@
 package com.example.SWP_Project_BackEnd.Entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -44,6 +45,11 @@ public class KoiFarm {
             inverseJoinColumns = @JoinColumn(name = "variety_id")
     )
     private List<KoiVariety> koiVarieties = new ArrayList<>();
+
+    // Liên kết OneToOne với PODetail
+    @OneToOne(mappedBy = "farm")
+    @JsonBackReference
+    private PODetail poDetail;
 //
 //    @ManyToMany(mappedBy = "koiFarms", fetch = FetchType.LAZY)
 //    @JsonIgnore

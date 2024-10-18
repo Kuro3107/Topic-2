@@ -37,5 +37,9 @@ public class BookingDTO {
     }
 
     // Getters and setters
+
+    public Date getEndDate() {
+        return (endDate == null) ? null : new Date(endDate.getTime());
+    }
 }
 

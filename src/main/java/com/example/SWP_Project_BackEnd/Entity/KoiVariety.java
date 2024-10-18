@@ -1,5 +1,6 @@
 package com.example.SWP_Project_BackEnd.Entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -31,6 +32,10 @@ public class KoiVariety {
     @ManyToMany(mappedBy = "koiVarieties",fetch = FetchType.LAZY) // Sử dụng mappedBy để ánh xạ ngược lại quan hệ trong Trip
     @JsonIgnore // Để tránh vòng lặp tuần hoàn khi trả dữ liệu về
     private List<KoiFarm> koiFarms = new ArrayList<>();
+
+    @OneToOne(mappedBy = "variety")
+    @JsonBackReference
+    private PODetail poDetail;
 
 //    @OneToMany
 //    @JoinTable(
