@@ -15,6 +15,9 @@ import ManageTrip from "./pages/admin/manage-trip";
 import Product from "./pages/product";
 import ManageBooking from "./pages/admin/manage-booking";
 import Sales from "./pages/staff/sales";
+import Payment from "./pages/payment";
+import Consulting from "./pages/staff/consulting";
+
 function App() {
   const router = createBrowserRouter([
     {
@@ -62,6 +65,14 @@ function App() {
     {
       path: "/sales",
       element: <Sales />,
+    },
+    {
+      path: "/payment",
+      element: <Payment />,
+    },
+    {
+      path: "/consulting",
+      element: <Consulting />,
     },
   ]);
   return (

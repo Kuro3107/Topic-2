@@ -60,21 +60,19 @@ function ManageBooking() {
   const handleOk = () => {
     form.validateFields().then((values) => {
       const bookingData = {
-        ...values,
-        startDate: values.startDate.format(),
-        endDate: values.endDate.format(),
-        isActive: values.status !== "delivered",
+        status: values.status, // Chỉ gửi trạng thái
       };
-      if (editingBooking) {
-        updateBooking(editingBooking.BookingID, bookingData);
+      if (editingBooking && editingBooking.bookingId) { // Kiểm tra BookingID
+        const updatedData = { ...editingBooking, ...bookingData }; // Giữ nguyên các trường khác
+        updateBooking(editingBooking.bookingId, updatedData); // Cập nhật chỉ trạng thái
       } else {
-        createBooking(bookingData);
+        message.error("Không có ID đặt chỗ để cập nhật."); // Thông báo lỗi nếu không có ID
       }
       setIsModalVisible(false);
     });
   };
 
-  const createBooking = async (bookingData) => {
+   const createBooking = async (bookingData) => {
     try {
       await axios.post(api, bookingData);
       message.success("Đã tạo đặt chỗ mới");
@@ -123,7 +121,7 @@ function ManageBooking() {
       render: (date) => dayjs(date).format("DD/MM/YYYY"),
     },
     {
-      title: "Ngày kết thúc",
+      title: "Ngày kết thc",
       dataIndex: "endDate",
       key: "endDate",
       render: (date) => dayjs(date).format("DD/MM/YYYY"),
@@ -156,17 +154,79 @@ function ManageBooking() {
           >
             Xóa
           </Button>
+          <Button onClick={() => viewTripDetails(record.bookingId)}>
+            View Trip Detail
+          </Button>
         </>
       ),
     },
-    {
-      title: "View Trip Detail",
-      key: "view",
-      render: (_, record) => (
-        <Button onClick={() => showModal(record)}>View</Button>
-      ),
-    },
   ];
+
+  const viewTripDetails = async (bookingId) => {
+    try {
+        const responseTrips = await axios.get(`http://localhost:8080/api/trips`); // Gọi API để lấy tất cả các chuyến đi
+        const responseFarms = await axios.get(`http://localhost:8080/api/farms`); // Gọi API để lấy tất cả các trang trại
+        const responseTripDetails = await axios.get(`http://localhost:8080/api/trip-details`); // Gọi API để lấy tất cả các chi tiết chuyến đi
+
+        // Lấy trip_id từ booking tương ứng
+        const booking = bookings.find(b => b.bookingId === bookingId);
+        if (!booking) {
+            message.warning("Không tìm thấy đặt chỗ.");
+            return;
+        }
+
+        // Lọc chuyến đi theo trip_id từ booking
+        const trips = responseTrips.data.filter(trip => trip.tripId === booking.tripId); 
+        
+        // Hiển thị thông tin chuyến đi (có thể sử dụng Modal hoặc một component khác)
+        if (trips.length > 0) {
+            Modal.info({
+                title: 'Chi tiết chuyến đi',
+                content: (
+                    <div>
+                        {trips.map(trip => (
+                            <div key={trip.tripId}>
+                                <p>Trip ID: {trip.tripId}</p>
+                                <p>Tên chuyến đi: {trip.tripName}</p>
+                                <p>Tổng giá: {trip.priceTotal} VNĐ</p>
+                                <img src={trip.imageUrl} alt={trip.tripName} style={{ width: '100%', height: 'auto' }} />
+                                
+                                <h4>Chi tiết chuyến đi:</h4>
+                                {responseTripDetails.data
+                                    .filter(detail => detail.tripId === trip.tripId) // Lọc chi tiết chuyến đi theo tripId
+                                    .map(detail => (
+                                        <div key={detail.tripDetailId}>
+                                            <p>Ngày: {detail.day}</p>
+                                            <p>Chủ đề chính: {detail.mainTopic}</p>
+                                            <p>Chủ đề phụ: {detail.subTopic || 'Không có'}</p>
+                                            <p>Giá ghi chú: {detail.notePrice} VNĐ</p>
+                                        </div>
+                                    ))}
+                                
+                                <h4>Trang trại Koi:</h4>
+                                {responseFarms.data
+                                    .filter(farm => trip.koiFarms && trip.koiFarms.some(koiFarm => koiFarm.farmId === farm.farmId))
+                                    .map(farm => (
+                                        <div key={farm.farmId}>
+                                            <p>Tên trang trại: {farm.farmName}</p>
+                                            <p>Địa điểm: {farm.location}</p>
+                                            <p>Thông tin liên hệ: {farm.contactInfo}</p>
+                                        </div>
+                                    ))}
+                            </div>
+                        ))}
+                    </div>
+                ),
+                onOk() {},
+            });
+        } else {
+            message.warning("Không có chuyến đi nào cho đặt chỗ này.");
+        }
+    } catch (error) {
+        console.error("Lỗi khi lấy thông tin chuyến đi:", error);
+        message.error("Không thể lấy thông tin chuyến đi");
+    }
+  };
 
   return (
     <div>
