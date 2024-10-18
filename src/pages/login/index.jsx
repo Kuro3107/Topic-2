@@ -78,6 +78,10 @@ function LoginPage() {
       } else if (role_id === 2) {
         navigate("/sales"); // Staff
       }
+     else if (role_id === 3) {
+      navigate("/consulting"); // Staff
+    }
+      
       
     } catch (error) {
       console.error("Login error:", error);

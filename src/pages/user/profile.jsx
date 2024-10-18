@@ -16,6 +16,7 @@ import {
 import "./profile.css";
 import api from "../../config/axios";
 import { Upload, message } from "antd"; // Thêm import cho Upload
+// import ModalPayment from "../../components/ModalPayment";
 
 const defaultImageUrl = "/istockphoto-1495088043-612x612.jpg"; // Đường dẫn đến hình ảnh mặc định
 // Thêm state cho modal
@@ -29,75 +30,74 @@ function Profile() {
   const apiAccountBaseUrl = "http://localhost:8080/api/accounts/"; // Địa chỉ API
   const [isModalVisible, setIsModalVisible] = useState(false);
 const [selectedBooking, setSelectedBooking] = useState(null);
-const bookingApi = "http://localhost:8080/api/bookings";
 
   
 
   useEffect(() => {
     const fetchUserInfo = async () => {
       setLoading(true);
-  try {
-    const userInfo = localStorage.getItem("userInfo");
+      try {
+        const userInfo = localStorage.getItem("userInfo");
 
-    if (userInfo) {
-      const parsedUserData = JSON.parse(userInfo);
-      setParsedUser(parsedUserData); // Cập nhật trạng thái parsedUser
+        if (userInfo) {
+          const parsedUserData = JSON.parse(userInfo);
+          setParsedUser(parsedUserData); // Cập nhật trạng thái parsedUser
 
-      if (!parsedUserData.id) {
-        toast.error("User ID does not exist.");
-        return;
+          if (!parsedUserData.id) {
+            toast.error("User ID does not exist.");
+            return;
+          }
+
+          const apiAccount = `${apiAccountBaseUrl}${parsedUserData.id}`;
+          console.log("Calling API with URL:", apiAccount);
+
+          const response = await api.get(apiAccount);
+          console.log("API Response:", response.data);
+
+          if (response.data) {
+            const customerData = response.data.customer; // Trích xuất thông tin khách hàng
+
+            // Cập nhật user với thông tin từ API
+            setUser({
+              fullName: response.data.fullName || "Not Updated!",
+              username: response.data.username || "N/A",
+              email: response.data.email || "N/A",
+              phone: response.data.phone || "N/A",
+              status: response.data.status || "N/A",
+              roleId: response.data.roleId || "N/A",
+              imageUrl: response.data.imageUrl || defaultImageUrl, // Dùng hình ảnh mặc định nếu không có
+            });
+
+            const bookings = customerData.bookings || [];
+            console.log("Fetched bookings:", bookings);
+            setOrders(bookings);
+          } else {
+            toast.error("No bookings found for this user.");
+          }
+        } else {
+          toast.warning("Please login to view personal information.");
+          navigate("/login");
+        }
+      } catch (error) {
+        console.error("Error fetching user info:", error);
+        toast.error("An error occurred while fetching user information.");
+      } finally {
+        setLoading(false);
       }
-
-      const apiAccount = `${apiAccountBaseUrl}${parsedUserData.id}`;
-      console.log("Calling API with URL:", apiAccount);
-      
-      const response = await api.get(apiAccount);
-      console.log("API Response:", response.data);
-
-      if (response.data) {
-        const customerData = response.data.customer; // Trích xuất thông tin khách hàng
-
-        // Cập nhật user với thông tin từ API
-        setUser({
-          fullName: response.data.fullName || "Not Updated!",
-          username: response.data.username || "N/A",
-          email: response.data.email || "N/A",
-          phone: response.data.phone || "N/A",
-          status: response.data.status || "N/A",
-          roleId: response.data.roleId || "N/A",
-          imageUrl: response.data.imageUrl || defaultImageUrl, // Dùng hình ảnh mặc định nếu không có
-        });
-        
-        const bookings = customerData.bookings || []; // Lấy danh sách booking từ phản hồi
-        console.log("Bookings:", bookings);
-        setOrders(bookings); // Cập nhật orders với bookings
-        console.log("Updated Orders:", bookings); // Xem giá trị orders sau khi cập nhật
-      } else {
-        toast.error("No bookings found for this user.");
-      }
-    } else {
-      toast.warning("Please login to view personal information.");
-      navigate("/login");
-    }
-  } catch (error) {
-    console.error("Error fetching user info:", error);
-    toast.error("An error occurred while fetching user information.");
-  } finally {
-    setLoading(false);
-  }
     };
-  
+
     fetchUserInfo();
   }, [navigate]);
-  
+
   console.log("Rendering Orders:", orders); // Log để kiểm tra orders
-  
 
   useEffect(() => {
     console.log("Orders:", orders); // Kiểm tra giá trị orders sau khi cập nhật
   }, [orders]);
-  
-  
+
+  useEffect(() => {
+    console.log("Updated orders:", orders);
+  }, [orders]);
 
   const handleEdit = () => {
     navigate("/edit-profile");
@@ -111,6 +111,7 @@ const bookingApi = "http://localhost:8080/api/bookings";
       toast.success("Order was canceled successfully.");
       setOrders(orders.filter((order) => order.bookingId !== bookingId)); // Cập nhật lại danh sách orders
     } catch (error) {
+      console.error("Error canceling order:", error);
       toast.error("An error occurred while canceling the order.");
     }
   };
@@ -122,10 +123,10 @@ const bookingApi = "http://localhost:8080/api/bookings";
   };
 
   // Hàm để đóng modal
-const handleCloseModal = () => {
-  setIsModalVisible(false);
-  setSelectedBooking(null); // Đặt lại state khi đóng modal
-};
+  const handleCloseModal = () => {
+    setIsModalVisible(false);
+    setSelectedBooking(null); // Đặt lại state khi đóng modal
+  };
 
   const roleMapping = {
     1: "Manager",
@@ -148,10 +149,17 @@ const handleCloseModal = () => {
         );
         message.success("Image updated successfully!");
       } catch (error) {
+        console.error("Error updating image:", error);
         message.error("An error occurred while updating the image.");
       }
     }
   };
+
+  const handlePayment = (order) => {
+    navigate("/payment", { state: { order } });
+  };
+
+
 
   if (loading) {
     return (
@@ -185,7 +193,7 @@ const handleCloseModal = () => {
       title: "Booking Date",
       dataIndex: "bookingDate",
       key: "bookingDate",
-      render: (date) => date ? new Date(date).toLocaleDateString() : 'N/A', // Định dạng ngày, kiểm tra null
+      render: (date) => (date ? new Date(date).toLocaleDateString() : "N/A"), // Định dạng ngày, kiểm tra null
     },
     {
       title: "Status",
@@ -210,23 +218,34 @@ const handleCloseModal = () => {
     {
       title: "Action",
       key: "action",
-      render: (record) => (
-        <>
-          <Button
-            onClick={() => handleViewBooking(record.bookingId)}
-            icon={<ShoppingOutlined />}
-            style={{ marginRight: 8 }}
-          >
-            Xem lại
-          </Button>
-          <Button onClick={() => handleCancelOrder(record.bookingId)} danger>
-            Cancel
-          </Button>
-        </>
-      ),
+      render: (_, record) => {
+        console.log("Record status:", record.status); // Thêm log này để kiểm tra giá trị status
+        return (
+          <>
+            <Button
+              onClick={() => handleViewBooking(record.bookingId)}
+              icon={<ShoppingOutlined />}
+              style={{ marginRight: 8 }}
+            >
+              Xem lại
+            </Button>
+            {record.status && record.status.toLowerCase() === "approved" && (
+              <Button
+                onClick={() => handlePayment(record)}
+                type="primary"
+                style={{ marginRight: 8 }}
+              >
+                Thanh toán
+              </Button>
+            )}
+            <Button onClick={() => handleCancelOrder(record.bookingId)} danger>
+              Hủy
+            </Button>
+          </>
+        );
+      },
     },
   ];
-  
 
   return (
     <div className="profile-page">
@@ -307,45 +326,77 @@ const handleCloseModal = () => {
           </div>
         </Card>
 
-        <Card title={<h2><ShoppingOutlined /> Your Order</h2>}>
-        <div>
-      {loading ? (
-        <Spin />
-      ) : (
-        <Table
-          columns={columns}
-          dataSource={orders} // Đảm bảo sử dụng orders ở đây
-          rowKey="bookingId"
-        />
-      )}
-    </div>
+        <Card
+          title={
+            <h2>
+              <ShoppingOutlined /> Your Order
+            </h2>
+          }
+        >
+          <div>
+            {loading ? (
+              <Spin />
+            ) : (
+              <Table
+                columns={columns}
+                dataSource={orders} // Đảm bảo sử dụng orders ở đây
+                rowKey="bookingId"
+              />
+            )}
+          </div>
         </Card>
-<Modal
-  title="Booking Details"
-  visible={isModalVisible}
-  onCancel={handleCloseModal}
-  footer={[
-    <Button key="close" onClick={handleCloseModal}>
-      Đóng
-    </Button>,
-  ]}
->
-  {selectedBooking && (
-    <div>
-      <p><strong>Booking ID:</strong> {selectedBooking.bookingId}</p>
-      <p><strong>Booking Date:</strong> {new Date(selectedBooking.bookingDate).toLocaleDateString()}</p>
-      <p><strong>Full Name:</strong> {selectedBooking.fullname}</p>
-      <p><strong>Email:</strong> {selectedBooking.email}</p>
-      <p><strong>Phone:</strong> {selectedBooking.phone}</p>
-      <p><strong>Start Date:</strong> {new Date(selectedBooking.startDate).toLocaleDateString()}</p>
-      <p><strong>End Date:</strong> {new Date(selectedBooking.endDate).toLocaleDateString()}</p>
-      <p><strong>Status:</strong> {selectedBooking.status}</p>
-      <p><strong>Favorite Farms:</strong> {selectedBooking.favoriteFarm}</p>
-      <p><strong>Favorite Koi:</strong> {selectedBooking.favoriteKoi}</p>
-      <p><strong>Note:</strong> {selectedBooking.note}</p>
-    </div>
-  )}
-</Modal>
+        <Modal
+          title="Booking Details"
+          visible={isModalVisible}
+          onCancel={handleCloseModal}
+          footer={[
+            <Button key="close" onClick={handleCloseModal}>
+              Đóng
+            </Button>,
+          ]}
+        >
+          {selectedBooking && (
+            <div>
+              <p>
+                <strong>Booking ID:</strong> {selectedBooking.bookingId}
+              </p>
+              <p>
+                <strong>Booking Date:</strong>{" "}
+                {new Date(selectedBooking.bookingDate).toLocaleDateString()}
+              </p>
+              <p>
+                <strong>Full Name:</strong> {selectedBooking.fullname}
+              </p>
+              <p>
+                <strong>Email:</strong> {selectedBooking.email}
+              </p>
+              <p>
+                <strong>Phone:</strong> {selectedBooking.phone}
+              </p>
+              <p>
+                <strong>Start Date:</strong>{" "}
+                {new Date(selectedBooking.startDate).toLocaleDateString()}
+              </p>
+              <p>
+                <strong>End Date:</strong>{" "}
+                {new Date(selectedBooking.endDate).toLocaleDateString()}
+              </p>
+              <p>
+                <strong>Status:</strong> {selectedBooking.status}
+              </p>
+              <p>
+                <strong>Favorite Farms:</strong> {selectedBooking.favoriteFarm}
+              </p>
+              <p>
+                <strong>Favorite Koi:</strong> {selectedBooking.favoriteKoi}
+              </p>
+              <p>
+                <strong>Note:</strong> {selectedBooking.note}
+              </p>
+            </div>
+          )}
+        </Modal>
+
       </main>
       <Footer />
     </div>
