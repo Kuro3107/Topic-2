@@ -333,7 +333,7 @@ const updateKoiFarms = (tripId, farmsToAdd, farmsToRemove) => {
             console.error("Error adding koi farm:", error);
             message.error("Unable to add koi farm");
         });
-    });
+});
 
     // Xóa các farms đã bị loại bỏ
     farmsToRemove.forEach(farm => {
