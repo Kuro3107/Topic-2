@@ -26,6 +26,7 @@ public class BookingService {
     public Booking saveBooking(BookingDTO bookingDTO) {
         Booking booking = new Booking();
         booking.setBookingId(bookingDTO.getBookingId());
+        booking.setTripId(bookingDTO.getTripId());
         booking.setFullname(bookingDTO.getFullname());
         booking.setPhone(bookingDTO.getPhone());
         booking.setEmail(bookingDTO.getEmail());
