@@ -12,6 +12,7 @@ function Consulting() {
   const [totalAmount, setTotalAmount] = useState(0); // Thêm state cho total_amount
   const [deliveryDate, setDeliveryDate] = useState(null); // Thêm state cho koi_delivery_date
   const [status, setStatus] = useState("Not Yet"); // Thêm state cho status
+  const [poAddress, setPoAddress] = useState(''); // Thêm state cho địa chỉ PO
   const [farms, setFarms] = useState([]); // State cho danh sách farms
   const [koiVarieties, setKoiVarieties] = useState([]); // State cho danh sách koi varieties
   const [selectedFarmId, setSelectedFarmId] = useState(null); // State cho farm đã chọn
@@ -79,7 +80,7 @@ function Consulting() {
       if (!currentBooking) {
         throw new Error("Booking not found");
       }
-      await api.put(`/bookings/${bookingId}`, { status: newStatus }); // Gửi chỉ status lên server
+      await api.put(`/bookings/${bookingId}`, { ...currentBooking, status: newStatus });
       message.success(`Booking status updated to ${newStatus}`);
       fetchBookings();
     } catch (error) {
@@ -123,18 +124,15 @@ function Consulting() {
       const newPoId = response.data.po_id; // Đảm bảo API trả về po_id
 
       // Cập nhật PO ID cho booking
-      await api.put(`/bookings/${bookingId}`, { poId: newPoId });
-
-      // Cập nhật danh sách bookings trong state
-      const updatedBooking = bookings.map((booking) => {
-        if (booking.bookingId === bookingId) {
-          return { ...booking, poId: newPoId }; // Cập nhật poId
-        }
-        return booking; // Giữ nguyên booking khác
-      });
-
-      setBookings(updatedBooking); // Cập nhật danh sách bookings trong state
+      const currentBooking = bookings.find(
+        (booking) => booking.bookingId === bookingId
+      );
+      if (!currentBooking) {
+        throw new Error("Booking not found");
+      }
+      await api.put(`/bookings/${bookingId}`, { ...currentBooking, poId: newPoId });
       message.success("Purchase Order created successfully.");
+      fetchBookings();
     } catch (error) {
       console.error("Error creating purchase order:", error);
       message.error("Failed to create Purchase Order.");
@@ -144,25 +142,26 @@ function Consulting() {
   const viewPurchaseOrder = async (booking) => {
     // Lấy thông tin PO từ booking
     if (booking.poId) {
-        try {
-            const response = await api.get(`http://localhost:8080/api/pos/${booking.poId}`);
-            const poData = response.data;
+      try {
+        const response = await api.get(`http://localhost:8080/api/pos/${booking.poId}`);
+        const poData = response.data;
 
-            // Cập nhật các state với thông tin từ PO
-            setSelectedBooking(booking); // Giữ lại thông tin booking nếu cần
-            setTotalAmount(poData.totalAmount); 
-            setDeliveryDate(poData.koiDeliveryDate || null); 
-            setStatus(poData.status || "pending"); 
-            setIsPoModalVisible(true);
+        // Cập nhật các state với thông tin từ PO
+        setSelectedBooking(booking); // Giữ lại thông tin booking nếu cần
+        setTotalAmount(poData.totalAmount); 
+        setDeliveryDate(poData.koiDeliveryDate || null); 
+        setStatus(poData.status || "pending"); 
+        setPoAddress(poData.address || ''); // Cập nhật địa chỉ PO
+        setIsPoModalVisible(true);
 
-            // Gọi hàm fetchPODetails để tải danh sách PODetails
-            await fetchPODetails(booking.poId);
-        } catch (error) {
-            console.error("Error fetching purchase order:", error);
-            message.error("Failed to fetch Purchase Order.");
-        }
+        // Gọi hàm fetchPODetails để tải danh sách PODetails
+        await fetchPODetails(booking.poId);
+      } catch (error) {
+        console.error("Error fetching purchase order:", error);
+        message.error("Failed to fetch Purchase Order.");
+      }
     } else {
-        message.error("No Purchase Order found for this booking.");
+      message.error("No Purchase Order found for this booking.");
     }
   };
 
@@ -172,6 +171,7 @@ function Consulting() {
         totalAmount: totalAmount,
         koiDeliveryDate: deliveryDate,
         status: status,
+        address: poAddress, // Cập nhật địa chỉ PO
       });
       message.success("Purchase Order updated successfully.");
       fetchBookings(); // Cập nhật lại danh sách bookings
@@ -271,66 +271,65 @@ function Consulting() {
 
   const columns = [
     { title: "Booking ID", dataIndex: "bookingId", key: "bookingId" },
-    { title: "Full Name", dataIndex: "fullname", key: "fullname" }, // Thêm cột Full Name
+    { title: "Full Name", dataIndex: "fullname", key: "fullname" },
     {
-        title: "Booking Date",
-        dataIndex: "bookingDate",
-        key: "bookingDate",
-        render: (date) => new Date(date).toLocaleDateString(), // Định dạng ngày
+      title: "Booking Date",
+      dataIndex: "bookingDate",
+      key: "bookingDate",
+      render: (date) => new Date(date).toLocaleDateString(),
     },
     {
-        title: "Start Date",
-        dataIndex: "startDate",
-        key: "startDate",
-        render: (date) => new Date(date).toLocaleDateString(),
+      title: "Start Date",
+      dataIndex: "startDate",
+      key: "startDate",
+      render: (date) => new Date(date).toLocaleDateString(),
     },
     {
-        title: "End Date",
-        dataIndex: "endDate",
-        key: "endDate",
-        render: (date) => new Date(date).toLocaleDateString(),
+      title: "End Date",
+      dataIndex: "endDate",
+      key: "endDate",
+      render: (date) => new Date(date).toLocaleDateString(),
     },
     { title: "Status", dataIndex: "status", key: "status" },
-    { title: "Note", dataIndex: "note", key: "note" }, // Thêm cột Note
+    { title: "Note", dataIndex: "note", key: "note" },
     {
-        title: "Action",
-        key: "action",
-        render: (_, record) => (
-            <Space size="small">
-                <Button onClick={() => showBookingDetails(record)}>View Details</Button>
-                {record.status === "purchased" && (
-                    <Button
-                        onClick={() => handleStatusChange(record.bookingId, "checkin")}
-                    >
-                        Check In
-                    </Button>
-                )}
-                {record.status === "checkin" && (
-                    <>
-                        <Button
-                            onClick={() => handleStatusChange(record.bookingId, "checkout")}
-                        >
-                            Check Out
-                        </Button>
-                        {record.poId ? (
-                            <Button
-                                onClick={() => viewPurchaseOrder(record)}
-                            >
-                                View Purchase Order
-                            </Button>
-                        ) : (
-                            <Button
-                                onClick={() => createPurchaseOrder(record.bookingId)}
-                            >
-                                Create Purchase Order
-                            </Button>
-                        )}
-                    </>
-                )}
-            </Space>
-        ),
+      title: "Action",
+      key: "action",
+      render: (_, record) => (
+        <Space size="small">
+          <Button onClick={() => showBookingDetails(record)}>View Details</Button>
+          
+          {record.status === "purchased" && (
+            <Button onClick={() => handleStatusChange(record.bookingId, "checkin")}>
+              Check In
+            </Button>
+          )}
+  
+          {record.status === "checkin" && (
+            <>
+              <Button onClick={() => handleStatusChange(record.bookingId, "checkout")}>
+                Check Out
+              </Button>
+  
+              {record.poId ? (
+                <Button onClick={() => viewPurchaseOrder(record)}>View Purchase Order</Button>
+              ) : (
+                <Button onClick={() => createPurchaseOrder(record.bookingId)}>
+                  Create Purchase Order
+                </Button>
+              )}
+            </>
+          )}
+  
+          {record.status === "checkout" && (
+            <Button onClick={() => handleStatusChange(record.bookingId, "checkin")}>
+              Check In
+            </Button>
+          )}
+        </Space>
+      ),
     },
-  ];
+  ];  
 
   return (
     <div>
@@ -480,6 +479,15 @@ function Consulting() {
                 <option value="delivering">Delivering</option>
                 <option value="delivered">Delivered</option>
               </select>
+            </p>
+            <p>
+              <strong>Address:</strong>
+              <input 
+                type="text" 
+                value={poAddress} // Hiển thị địa chỉ PO
+                onChange={(e) => setPoAddress(e.target.value)} // Cập nhật địa chỉ PO
+                style={{ width: '100%', marginTop: '5px' }} 
+              />
             </p>
             <h3>PODetails</h3>
             <Button type="primary" onClick={() => setIsAddPODetailVisible(true)}>

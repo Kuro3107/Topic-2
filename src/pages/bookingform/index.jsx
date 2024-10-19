@@ -142,7 +142,6 @@ function BookingForm() {
           fullname: "",
           phone: "",
           email: "",
-          district: "",
           favoriteKoi: [],
           favoriteFarm: [],
           note: "",
@@ -202,18 +201,7 @@ function BookingForm() {
                   />
                 </div>
               </div>
-              <div className="form-column">
-                <div className="form-group">
-                  <label>Address:</label>
-                  <input
-                    type="text"
-                    name="district"
-                    value={formData.district}
-                    onChange={handleChange}
-                    // Xóa thuộc tính required để không bắt buộc
-                  />
-                </div>
-              </div>
+              
             </div>
 
             <div className="form-row">

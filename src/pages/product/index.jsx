@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
-import { Card, Col, Row, Button, message, Pagination, Spin, Modal } from "antd";
+import { Card, Col, Row, Button, message, Pagination, Spin, Modal, Form, Input, DatePicker } from "antd";
 import axios from "axios";
 import "./index.css";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
+import { useNavigate } from "react-router-dom";
+import moment from "moment";
+
 const { Meta } = Card;
 
 const Product = () => {
@@ -11,8 +14,19 @@ const Product = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [selectedTour, setSelectedTour] = useState(null);
+  const [isBookingModalVisible, setIsBookingModalVisible] = useState(false);
+  const [isTourDetailModalVisible, setIsTourDetailModalVisible] = useState(false); // Thêm biến trạng thái cho modal chi tiết tour
+  const [bookingData, setBookingData] = useState({
+    fullname: '',
+    phone: '',
+    email: '',
+    startDate: null,
+    note: ''
+  });
   const pageSize = 6; // 2 rows x 3 columns
   const apiTour = "http://localhost:8080/api/trips";
+  const apiBooking = "http://localhost:8080/api/bookings"; // Đường dẫn API cho booking
+  const navigate = useNavigate();
 
   const fetchTours = async () => {
     setLoading(true);
@@ -35,7 +49,21 @@ const Product = () => {
   }, []);
 
   const handleBooking = (tripId) => {
-    message.success(`Booked tour with ID: ${tripId}`);
+    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+    if (!userInfo) {
+        message.warning("Vui lòng đăng nhập để đặt tour.");
+        navigate("/login");
+    } else {
+        // Tìm tour tương ứng với tripId
+        const tourToBook = tours.find(tour => tour.tripId === tripId);
+        if (tourToBook) {
+            setSelectedTour(tourToBook); // Cập nhật selectedTour
+            setIsBookingModalVisible(true); // Hiện modal booking
+            setIsTourDetailModalVisible(false); // Đảm bảo modal chi tiết tour không hiển thị
+        } else {
+            message.error("Tour không tìm thấy.");
+        }
+    }
   };
 
   const handleViewTour = async (tour) => {
@@ -43,6 +71,8 @@ const Product = () => {
     try {
       const response = await axios.get(`${apiTour}/${tour.tripId}`); // Lấy thông tin chi tiết của tour
       setSelectedTour(response.data); // Cập nhật selectedTour với dữ liệu chi tiết
+      setIsTourDetailModalVisible(true); // Hiện modal chi tiết tour
+      setIsBookingModalVisible(false); // Đảm bảo modal booking không hiển thị
     } catch (error) {
       message.error("Unable to load tour details");
       console.error("Error loading tour details:", error);
@@ -51,8 +81,69 @@ const Product = () => {
     }
   };
 
+  const handleBookingSubmit = async () => {
+    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+
+    if (!selectedTour) {
+        message.error("No tour selected. Please select a tour before booking.");
+        return;
+    }
+
+    if (!bookingData.startDate) {
+        message.error("Please select a start date.");
+        return;
+    }
+
+    console.log("Booking Data:", bookingData); // Kiểm tra dữ liệu booking
+
+    const newBooking = {
+      tripId: selectedTour.tripId,
+      customerId: userInfo.customerId,
+      bookingPaymentId: null,
+      feedbackId: null,
+      status: "Approved",
+      startDate: bookingData.startDate.format("YYYY-MM-DD"),
+      bookingDate: moment().format("YYYY-MM-DD"),
+      fullname: bookingData.fullname,
+      phone: bookingData.phone,
+      email: bookingData.email,
+      favoriteFarm: null,
+      favoriteKoi: null,
+      note: bookingData.note,
+      isActive: null
+    };
+
+    console.log("Submitting booking:", newBooking);
+
+    try {
+      const response = await axios.post(apiBooking, newBooking);
+      console.log("Booking created:", response.data);
+      message.success("Booking created successfully!");
+      setIsBookingModalVisible(false);
+      setBookingData({
+        fullname: '',
+        phone: '',
+        email: '',
+        startDate: null,
+        note: ''
+      });
+    } catch (error) {
+      console.error("Error creating booking:", error);
+      message.error("Failed to create booking. Please try again.");
+    }
+  };
+
+  const handleBookingChange = (e) => {
+    const { name, value } = e.target;
+    setBookingData(prevData => ({
+        ...prevData,
+        [name]: value
+    }));
+  };
+
   const handleCloseModal = () => {
     setSelectedTour(null);
+    setIsTourDetailModalVisible(false); // Đóng modal chi tiết tour
   };
 
   const paginatedTours = tours.slice((currentPage - 1) * pageSize, currentPage * pageSize);
@@ -119,7 +210,7 @@ const Product = () => {
       {/* Modal hiển thị thông tin chi tiết của tour */}
       <Modal
         title={selectedTour ? selectedTour.tripName : ''}
-        visible={!!selectedTour}
+        visible={isTourDetailModalVisible} // Sử dụng biến trạng thái cho modal chi tiết tour
         onCancel={handleCloseModal}
         footer={null}
       >
@@ -156,6 +247,54 @@ const Product = () => {
             ))}
           </div>
         )}
+      </Modal>
+
+      {/* Modal cho booking */}
+      <Modal
+        title="Create Booking"
+        visible={isBookingModalVisible}
+        onCancel={() => setIsBookingModalVisible(false)}
+        footer={null}
+      >
+        <Form onFinish={handleBookingSubmit}>
+          <Form.Item 
+            label="Full Name" 
+            name="fullname" 
+            rules={[{ required: true, message: 'Please input your full name!' }]}
+          >
+            <Input name="fullname" value={bookingData.fullname} onChange={handleBookingChange} />
+          </Form.Item>
+          <Form.Item 
+            label="Phone" 
+            name="phone" 
+            rules={[{ required: true, message: 'Please input your phone number!' }]}
+          >
+            <Input name="phone" value={bookingData.phone} onChange={handleBookingChange} />
+          </Form.Item>
+          <Form.Item 
+            label="Email" 
+            name="email" 
+            rules={[{ required: true, message: 'Please input your email!' }]}
+          >
+            <Input name="email" value={bookingData.email} onChange={handleBookingChange} />
+          </Form.Item>
+          <Form.Item 
+            label="Start Date" 
+            name="startDate" 
+            rules={[{ required: true, message: 'Please select a start date!' }]}
+          >
+            <DatePicker 
+              value={bookingData.startDate ? moment(bookingData.startDate) : null} 
+              onChange={(date) => setBookingData({ ...bookingData, startDate: date })} 
+            />
+          </Form.Item>
+          <Form.Item label="Note">
+            <Input.TextArea name="note" value={bookingData.note} onChange={handleBookingChange} />
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" htmlType="submit">Submit Booking</Button>
+          </Form.Item>
+        </Form>
       </Modal>
     </div>
   );
