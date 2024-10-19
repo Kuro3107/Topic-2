@@ -3,6 +3,7 @@ package com.example.SWP_Project_BackEnd.Controller;
 import com.example.SWP_Project_BackEnd.Dto.BookingDTO;
 import com.example.SWP_Project_BackEnd.Entity.Booking;
 import com.example.SWP_Project_BackEnd.Exception.ResourceNotFoundException;
+import com.example.SWP_Project_BackEnd.Repository.BookingRepository;
 import com.example.SWP_Project_BackEnd.Service.BookingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -10,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -19,6 +21,9 @@ public class BookingController {
 
     @Autowired
     private BookingService bookingService;
+
+    @Autowired
+    private BookingRepository bookingRepository;
 
     // CREATE booking
     @PostMapping
@@ -48,6 +53,35 @@ public class BookingController {
         Booking updatedBooking = bookingService.updateBooking(id, bookingDTO);
         return ResponseEntity.ok(updatedBooking);
     }
+
+    //Update booking with feedback
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> updateBookingFeedback(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
+        Optional<Booking> optionalBooking = bookingRepository.findById(id);
+        if (!optionalBooking.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Booking booking = optionalBooking.get();
+
+        // Kiểm tra và chỉ cập nhật feedbackId
+        if (updates.containsKey("feedbackId")) {
+            Long newFeedbackId = ((Number) updates.get("feedbackId")).longValue();
+            booking.setFeedbackId(newFeedbackId);
+        }
+        if (updates.containsKey("status")){
+            String newStatus = ((String) updates.get("status") );
+            booking.setStatus(newStatus);
+        }
+
+        // Lưu lại booking với feedbackId mới
+        bookingRepository.save(booking);
+
+        return ResponseEntity.ok().build();
+    }
+
+
+
 
     // DELETE booking by ID
     @DeleteMapping("/{id}")

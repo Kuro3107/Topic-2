@@ -59,6 +59,7 @@ public class POService {
             existingPO.setTotalAmount(updatedPO.getTotalAmount());
             existingPO.setKoiDeliveryDate(updatedPO.getKoiDeliveryDate());
             existingPO.setStatus(updatedPO.getStatus());
+            existingPO.setAddress(updatedPO.getAddress());
 
             return poRepository.save(existingPO);
         } else {

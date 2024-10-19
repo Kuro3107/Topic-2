@@ -32,6 +32,9 @@ public class PO {
     @Column(name = "status")
     private String status;
 
+    @Column(name = "address")
+    private String address;
+
     // Liên kết OneToMany với PODetail
     @OneToMany(mappedBy = "po", cascade = CascadeType.ALL)
     @JsonManagedReference // Giữ lại thông tin PO
