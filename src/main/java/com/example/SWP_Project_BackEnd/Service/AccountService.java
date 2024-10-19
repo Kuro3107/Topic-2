@@ -3,7 +3,9 @@ package com.example.SWP_Project_BackEnd.Service;
 import com.example.SWP_Project_BackEnd.Dto.LoginRequest;
 import com.example.SWP_Project_BackEnd.Dto.LoginResponse;
 import com.example.SWP_Project_BackEnd.Entity.Account;
+import com.example.SWP_Project_BackEnd.Entity.Customer;
 import com.example.SWP_Project_BackEnd.Repository.AccountRepository;
+import com.example.SWP_Project_BackEnd.Repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,9 @@ public class AccountService {
 
     @Autowired
     private AccountRepository accountRepository;
+
+    @Autowired
+    private CustomerRepository customerRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -54,6 +59,10 @@ public class AccountService {
 
         // Lưu tài khoản vào cơ sở dữ liệu
         accountRepository.save(account);
+        // Tạo một bản ghi trong bảng Customer với account_id
+        Customer customer = new Customer();
+        customer.setAccount(account); // Liên kết với account_id
+        customerRepository.save(customer);
         return "User registered successfully";
     }
 
