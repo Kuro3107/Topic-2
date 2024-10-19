@@ -1,0 +1,20 @@
+html, body, #root, .ant-layout {
+  height: 100%;
+}
+
+.ant-layout {
+  display: flex;
+  flex-direction: column;
+}
+
+.ant-layout-content {
+  flex-grow: 1; /* Để content co giãn theo chiều cao */
+  margin: 24px 16px;
+  padding: 24px;
+  background: #fff;
+}
+
+.site-layout-background {
+  height: 100%;
+  min-height: 100%;
+}
