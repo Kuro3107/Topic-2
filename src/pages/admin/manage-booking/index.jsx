@@ -148,7 +148,7 @@ function ManageBooking() {
             Sửa
           </Button>
           <Button
-            onClick={() => deleteBooking(record.BookingID)}
+            onClick={() => deleteBooking(record.bookingId)} // Sửa lại để sử dụng bookingId
             danger
             disabled={!record.isActive}
           >
@@ -166,7 +166,6 @@ function ManageBooking() {
     try {
         const responseTrips = await axios.get(`http://localhost:8080/api/trips`); // Gọi API để lấy tất cả các chuyến đi
         const responseFarms = await axios.get(`http://localhost:8080/api/farms`); // Gọi API để lấy tất cả các trang trại
-        const responseTripDetails = await axios.get(`http://localhost:8080/api/trip-details`); // Gọi API để lấy tất cả các chi tiết chuyến đi
 
         // Lấy trip_id từ booking tương ứng
         const booking = bookings.find(b => b.bookingId === bookingId);
@@ -176,9 +175,9 @@ function ManageBooking() {
         }
 
         // Lọc chuyến đi theo trip_id từ booking
-        const trips = responseTrips.data.filter(trip => trip.tripId === booking.tripId); 
+        const trips = responseTrips.data.filter(trip => trip.tripId === booking.tripId);
         
-        // Hiển thị thông tin chuyến đi (có thể sử dụng Modal hoặc một component khác)
+        // Hiển thị thông tin chuyến đi
         if (trips.length > 0) {
             Modal.info({
                 title: 'Chi tiết chuyến đi',
@@ -192,27 +191,23 @@ function ManageBooking() {
                                 <img src={trip.imageUrl} alt={trip.tripName} style={{ width: '100%', height: 'auto' }} />
                                 
                                 <h4>Chi tiết chuyến đi:</h4>
-                                {responseTripDetails.data
-                                    .filter(detail => detail.tripId === trip.tripId) // Lọc chi tiết chuyến đi theo tripId
-                                    .map(detail => (
-                                        <div key={detail.tripDetailId}>
-                                            <p>Ngày: {detail.day}</p>
-                                            <p>Chủ đề chính: {detail.mainTopic}</p>
-                                            <p>Chủ đề phụ: {detail.subTopic || 'Không có'}</p>
-                                            <p>Giá ghi chú: {detail.notePrice} VNĐ</p>
-                                        </div>
-                                    ))}
+                                {trip.tripDetails.map(detail => (
+                                    <div key={detail.tripDetailId}>
+                                        <p>Ngày: {detail.day}</p>
+                                        <p>Chủ đề chính: {detail.mainTopic}</p>
+                                        <p>Chủ đề phụ: {detail.subTopic || 'Không có'}</p>
+                                        <p>Giá ghi chú: {detail.notePrice} VNĐ</p>
+                                    </div>
+                                ))}
                                 
                                 <h4>Trang trại Koi:</h4>
-                                {responseFarms.data
-                                    .filter(farm => trip.koiFarms && trip.koiFarms.some(koiFarm => koiFarm.farmId === farm.farmId))
-                                    .map(farm => (
-                                        <div key={farm.farmId}>
-                                            <p>Tên trang trại: {farm.farmName}</p>
-                                            <p>Địa điểm: {farm.location}</p>
-                                            <p>Thông tin liên hệ: {farm.contactInfo}</p>
-                                        </div>
-                                    ))}
+                                {trip.koiFarms.map(farm => (
+                                    <div key={farm.farmId}>
+                                        <p>Tên trang trại: {farm.farmName}</p>
+                                        <p>Địa điểm: {farm.location}</p>
+                                        <p>Thông tin liên hệ: {farm.contactInfo}</p>
+                                    </div>
+                                ))}
                             </div>
                         ))}
                     </div>
@@ -226,7 +221,8 @@ function ManageBooking() {
         console.error("Lỗi khi lấy thông tin chuyến đi:", error);
         message.error("Không thể lấy thông tin chuyến đi");
     }
-  };
+};
+
 
   return (
     <div>
@@ -237,7 +233,7 @@ function ManageBooking() {
         style={{ marginBottom: 16 }}
       >
         Thêm đặt chỗ mới
-      </Button>
+      </Button> */}
       <Table columns={columns} dataSource={bookings} rowKey="BookingID" />
       <Modal
         title={editingBooking ? "Sửa đặt chỗ" : "Thêm đặt chỗ mới"}
@@ -259,11 +255,11 @@ function ManageBooking() {
             rules={[{ required: true }]}
           >
             <Select>
-              <Select.Option value="pending">Pending</Select.Option>
+              {/* <Select.Option value="pending">Pending</Select.Option> */}
               <Select.Option value="detailed">Detailed</Select.Option>
               <Select.Option value="Approved">Approved</Select.Option>
               <Select.Option value="rejected">Rejected</Select.Option>
-              <Select.Option value="delivered">Delivered</Select.Option>
+              {/* <Select.Option value="delivered">Delivered</Select.Option> */}
             </Select>
           </Form.Item>
           <Form.Item
@@ -303,9 +299,7 @@ function ManageBooking() {
           <Form.Item name="note" label="Ghi chú">
             <Input.TextArea />
           </Form.Item>
-          <Form.Item name="district" label="Quận/Huyện">
-            <Input />
-          </Form.Item>
+        
           <Form.Item name="isActive" label="Hoạt động" valuePropName="checked">
             <Switch disabled />
           </Form.Item>

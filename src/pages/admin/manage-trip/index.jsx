@@ -18,6 +18,7 @@ const ManageTour = () => {
   const [tripDetailForm] = Form.useForm(); // Form cho trip detail
   const [editingTripDetail, setEditingTripDetail] = useState(null); // State cho trip detail đang chỉnh sửa
   const apiTour = "http://localhost:8080/api/trips";
+  const [isCreatingTour, setIsCreatingTour] = useState(true); // Trạng thái để xác định bước tạo tour
 
   const fetchTours = async () => {
     try {
@@ -54,45 +55,94 @@ const ManageTour = () => {
     if (tour) {
       form.setFieldsValue(tour);
       setTripDetails(tour.tripDetails || []); // Lấy trip details nếu có
+      setCurrentTourId(tour.tripId); // Thiết lập currentTourId khi chỉnh sửa tour
+      setIsCreatingTour(false); // Chuyển sang chế độ chỉnh sửa
+      fetchFarms(tour.tripId); // Lấy danh sách farms cho tour
     } else {
       form.resetFields();
       setTripDetails([]); // Reset trip details khi tạo mới
+      setCurrentTourId(null); // Đặt currentTourId là null khi tạo mới
+      setIsCreatingTour(true); // Chuyển sang chế độ tạo mới
     }
   };
 
   const handleCancel = () => {
     setIsModalVisible(false);
     form.resetFields();
+    setIsCreatingTour(true); // Reset về trạng thái tạo tour
   };
 
-  const onFinish = async (values) => {
+  const onFinishCreateTour = async (values) => {
     try {
       const tourData = {
-        ...values,
-        farms: editingTour ? farms : selectedFarms,
-        tripDetails: tripDetails, // Thêm trip details vào dữ liệu
+        tripName: values.tripName,
+        imageUrl: values.imageUrl,
       };
-      if (editingTour) {
-        await axios.put(`${apiTour}/${editingTour.tripId}`, tourData);
-        message.success("Tour updated successfully");
+      const config = {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      };
+      const response = await axios.post(apiTour, tourData, config);
+      if (response.status === 201) {
+        message.success("New tour created successfully");
+        setCurrentTourId(response.data.tripId); // Lưu lại ID của tour mới tạo
+        setIsCreatingTour(false); // Chuyển sang bước cập nhật thông tin chi tiết
       } else {
-        await axios.post(apiTour, tourData);
-        message.success("New tour added successfully");
+        throw new Error("Failed to create new tour");
       }
-      setIsModalVisible(false);
-      fetchTours();
     } catch (error) {
-      message.error("An error occurred while saving the tour");
-      console.error("Error saving tour:", error);
+      message.error(`An error occurred while creating the tour: ${error.message}`);
+      console.error("Error creating tour:", error);
+    }
+  };
+
+  const onFinishUpdateTour = async (values) => {
+    try {
+        const tourData = {
+            ...values,
+            farms: selectedFarms, // Đảm bảo rằng selectedFarms được bao gồm trong dữ liệu
+            tripDetails: tripDetails,
+        };
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        };
+        const response = await axios.put(`${apiTour}/${currentTourId}`, tourData, config);
+        if (response.status === 200) {
+            message.success("Tour updated successfully");
+            setIsModalVisible(false);
+            fetchTours();
+        } else {
+            throw new Error("Failed to update tour");
+        }
+    } catch (error) {
+        message.error(`An error occurred while updating the tour: ${error.message}`);
+        console.error("Error updating tour:", error);
     }
   };
 
   const handleAddTripDetail = async (values) => {
+    if (!currentTourId) {
+      message.error("No tour selected for adding trip detail");
+      return;
+    }
     const newDetail = {
-      tripDetailId: Date.now(), // Tạo ID tự động
       ...values,
     };
-    setTripDetails([...tripDetails, newDetail]); // Thêm trip detail vào danh sách
+    try {
+      await axios.post(`${apiTour}/${currentTourId}/trip-details`, newDetail, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      setTripDetails([...tripDetails, newDetail]); // Thêm trip detail vào danh sách
+      message.success("Trip detail added successfully");
+    } catch (error) {
+      message.error("An error occurred while adding the trip detail");
+      console.error("Error adding trip detail:", error);
+    }
     setIsTripDetailModalVisible(false); // Đóng modal
     tripDetailForm.resetFields(); // Reset form trip detail
   };
@@ -104,26 +154,49 @@ const ManageTour = () => {
   };
 
   const handleUpdateTripDetail = async (values) => {
+    if (!currentTourId) {
+      message.error("No tour selected for updating trip detail");
+      return;
+    }
     if (editingTripDetail) {
       try {
-        await axios.put(`${apiTour}/${currentTourId}/details/${editingTripDetail.tripDetailId}`, values);
+        await axios.put(`${apiTour}/${currentTourId}/trip-details/${editingTripDetail.tripDetailId}`, values, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
         const updatedDetails = tripDetails.map(detail => 
           detail.tripDetailId === editingTripDetail.tripDetailId ? { ...detail, ...values } : detail
         );
         setTripDetails(updatedDetails); // Cập nhật danh sách trip details
-        setIsTripDetailModalVisible(false); // Đóng modal
-        tripDetailForm.resetFields(); // Reset form trip detail
-        setEditingTripDetail(null); // Reset editing state
         message.success("Trip detail updated successfully");
       } catch (error) {
         message.error("An error occurred while updating the trip detail");
         console.error("Error updating trip detail:", error);
       }
+      setIsTripDetailModalVisible(false); // Đóng modal
+      tripDetailForm.resetFields(); // Reset form trip detail
+      setEditingTripDetail(null); // Reset editing state
     }
   };
 
-  const handleDeleteTripDetail = (tripDetailId) => {
-    setTripDetails(tripDetails.filter(detail => detail.tripDetailId !== tripDetailId)); // Xóa trip detail
+  const handleDeleteTripDetail = async (tripDetailId) => {
+    if (!currentTourId) {
+      message.error("No tour selected for deleting trip detail");
+      return;
+    }
+    try {
+      await axios.delete(`${apiTour}/${currentTourId}/trip-details/${tripDetailId}`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      setTripDetails(tripDetails.filter(detail => detail.tripDetailId !== tripDetailId)); // Xóa trip detail
+      message.success("Trip detail deleted successfully");
+    } catch (error) {
+      message.error("An error occurred while deleting the trip detail");
+      console.error("Error deleting trip detail:", error);
+    }
   };
 
   const handleDelete = async (id) => {
@@ -155,17 +228,17 @@ const ManageTour = () => {
 
   const handleAddFarm = async () => {
     if (selectedFarmToAdd) {
-      try {
-        await axios.post(`http://localhost:8080/api/trips/${currentTourId}/farms`, { farmId: selectedFarmToAdd });
-        message.success("Farm added successfully");
-        fetchFarms(currentTourId);
-        setSelectedFarmToAdd(null); // Reset farm đã chọn sau khi thêm
-      } catch (error) {
-        message.error("An error occurred while adding the farm");
-        console.error("Error adding farm:", error);
-      }
+        try {
+            await axios.post(`http://localhost:8080/api/trips/${currentTourId}/farms`, { farmId: selectedFarmToAdd });
+            message.success("Farm added successfully");
+            fetchFarms(currentTourId); // Cập nhật danh sách farms sau khi thêm
+            setSelectedFarmToAdd(null); // Reset farm đã chọn sau khi thêm
+        } catch (error) {
+            message.error("An error occurred while adding the farm");
+            console.error("Error adding farm:", error);
+        }
     } else {
-      message.error("Please select a farm to add");
+        message.error("Please select a farm to add");
     }
   };
 
@@ -178,6 +251,28 @@ const ManageTour = () => {
       message.error("An error occurred while deleting the farm");
       console.error("Error deleting farm:", error);
     }
+  };
+
+  const handleOpenAddTripDetailModal = () => {
+    setEditingTripDetail(null); // Đảm bảo không có trip detail nào đang được chỉnh sửa
+    tripDetailForm.resetFields(); // Reset form để tạo mới
+    setIsTripDetailModalVisible(true); // Mở modal
+  };
+
+  const handleAddFarmToTour = async (farmId) => {
+    try {
+        await axios.post(`http://localhost:8080/api/trips/${currentTourId}/farms`, { farmId });
+        message.success("Farm added successfully");
+        fetchFarms(currentTourId); // Cập nhật danh sách farms sau khi thêm
+    } catch (error) {
+        message.error("An error occurred while adding the farm");
+        console.error("Error adding farm:", error);
+    }
+  };
+
+  const handleSelectFarms = (farmIds) => {
+    setSelectedFarms(farmIds);
+    farmIds.forEach(farmId => handleAddFarmToTour(farmId)); // Thêm từng farm vào tour
   };
 
   const columns = [
@@ -246,7 +341,10 @@ const ManageTour = () => {
     <div>
       <h1>Manage Tours</h1>
       <Button
-        onClick={() => showModal()}
+        onClick={() => {
+          setIsModalVisible(true);
+          setIsCreatingTour(true);
+        }}
         type="primary"
         style={{ marginBottom: 16 }}
       >
@@ -258,12 +356,16 @@ const ManageTour = () => {
         rowKey="tripId"
       />
       <Modal
-        title={editingTour ? "Edit Tour Information" : "Add New Tour"}
+        title={isCreatingTour ? "Create New Tour" : "Update Tour Details"}
         open={isModalVisible}
         onCancel={handleCancel}
         footer={null}
       >
-        <Form form={form} onFinish={onFinish} layout="vertical">
+        <Form
+          form={form}
+          onFinish={isCreatingTour ? onFinishCreateTour : onFinishUpdateTour}
+          layout="vertical"
+        >
           <Form.Item
             name="tripName"
             label="Tour Name"
@@ -272,60 +374,76 @@ const ManageTour = () => {
             <Input placeholder="Enter tour name" />
           </Form.Item>
           <Form.Item
-            name="priceTotal"
-            label="Total Price"
-            rules={[{ required: true, message: "Please enter the total price!" }, { type: 'number', min: 0, message: "Price must be a positive number!" }]}
-          >
-            <InputNumber
-              style={{ width: '100%' }}
-              formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-              parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
-              placeholder="Enter total price"
-            />
-          </Form.Item>
-          <Form.Item
             name="imageUrl"
             label="Image URL"
-            rules={[{ required: true, message: "Please enter the image URL!" }]}
           >
             <Input placeholder="Enter image URL" />
           </Form.Item>
-          {!editingTour && (
-            <Form.Item
-              name="farms"
-              label="Select Farms"
-              rules={[{ required: true, message: "Please select at least one farm!" }]}
-            >
-              <Select
-                mode="multiple"
-                placeholder="Select farms"
-                onChange={setSelectedFarms}
-                options={availableFarms.map(farm => ({ label: farm.farmName, value: farm.farmId }))}
-              />
-            </Form.Item>
+          {!isCreatingTour && (
+            <>
+              <Form.Item
+                name="priceTotal"
+                label="Total Price"
+                rules={[{ required: true, message: "Please enter the total price!" }, { type: 'number', min: 0, message: "Price must be a positive number!" }]}
+              >
+                <InputNumber
+                  style={{ width: '100%' }}
+                  formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                  parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
+                  placeholder="Enter total price"
+                />
+              </Form.Item>
+              <Form.Item
+                name="farms"
+                label="Select Farms"
+              >
+                <Select
+                    placeholder="Select Farm to Add"
+                    onChange={setSelectedFarmToAdd}
+                    options={availableFarms.map(farm => ({ label: farm.farmName, value: farm.farmId }))}
+                    style={{ width: '100%', marginBottom: 16 }}
+                />
+                <Button onClick={handleAddFarm}>Add Farm</Button>
+                <ul>
+                  {farms.map(farm => (
+                    <li key={farm.farmId}>
+                      <div>
+                        <img src={farm.imageUrl} alt={farm.farmName} style={{ width: 100, marginRight: 10 }} />
+                        <strong>{farm.farmName}</strong>
+                      </div>
+                      <div>Location: {farm.location}</div>
+                      <div>Contact: {farm.contactInfo}</div>
+                      <Button onClick={() => handleDeleteFarm(farm.farmId)} danger style={{ marginLeft: 8 }}>
+                        Delete
+                      </Button>
+                    </li>
+                  ))}
+                </ul>
+              </Form.Item>
+              <Form.Item label="Activities">
+                <Button onClick={handleOpenAddTripDetailModal} type="primary">
+                  Add Trip Detail
+                </Button>
+                <ul>
+                  {tripDetails.map(detail => (
+                    <li key={detail.tripDetailId}>
+                      <strong>Main Topic:</strong> {detail.mainTopic} <br />
+                      <strong>Sub Topic:</strong> {detail.subTopic} <br />
+                      <strong>Note Price:</strong> {detail.notePrice} <br />
+                      <strong>Day:</strong> {detail.day} <br />
+                      <Button onClick={() => handleEditTripDetail(detail)}>Edit</Button>
+                      <Button onClick={() => handleDeleteTripDetail(detail.tripDetailId)} danger>
+                        Delete
+                      </Button>
+                    </li>
+                  ))}
+                </ul>
+              </Form.Item>
+            </>
           )}
-          <Form.Item label="Activities">
-            <Button onClick={() => setIsTripDetailModalVisible(true)}>
-              Add Trip Detail
-            </Button>
-            <ul>
-              {tripDetails.map(detail => (
-                <li key={detail.tripDetailId}>
-                  <strong>Main Topic:</strong> {detail.mainTopic} <br />
-                  <strong>Sub Topic:</strong> {detail.subTopic} <br />
-                  <strong>Note Price:</strong> {detail.notePrice} <br />
-                  <strong>Day:</strong> {detail.day} <br />
-                  <Button onClick={() => handleEditTripDetail(detail)}>Edit</Button> {/* Nút chỉnh sửa */}
-                  <Button onClick={() => handleDeleteTripDetail(detail.tripDetailId)} danger>
-                    Delete
-                  </Button>
-                </li>
-              ))}
-            </ul>
-          </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">
-              {editingTour ? "Update" : "Add New"}
+              {isCreatingTour ? "Create Tour" : "Update Tour"}
             </Button>
             <Button onClick={handleCancel} style={{ marginLeft: 8 }}>
               Cancel
@@ -334,54 +452,55 @@ const ManageTour = () => {
         </Form>
       </Modal>
       <Modal
-        title="Edit Trip Detail"
+        title={editingTripDetail ? "Edit Trip Detail" : "Create Trip Detail"} // Đổi tiêu đề modal dựa trên trạng thái
         open={isTripDetailModalVisible}
         onCancel={() => setIsTripDetailModalVisible(false)}
         footer={null}
       >
-        <Form form={tripDetailForm} onFinish={handleUpdateTripDetail}>
-          <Form.Item
-            name="mainTopic"
-            label="Main Topic"
-            rules={[{ required: true, message: "Please enter the main topic!" }]}
-          >
-            <Input placeholder="Enter main topic" />
-          </Form.Item>
-          <Form.Item
-            name="subTopic"
-            label="Sub Topic"
-          >
-            <Input placeholder="Enter sub topic" />
-          </Form.Item>
-          <Form.Item
-            name="notePrice"
-            label="Note Price"
-            rules={[{ required: true, message: "Please enter the note price!" }]}
-          >
-            <InputNumber
-              style={{ width: '100%' }}
-              placeholder="Enter note price"
-            />
-          </Form.Item>
-          <Form.Item
-            name="day"
-            label="Day"
-            rules={[{ required: true, message: "Please select a day!" }]}
-          >
-            <Select placeholder="Select day">
-              {Array.from({ length: 30 }, (_, i) => (
-                <Select.Option key={i + 1} value={i + 1}>{i + 1}</Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
-          <Form.Item>
-            <Button type="primary" htmlType="submit">
-              Update Detail
-            </Button>
-            <Button onClick={() => setIsTripDetailModalVisible(false)} style={{ marginLeft: 8 }}>
-              Cancel
-            </Button>
-          </Form.Item>
+        <Form form={tripDetailForm} onFinish={editingTripDetail ? handleUpdateTripDetail : handleAddTripDetail}>
+            {/* Các trường cho modal */}
+            <Form.Item
+                name="mainTopic"
+                label="Main Topic"
+                rules={[{ required: true, message: "Please enter the main topic!" }]}
+            >
+                <Input placeholder="Enter main topic" />
+            </Form.Item>
+            <Form.Item
+                name="subTopic"
+                label="Sub Topic"
+            >
+                <Input placeholder="Enter sub topic" />
+            </Form.Item>
+            <Form.Item
+                name="notePrice"
+                label="Note Price"
+                rules={[{ required: true, message: "Please enter the note price!" }]}
+            >
+                <InputNumber
+                    style={{ width: '100%' }}
+                    placeholder="Enter note price"
+                />
+            </Form.Item>
+            <Form.Item
+                name="day"
+                label="Day"
+                rules={[{ required: true, message: "Please select a day!" }]}
+            >
+                <Select placeholder="Select day">
+                    {Array.from({ length: 30 }, (_, i) => (
+                        <Select.Option key={i + 1} value={i + 1}>{i + 1}</Select.Option>
+                    ))}
+                </Select>
+            </Form.Item>
+            <Form.Item>
+                <Button type="primary" htmlType="submit">
+                    {editingTripDetail ? "Update Detail" : "Create Trip Detail"}
+                </Button>
+                <Button onClick={() => setIsTripDetailModalVisible(false)} style={{ marginLeft: 8 }}>
+                    Cancel
+                </Button>
+            </Form.Item>
         </Form>
       </Modal>
       <Modal

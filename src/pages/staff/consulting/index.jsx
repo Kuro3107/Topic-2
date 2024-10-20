@@ -306,25 +306,19 @@ function Consulting() {
           )}
   
           {record.status === "checkin" && (
-            <>
-              <Button onClick={() => handleStatusChange(record.bookingId, "checkout")}>
-                Check Out
-              </Button>
-  
-              {record.poId ? (
-                <Button onClick={() => viewPurchaseOrder(record)}>View Purchase Order</Button>
-              ) : (
-                <Button onClick={() => createPurchaseOrder(record.bookingId)}>
-                  Create Purchase Order
-                </Button>
-              )}
-            </>
+            <Button onClick={() => handleStatusChange(record.bookingId, "checkout")}>
+              Check Out
+            </Button>
           )}
   
           {record.status === "checkout" && (
             <Button onClick={() => handleStatusChange(record.bookingId, "checkin")}>
               Check In
             </Button>
+          )}
+  
+          {record.poId && (
+            <Button onClick={() => viewPurchaseOrder(record)}>View Purchase Order</Button>
           )}
         </Space>
       ),
