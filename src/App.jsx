@@ -18,6 +18,8 @@ import Sales from "./pages/staff/sales";
 import Payment from "./pages/payment";
 import Consulting from "./pages/staff/consulting";
 import Delivery from "./pages/staff/delivery";
+import ManageAccounts from "./pages/admin/manage-accounts";
+import ManageFeedback from "./pages/admin/manage-feedback";
 
 function App() {
   const router = createBrowserRouter([
@@ -52,6 +54,8 @@ function App() {
         { path: "farm", element: <ManageFarm /> },
         { path: "trip", element: <ManageTrip /> },
         { path: "booking", element: <ManageBooking /> },
+        { path: "account", element: <ManageAccounts /> },
+        { path: "feedback", element: <ManageFeedback /> },
       ],
     },
     {

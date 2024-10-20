@@ -95,11 +95,13 @@ const ManageAccounts = () => {
 
   return (
     <div>
+      <h1>Manage Accounts</h1>
       <Tabs activeKey={activeTab} onChange={setActiveTab}>
         <TabPane tab="All Accounts" key="all" />
 
         <TabPane tab="Sales Staff" key="sales" />
         <TabPane tab="Consulting Staff" key="consulting" />
+        <TabPane tab="Delivery Staff" key="delivery" />
         <TabPane tab="Customers" key="customer" />
       </Tabs>
 
@@ -141,6 +143,7 @@ const ManageAccounts = () => {
             <Select>
               <Option value="sales">Sales</Option>
               <Option value="consulting">Consulting</Option>
+              <Option value="delivery">Delivery</Option>
               <Option value="customer">Customer</Option>
             </Select>
           </Form.Item>

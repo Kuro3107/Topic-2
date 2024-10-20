@@ -230,6 +230,7 @@ function ManageBooking() {
 
   return (
     <div>
+      <h1>Manage Booking</h1>
       <Button
         onClick={() => showModal()}
         type="primary"
