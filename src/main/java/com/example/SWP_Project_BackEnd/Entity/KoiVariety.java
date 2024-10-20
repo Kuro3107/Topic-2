@@ -1,7 +1,9 @@
 package com.example.SWP_Project_BackEnd.Entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,6 +15,7 @@ import java.util.List;
 @Table(name = "koi_variety")
 @Getter
 @Setter
+//@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "varietyId")
 public class KoiVariety {
     @Id
     @Column(name = "variety_id")
@@ -34,7 +37,8 @@ public class KoiVariety {
     private List<KoiFarm> koiFarms = new ArrayList<>();
 
     @OneToMany(mappedBy = "variety")
-    @JsonBackReference
+//    @JsonBackReference
+    @JsonIgnore
     private List<PODetail> poDetails = new ArrayList<>(); // Thay đổi từ poDetail sang poDetails và chuyển thành List
 
 //    @OneToMany

@@ -1,6 +1,8 @@
 package com.example.SWP_Project_BackEnd.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,6 +17,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+//@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "accountId")
 public class Account {
     @Id
     @Column(name = "account_id")
@@ -47,7 +50,7 @@ public class Account {
 
     // Liên kết OneToOne với Customer
     @OneToOne(mappedBy = "account")
-    @JsonManagedReference
+//    @JsonManagedReference
     private Customer customer;
     // Constructors, getters, and setters
 }

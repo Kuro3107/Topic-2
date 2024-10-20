@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/farms")
 @CrossOrigin(origins = "http://localhost:5173")
@@ -49,5 +51,26 @@ public class KoiFarmController {
     @GetMapping("/{id}/koi-varieties")
     public List<KoiVariety> getKoiVarietiesForFarm(@PathVariable Long id) {
         return koiFarmService.getKoiVarietiesForFarm(id);
+    }
+
+    @PostMapping("/{id}/koi-varieties")
+    public ResponseEntity<Void> addKoiVarietyToFarm(@PathVariable Long id, @RequestBody Map<String, Long> payload) {
+        Long varietyId = payload.get("varietyId");  // Lấy varietyId từ payload
+        koiFarmService.addKoiVarietyToFarm(id, varietyId);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+
+
+    @PutMapping("/{id}/koi-varieties/{varietyId}")
+    public ResponseEntity<KoiVariety> updateKoiVarietyInFarm(@PathVariable Long id, @PathVariable Long varietyId, @RequestBody KoiVariety koiVarietyDetails) {
+        KoiVariety updatedVariety = koiFarmService.updateKoiVarietyInFarm(id, varietyId, koiVarietyDetails);
+        return ResponseEntity.ok(updatedVariety);
+    }
+
+    @DeleteMapping("/{id}/koi-varieties/{varietyId}")
+    public ResponseEntity<Void> removeKoiVarietyFromFarm(@PathVariable Long id, @PathVariable Long varietyId) {
+        koiFarmService.removeKoiVarietyFromFarm(id, varietyId);
+        return ResponseEntity.noContent().build();
     }
 }

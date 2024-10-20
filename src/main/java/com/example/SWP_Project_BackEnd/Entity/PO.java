@@ -1,6 +1,8 @@
 package com.example.SWP_Project_BackEnd.Entity;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,6 +18,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+//@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "poId")
 public class PO {
 
     @Id
@@ -37,7 +40,7 @@ public class PO {
 
     // Liên kết OneToMany với PODetail
     @OneToMany(mappedBy = "po", cascade = CascadeType.ALL)
-    @JsonManagedReference // Giữ lại thông tin PO
+//    @JsonManagedReference // Giữ lại thông tin PO
     private List<PODetail> poDetails;
 
     public void addPODetail(PODetail poDetail) {

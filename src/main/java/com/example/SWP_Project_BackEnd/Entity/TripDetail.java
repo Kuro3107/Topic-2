@@ -1,7 +1,9 @@
 package com.example.SWP_Project_BackEnd.Entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,6 +22,7 @@ import java.util.Set;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+//@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "tripDetailId")
 public class TripDetail {
     @Id
     @Column(name = "trip_detail_id")
@@ -40,7 +43,8 @@ public class TripDetail {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "trip_id", nullable = false)
-    @JsonBackReference
+//    @JsonBackReference
+    @JsonIgnore
     private Trip trip;
 
 //    @OneToMany(mappedBy = "tripDetails", fetch = FetchType.LAZY, cascade = CascadeType.ALL)

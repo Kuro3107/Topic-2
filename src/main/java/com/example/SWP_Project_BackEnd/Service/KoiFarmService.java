@@ -55,4 +55,41 @@ public class KoiFarmService {
         return new ArrayList<>();
     }
 
+    public void addKoiVarietyToFarm(Long farmId, Long varietyId) {
+        // Lấy farm và variety từ cơ sở dữ liệu
+        KoiFarm farm = koiFarmRepository.findById(farmId)
+                .orElseThrow(() -> new ResourceNotFoundException("Farm not found with id " + farmId));
+        KoiVariety variety = koiVarietyRepository.findById(varietyId)
+                .orElseThrow(() -> new ResourceNotFoundException("Koi variety not found with id " + varietyId));
+
+        // Thêm variety vào farm
+        farm.getKoiVarieties().add(variety);
+        koiFarmRepository.save(farm);  // Lưu farm để cập nhật bảng trung gian farm_variety
+    }
+
+
+    public KoiVariety updateKoiVarietyInFarm(Long farmId, Long varietyId, KoiVariety koiVarietyDetails) {
+        KoiVariety existingVariety = koiVarietyRepository.findById(varietyId)
+                .orElseThrow(() -> new ResourceNotFoundException("Koi Variety not found with id " + varietyId));
+
+        // Cập nhật chi tiết của variety
+        existingVariety.setVarietyName(koiVarietyDetails.getVarietyName());
+        existingVariety.setDescription(koiVarietyDetails.getDescription());
+
+        return koiVarietyRepository.save(existingVariety);
+    }
+
+    public void removeKoiVarietyFromFarm(Long farmId, Long varietyId) {
+        // Tìm farm và variety
+        KoiFarm farm = getFarmById(farmId);
+        KoiVariety variety = koiVarietyRepository.findById(varietyId)
+                .orElseThrow(() -> new ResourceNotFoundException("Koi Variety not found with id " + varietyId));
+
+        // Xóa variety khỏi danh sách koi varieties của farm
+        farm.getKoiVarieties().remove(variety);
+
+        // Lưu farm để cập nhật thay đổi
+        koiFarmRepository.save(farm);
+    }
+
 }

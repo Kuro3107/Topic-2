@@ -100,6 +100,7 @@ public class TripController {
     // Thêm trip detail vào trip
     @PostMapping("/{tripId}/trip-details")
     public ResponseEntity<TripDetail> addTripDetail(@PathVariable Long tripId, @RequestBody TripDetail tripDetail) {
+        System.out.println("Received TripDetail: " + tripDetail);
         TripDetail createdTripDetail = tripService.addTripDetail(tripId, tripDetail);
         return new ResponseEntity<>(createdTripDetail, HttpStatus.CREATED);
     }
@@ -107,6 +108,7 @@ public class TripController {
     // Cập nhật trip detail
     @PutMapping("/{tripId}/trip-details/{tripDetailId}")
     public ResponseEntity<TripDetail> updateTripDetail(@PathVariable Long tripId, @PathVariable Long tripDetailId, @RequestBody TripDetail tripDetail) {
+        System.out.println("Received TripDetail: " + tripDetail);
         TripDetail updatedTripDetail = tripService.updateTripDetail(tripId, tripDetailId, tripDetail);
         return new ResponseEntity<>(updatedTripDetail, HttpStatus.OK);
     }

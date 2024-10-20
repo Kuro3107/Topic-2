@@ -1,7 +1,9 @@
 package com.example.SWP_Project_BackEnd.Entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,6 +18,7 @@ import java.util.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+//@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "farmId")
 public class KoiFarm {
     @Id
     @Column(name = "farm_id", nullable = false)
@@ -48,7 +51,8 @@ public class KoiFarm {
 
     // Liên kết OneToOne với PODetail
     @OneToOne(mappedBy = "farm")
-    @JsonBackReference
+//    @JsonBackReference
+    @JsonIgnore
     private PODetail poDetail;
 //
 //    @ManyToMany(mappedBy = "koiFarms", fetch = FetchType.LAZY)
