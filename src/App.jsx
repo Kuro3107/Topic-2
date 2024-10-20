@@ -17,6 +17,7 @@ import ManageBooking from "./pages/admin/manage-booking";
 import Sales from "./pages/staff/sales";
 import Payment from "./pages/payment";
 import Consulting from "./pages/staff/consulting";
+import ManageAccounts from "./pages/admin/manage-accounts";
 
 function App() {
   const router = createBrowserRouter([
@@ -73,6 +74,10 @@ function App() {
     {
       path: "/consulting",
       element: <Consulting />,
+    },
+    {
+      path: "/manage-accounts",
+      element: <ManageAccounts />,
     },
   ]);
   return (

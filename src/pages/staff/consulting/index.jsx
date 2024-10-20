@@ -1,12 +1,17 @@
 import { useState, useEffect } from "react";
-import { Table, Button, message, Space, Modal } from "antd";
+import { Table, Button, message, Space, Modal, Layout, Menu } from "antd";
+import { UserOutlined, LogoutOutlined } from "@ant-design/icons";
 import api from "../../../config/axios";
+import { useNavigate } from "react-router-dom";
+
+const { Header, Content, Footer } = Layout;
 
 function Consulting() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchBookings();
@@ -16,14 +21,17 @@ function Consulting() {
     try {
       setLoading(true);
       const response = await api.get("/bookings");
-      const filteredBookings = response.data.filter(
-        (booking) =>
-          booking.status === "purchased" || booking.status === "checkin"
-      );
+      const filteredBookings = Array.isArray(response.data) 
+        ? response.data.filter(
+            (booking) =>
+              booking.status === "purchased" || booking.status === "checkin"
+          )
+        : [];
       setBookings(filteredBookings);
     } catch (error) {
       console.error("Error fetching bookings:", error);
       message.error("Failed to fetch bookings");
+      setBookings([]); // Đặt bookings là mảng rỗng nếu có lỗi
     } finally {
       setLoading(false);
     }
@@ -94,7 +102,7 @@ function Consulting() {
           )}
           {
             <Button
-              onClick={() => handleStatusChange(record.bookingId, "cancel")}
+              
             >
               Create Purchase Order
             </Button>
@@ -104,65 +112,97 @@ function Consulting() {
     },
   ];
 
+  const handleMenuClick = (e) => {
+    if (e.key === 'profile') {
+      // Xử lý chuyển đến trang profile (nếu có)
+      message.info("Profile feature is not implemented yet");
+    } else if (e.key === 'logout') {
+      // Xử lý đăng xuất
+      localStorage.removeItem("token"); // Xóa token từ localStorage
+      message.success("Logged out successfully");
+      navigate("/login"); // Chuyển hướng về trang đăng nhập
+    }
+  };
+
   return (
-    <div>
-      <h1>Consulting Staff Dashboard</h1>
-      <Table
-        columns={columns}
-        dataSource={bookings}
-        rowKey="bookingId"
-        loading={loading}
-      />
-      <Modal
-        title="Booking Details"
-        visible={isModalVisible}
-        onCancel={() => setIsModalVisible(false)}
-        footer={[
-          <Button key="close" onClick={() => setIsModalVisible(false)}>
-            Close
-          </Button>,
-        ]}
-      >
-        {selectedBooking && (
-          <div>
-            <p>
-              <strong>Booking ID:</strong> {selectedBooking.bookingId}
-            </p>
-            <p>
-              <strong>Customer Name:</strong> {selectedBooking.fullname}
-            </p>
-            <p>
-              <strong>Email:</strong> {selectedBooking.email}
-            </p>
-            <p>
-              <strong>Phone:</strong> {selectedBooking.phone}
-            </p>
-            <p>
-              <strong>Start Date:</strong>{" "}
-              {new Date(selectedBooking.startDate).toLocaleDateString()}
-            </p>
-            <p>
-              <strong>End Date:</strong>{" "}
-              {new Date(selectedBooking.endDate).toLocaleDateString()}
-            </p>
-            <p>
-              <strong>Status:</strong> {selectedBooking.status}
-            </p>
-            <p>
-              <strong>Favorite Farms:</strong>{" "}
-              {selectedBooking.favoriteFarm || "N/A"}
-            </p>
-            <p>
-              <strong>Favorite Koi:</strong>{" "}
-              {selectedBooking.favoriteKoi || "N/A"}
-            </p>
-            <p>
-              <strong>Note:</strong> {selectedBooking.note || "N/A"}
-            </p>
-          </div>
-        )}
-      </Modal>
-    </div>
+    <Layout className="layout" style={{ minHeight: "100vh" }}>
+      <Header style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div className="logo" style={{ color: "white", fontSize: "20px" }}>
+          Consulting Staff Dashboard
+        </div>
+        <Menu theme="dark" mode="horizontal" selectable={false} onClick={handleMenuClick}>
+          <Menu.Item key="profile" icon={<UserOutlined />}>
+            My Profile
+          </Menu.Item>
+          <Menu.Item key="logout" icon={<LogoutOutlined />}>
+            Logout
+          </Menu.Item>
+        </Menu>
+      </Header>
+      <Content style={{ padding: "0 50px" }}>
+        <div className="site-layout-content" style={{ margin: "16px 0" }}>
+          <h1>Consulting Staff Dashboard</h1>
+          <Table
+            columns={columns}
+            dataSource={bookings}
+            rowKey="bookingId"
+            loading={loading}
+          />
+          <Modal
+            title="Booking Details"
+            visible={isModalVisible}
+            onCancel={() => setIsModalVisible(false)}
+            footer={[
+              <Button key="close" onClick={() => setIsModalVisible(false)}>
+                Close
+              </Button>,
+            ]}
+          >
+            {selectedBooking && (
+              <div>
+                <p>
+                  <strong>Booking ID:</strong> {selectedBooking.bookingId}
+                </p>
+                <p>
+                  <strong>Customer Name:</strong> {selectedBooking.fullname}
+                </p>
+                <p>
+                  <strong>Email:</strong> {selectedBooking.email}
+                </p>
+                <p>
+                  <strong>Phone:</strong> {selectedBooking.phone}
+                </p>
+                <p>
+                  <strong>Start Date:</strong>{" "}
+                  {new Date(selectedBooking.startDate).toLocaleDateString()}
+                </p>
+                <p>
+                  <strong>End Date:</strong>{" "}
+                  {new Date(selectedBooking.endDate).toLocaleDateString()}
+                </p>
+                <p>
+                  <strong>Status:</strong> {selectedBooking.status}
+                </p>
+                <p>
+                  <strong>Favorite Farms:</strong>{" "}
+                  {selectedBooking.favoriteFarm || "N/A"}
+                </p>
+                <p>
+                  <strong>Favorite Koi:</strong>{" "}
+                  {selectedBooking.favoriteKoi || "N/A"}
+                </p>
+                <p>
+                  <strong>Note:</strong> {selectedBooking.note || "N/A"}
+                </p>
+              </div>
+            )}
+          </Modal>
+        </div>
+      </Content>
+      <Footer style={{ textAlign: "center" }}>
+        Koi Farm Management System ©2023 Created by Your Company
+      </Footer>
+    </Layout>
   );
 }
 

@@ -13,16 +13,21 @@ import {
   Col,
   Statistic,
   InputNumber,
+  Layout,
+  Menu,
 } from "antd";
 import {
   ShoppingCartOutlined,
   UserOutlined,
   CheckOutlined,
+  LogoutOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import axios from "axios";
 import { Space } from 'antd';
+import { useNavigate } from "react-router-dom";
 
+const { Header, Content, Footer } = Layout;
 
 function SalesDashboard() {
   const [bookings, setBookings] = useState([]);
@@ -49,7 +54,19 @@ function SalesDashboard() {
     setIsTripModalVisible(true); // Mở modal
 };
 
+  const navigate = useNavigate();
 
+  const handleMenuClick = (e) => {
+    if (e.key === 'profile') {
+      // Xử lý chuyển đến trang profile (nếu có)
+      message.info("Profile feature is not implemented yet");
+    } else if (e.key === 'logout') {
+      // Xử lý đăng xuất
+      localStorage.removeItem("token"); // Xóa token từ localStorage
+      message.success("Logged out successfully");
+      navigate("/login"); // Chuyển hướng về trang đăng nhập
+    }
+  };
 
   const fetchBookings = async () => {
     try {
@@ -497,188 +514,206 @@ const handleRemoveFarm = (farmId) => {
   
 
   return (
-    <div>
-      <h1>Sales Staff Dashboard</h1>
+    <Layout className="layout" style={{ minHeight: "100vh" }}>
+      <Header style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div className="logo" style={{ color: "white", fontSize: "20px" }}>
+          Sales Staff Dashboard
+        </div>
+        <Menu theme="dark" mode="horizontal" selectable={false} onClick={handleMenuClick}>
+          <Menu.Item key="profile" icon={<UserOutlined />}>
+            My Profile
+          </Menu.Item>
+          <Menu.Item key="logout" icon={<LogoutOutlined />}>
+            Logout
+          </Menu.Item>
+        </Menu>
+      </Header>
+      <Content style={{ padding: "0 50px" }}>
+        <div className="site-layout-content" style={{ margin: "16px 0" }}>
+          <h1>Sales Staff Dashboard</h1>
 
-      <Row gutter={16} style={{ marginBottom: 16 }}>
-        <Col span={8}>
-          <Card>
-            <Statistic
-              title="Total Bookings"
-              value={bookings.length}
-              prefix={<ShoppingCartOutlined />}
-            />
-          </Card>
-        </Col>
-        <Col span={8}>
-          <Card>
-            <Statistic
-              title="Pending Bookings"
-              value={bookings.filter(b => b.status === "pending").length}
-              prefix={<UserOutlined />}
-            />
-          </Card>
-        </Col>
-        <Col span={8}>
-          <Card>
-            <Statistic
-              title="Rejected Bookings"
-              value={bookings.filter(b => b.status === "rejected").length}
-              prefix={<CheckOutlined />}
-            />
-          </Card>
-        </Col>
-      </Row>
+          <Row gutter={16} style={{ marginBottom: 16 }}>
+            <Col span={8}>
+              <Card>
+                <Statistic
+                  title="Total Bookings"
+                  value={bookings.length}
+                  prefix={<ShoppingCartOutlined />}
+                />
+              </Card>
+            </Col>
+            <Col span={8}>
+              <Card>
+                <Statistic
+                  title="Pending Bookings"
+                  value={bookings.filter(b => b.status === "pending").length}
+                  prefix={<UserOutlined />}
+                />
+              </Card>
+            </Col>
+            <Col span={8}>
+              <Card>
+                <Statistic
+                  title="Rejected Bookings"
+                  value={bookings.filter(b => b.status === "rejected").length}
+                  prefix={<CheckOutlined />}
+                />
+              </Card>
+            </Col>
+          </Row>
 
-      <Table columns={columns} dataSource={bookings} rowKey="bookingId" />
+          <Table columns={columns} dataSource={bookings} rowKey="bookingId" />
 
-      {/* Modal Cp Nhật Booking */}
-      <Modal
-        title="Update Booking"
-        open={isModalVisible}
-        onOk={handleOk}
-        onCancel={() => setIsModalVisible(false)}
-      >
-        <Form form={form} layout="vertical">
-          <Form.Item name="tripId" label="Trip ID">
-            <Input disabled />
-          </Form.Item>
-          <Form.Item name="fullname" label="Customer Name">
-            <Input disabled />
-          </Form.Item>
-          <Form.Item name="phone" label="Phone">
-            <Input disabled />
-          </Form.Item>
-          <Form.Item name="email" label="Email">
-            <Input disabled />
-          </Form.Item>
-          <Form.Item name="favoriteKoi" label="Favorite Koi">
-            <Select mode="multiple" disabled>
-              {Array.isArray(form.getFieldValue('favoriteKoi')) ? form.getFieldValue('favoriteKoi').map(koi => (
-                  <Select.Option key={koi} value={koi}>
-                      {koi}
-                  </Select.Option>
-              )) : null}
-            </Select>
-          </Form.Item>
-          <Form.Item name="favoriteFarm" label="Favorite Farm">
-            <Select mode="multiple" disabled>
-              {Array.isArray(form.getFieldValue('favoriteFarm')) ? form.getFieldValue('favoriteFarm').map(farm => (
-                  <Select.Option key={farm} value={farm}>
-                      {farm}
-                  </Select.Option>
-              )) : null}
-            </Select>
-          </Form.Item>
-          <Form.Item name="status" label="Status" rules={[{ required: true }]}>
-            <Select>
-              <Select.Option value="pending">Pending</Select.Option>
-              <Select.Option value="detailed">Detailed</Select.Option>
-              <Select.Option value="rejected">Rejected</Select.Option>
-            </Select>
-          </Form.Item>
-          <Form.Item name="startDate" label="Start Date">
-            <DatePicker disabled />
-          </Form.Item>
-          <Form.Item name="endDate" label="End Date">
-            <DatePicker disabled />
-          </Form.Item>
-          <Form.Item name="note" label="Note">
-            <Input.TextArea disabled />
-          </Form.Item>
-        </Form>
-      </Modal>
+          {/* Modal Cp Nhật Booking */}
+          <Modal
+            title="Update Booking"
+            open={isModalVisible}
+            onOk={handleOk}
+            onCancel={() => setIsModalVisible(false)}
+          >
+            <Form form={form} layout="vertical">
+              <Form.Item name="tripId" label="Trip ID">
+                <Input disabled />
+              </Form.Item>
+              <Form.Item name="fullname" label="Customer Name">
+                <Input disabled />
+              </Form.Item>
+              <Form.Item name="phone" label="Phone">
+                <Input disabled />
+              </Form.Item>
+              <Form.Item name="email" label="Email">
+                <Input disabled />
+              </Form.Item>
+              <Form.Item name="favoriteKoi" label="Favorite Koi">
+                <Select mode="multiple" disabled>
+                  {Array.isArray(form.getFieldValue('favoriteKoi')) ? form.getFieldValue('favoriteKoi').map(koi => (
+                      <Select.Option key={koi} value={koi}>
+                          {koi}
+                      </Select.Option>
+                  )) : null}
+                </Select>
+              </Form.Item>
+              <Form.Item name="favoriteFarm" label="Favorite Farm">
+                <Select mode="multiple" disabled>
+                  {Array.isArray(form.getFieldValue('favoriteFarm')) ? form.getFieldValue('favoriteFarm').map(farm => (
+                      <Select.Option key={farm} value={farm}>
+                          {farm}
+                      </Select.Option>
+                  )) : null}
+                </Select>
+              </Form.Item>
+              <Form.Item name="status" label="Status" rules={[{ required: true }]}>
+                <Select>
+                  <Select.Option value="pending">Pending</Select.Option>
+                  <Select.Option value="detailed">Detailed</Select.Option>
+                  <Select.Option value="rejected">Rejected</Select.Option>
+                </Select>
+              </Form.Item>
+              <Form.Item name="startDate" label="Start Date">
+                <DatePicker disabled />
+              </Form.Item>
+              <Form.Item name="endDate" label="End Date">
+                <DatePicker disabled />
+              </Form.Item>
+              <Form.Item name="note" label="Note">
+                <Input.TextArea disabled />
+              </Form.Item>
+            </Form>
+          </Modal>
 
-      <Modal
-  title={isEditingTrip ? "Edit Trip" : "Create Trip"}
-  open={isTripModalVisible}
-  onOk={handleTripOk}
-  onCancel={() => setIsTripModalVisible(false)}
-  width={800}
->
-  <Form form={tripForm} layout="vertical">
-    <Form.Item name="tripName" label="Trip Name">
-      <Input placeholder="Enter trip name" />
-    </Form.Item>
+          <Modal
+    title={isEditingTrip ? "Edit Trip" : "Create Trip"}
+    open={isTripModalVisible}
+    onOk={handleTripOk}
+    onCancel={() => setIsTripModalVisible(false)}
+    width={800}
+  >
+    <Form form={tripForm} layout="vertical">
+      <Form.Item name="tripName" label="Trip Name">
+        <Input placeholder="Enter trip name" />
+      </Form.Item>
 
-    {isEditingTrip && (
+      {isEditingTrip && (
+        <>
+          <Form.Item name="priceTotal" label="Total Price">
+            <InputNumber placeholder="Enter total price" style={{ width: '100%' }} />
+          </Form.Item>
+
+          {/* Form.List cho Trip Details */}
+          <Form.List name="tripDetails">
+    {(fields, { add, remove }) => (
       <>
-        <Form.Item name="priceTotal" label="Total Price">
-          <InputNumber placeholder="Enter total price" style={{ width: '100%' }} />
-        </Form.Item>
-
-        {/* Form.List cho Trip Details */}
-        <Form.List name="tripDetails">
-  {(fields, { add, remove }) => (
-    <>
-      {fields.map((field, index) => {
-        const tripDetailId = tripForm.getFieldValue(['tripDetails', index, 'tripDetailId']); // Lấy tripDetailId từ form
-        return (
-          <Space key={field.key} align="baseline">
-            <Form.Item {...field} name={[field.name, 'mainTopic']} label="Main Topic">
-              <Input placeholder="Enter main topic" />
-            </Form.Item>
-            <Form.Item {...field} name={[field.name, 'subTopic']} label="Sub Topic">
-              <Input placeholder="Enter sub topic" />
-            </Form.Item>
-            <Form.Item {...field} name={[field.name, 'notePrice']} label="Price Note">
-              <Input placeholder="Enter price note" />
-            </Form.Item>
-            <Form.Item {...field} name={[field.name, 'day']} label="Day">
-              <InputNumber min={1} />
-            </Form.Item>
-            <Button onClick={() => {
-              if (tripDetailId) { // Kiểm tra xem tripDetailId có tồn tại không
-                removeTripDetail(viewingBooking.tripId, tripDetailId); // Gọi hàm xóa trip detail
-              } else {
-                message.error("Trip detail ID is undefined."); // Thông báo lỗi nếu ID không tồn tại
-              }
-              remove(field.name); // Xóa trip detail khỏi form
-            }}>Remove</Button>
-          </Space>
-        );
-      })}
-      <Button onClick={() => add()}>Add Trip Detail</Button>
-    </>
-  )}
-</Form.List>
-
-        {/* Hiển thị danh sách Koi Farms */}
-        <Form.List name="koiFarms">
-          {(fields, { add, remove }) => (
-            <>
-              {fields.map((field) => {
-                const farmId = tripForm.getFieldValue(['koiFarms', field.name, 'farmId']);
-                const farmName = tripForm.getFieldValue(['koiFarms', field.name, 'farmName']);
-                const location = tripForm.getFieldValue(['koiFarms', field.name, 'location']);
-
-                return (
-                  <div key={field.key}>
-                    <h4>{farmName}</h4>
-                    <p>{location}</p>
-                    <Button onClick={() => {
-                      // Gọi API xóa farm và xóa khỏi form
-                      handleRemoveFarm(farmId); // Hàm này sẽ gọi API và xóa farm khỏi form
-                      remove(field.name); // Xóa farm khỏi form sau khi API xóa thành công
-                    }}>Remove Farm</Button>
-                  </div>
-                );
-              })}
-              <Button type="dashed" onClick={handleAddFarm} style={{ width: '100%', marginTop: '16px' }}>
-                Add Farm
-              </Button>
-            </>
-          )}
-        </Form.List>
+        {fields.map((field, index) => {
+          const tripDetailId = tripForm.getFieldValue(['tripDetails', index, 'tripDetailId']); // Lấy tripDetailId từ form
+          return (
+            <Space key={field.key} align="baseline">
+              <Form.Item {...field} name={[field.name, 'mainTopic']} label="Main Topic">
+                <Input placeholder="Enter main topic" />
+              </Form.Item>
+              <Form.Item {...field} name={[field.name, 'subTopic']} label="Sub Topic">
+                <Input placeholder="Enter sub topic" />
+              </Form.Item>
+              <Form.Item {...field} name={[field.name, 'notePrice']} label="Price Note">
+                <Input placeholder="Enter price note" />
+              </Form.Item>
+              <Form.Item {...field} name={[field.name, 'day']} label="Day">
+                <InputNumber min={1} />
+              </Form.Item>
+              <Button onClick={() => {
+                if (tripDetailId) { // Kiểm tra xem tripDetailId có tồn tại không
+                  removeTripDetail(viewingBooking.tripId, tripDetailId); // Gọi hàm xóa trip detail
+                } else {
+                  message.error("Trip detail ID is undefined."); // Thông báo lỗi nếu ID không tồn tại
+                }
+                remove(field.name); // Xóa trip detail khỏi form
+              }}>Remove</Button>
+            </Space>
+          );
+        })}
+        <Button onClick={() => add()}>Add Trip Detail</Button>
       </>
     )}
-  </Form>
-</Modal>
+  </Form.List>
 
+          {/* Hiển thị danh sách Koi Farms */}
+          <Form.List name="koiFarms">
+            {(fields, { add, remove }) => (
+              <>
+                {fields.map((field) => {
+                  const farmId = tripForm.getFieldValue(['koiFarms', field.name, 'farmId']);
+                  const farmName = tripForm.getFieldValue(['koiFarms', field.name, 'farmName']);
+                  const location = tripForm.getFieldValue(['koiFarms', field.name, 'location']);
 
-    </div>
-);
+                  return (
+                    <div key={field.key}>
+                      <h4>{farmName}</h4>
+                      <p>{location}</p>
+                      <Button onClick={() => {
+                        // Gọi API xóa farm và xóa khỏi form
+                        handleRemoveFarm(farmId); // Hàm này sẽ gọi API và xóa farm khỏi form
+                        remove(field.name); // Xóa farm khỏi form sau khi API xóa thành công
+                      }}>Remove Farm</Button>
+                    </div>
+                  );
+                })}
+                <Button type="dashed" onClick={handleAddFarm} style={{ width: '100%', marginTop: '16px' }}>
+                  Add Farm
+                </Button>
+              </>
+            )}
+          </Form.List>
+        </>
+      )}
+    </Form>
+  </Modal>
 
+        </div>
+      </Content>
+      <Footer style={{ textAlign: "center" }}>
+        Koi Farm Management System ©2023 Created by Your Company
+      </Footer>
+    </Layout>
+  );
 }
 
 export default SalesDashboard;

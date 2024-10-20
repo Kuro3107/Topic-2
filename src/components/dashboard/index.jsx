@@ -3,13 +3,14 @@ import {
   DesktopOutlined,
   FileOutlined,
   PieChartOutlined,
-  TeamOutlined,
   UserOutlined,
+  TeamOutlined,
 } from "@ant-design/icons";
 import { Breadcrumb, Layout, Menu, theme } from "antd";
 import ManageFarm from "../../pages/admin/manage-farm";
 import ManageTrip from "../../pages/admin/manage-trip";
 import ManageBooking from "../../pages/admin/manage-booking";
+import ManageAccounts from "../../pages/admin/manage-accounts";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -23,16 +24,11 @@ function getItem(label, key, icon, children) {
 }
 
 const items = [
-  getItem("Option 1", "1", <PieChartOutlined />),
-  getItem("Option 2", "2", <DesktopOutlined />),
-  getItem("User", "sub1", <UserOutlined />, [
-    getItem("Tom", "3"),
-    getItem("Bill", "4"),
-    getItem("Alex", "5"),
-  ]),
-  getItem("Manage Booking", "Booking", <DesktopOutlined />),
-  getItem("Manage Trip", "Trip", <FileOutlined />),
-  getItem("Manage Farm", "Farm", <DesktopOutlined />),
+  getItem("Dashboard", "1", <PieChartOutlined />),
+  getItem("Manage Accounts", "2", <TeamOutlined />),
+  getItem("Manage Booking", "3", <DesktopOutlined />),
+  getItem("Manage Trip", "4", <FileOutlined />),
+  getItem("Manage Farm", "5", <DesktopOutlined />),
 ];
 
 const Dashboard = () => {
@@ -44,15 +40,16 @@ const Dashboard = () => {
 
   const renderContent = () => {
     switch (selectedKey) {
-      case "Farm":
-        return <ManageFarm />;
-      case "Trip":
-        return <ManageTrip />;
-      case "Booking":
+      case "2":
+        return <ManageAccounts />;
+      case "3":
         return <ManageBooking />;
-      // Thêm các case khác cho các menu item khác nếu cần
+      case "4":
+        return <ManageTrip />;
+      case "5":
+        return <ManageFarm />;
       default:
-        return <div>Select a menu item</div>;
+        return <div>Welcome to the Dashboard</div>;
     }
   };
 
@@ -90,7 +87,7 @@ const Dashboard = () => {
           </div>
         </Content>
         <Footer style={{ textAlign: "center" }}>
-          Ant Design ©2023 Created by Ant UED
+          Koi Farm Management System ©2023 Created by Your Company
         </Footer>
       </Layout>
     </Layout>
