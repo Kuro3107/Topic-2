@@ -180,6 +180,7 @@ function SalesDashboard() {
 
       if (isEditingTrip) {
         // Cập nhật trip
+        console.log("Updating trip with payload:", payload); // Ghi log trước khi gửi
         axios.put(`http://localhost:8080/api/trips/${viewingBooking.tripId}`, payload)
           .then((response) => {
             console.log("Trip updated response:", response.data);
@@ -267,6 +268,7 @@ const updateTripDetails = (tripId, tripDetails) => {
   tripDetails.forEach(detail => {
     if (detail.tripDetailId) { 
       // Nếu có tripDetailId thì cập nhật
+      console.log("Trip details before sending:", tripDetails);
       if (detail.mainTopic && detail.subTopic && detail.day && detail.notePrice) {
         axios.put(`http://localhost:8080/api/trips/${tripId}/trip-details/${detail.tripDetailId}`, {
           mainTopic: detail.mainTopic,
@@ -289,6 +291,7 @@ const updateTripDetails = (tripId, tripDetails) => {
       }
     } else {
       // Nếu không có tripDetailId thì tạo mới
+      console.log("Trip details before sending:", tripDetails);
       if (detail.mainTopic && detail.subTopic && detail.day && detail.notePrice) {
         axios.post(`http://localhost:8080/api/trips/${tripId}/trip-details`, {
           mainTopic: detail.mainTopic,
