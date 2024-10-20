@@ -33,9 +33,9 @@ public class KoiVariety {
     @JsonIgnore // Để tránh vòng lặp tuần hoàn khi trả dữ liệu về
     private List<KoiFarm> koiFarms = new ArrayList<>();
 
-    @OneToOne(mappedBy = "variety")
+    @OneToMany(mappedBy = "variety")
     @JsonBackReference
-    private PODetail poDetail;
+    private List<PODetail> poDetails = new ArrayList<>(); // Thay đổi từ poDetail sang poDetails và chuyển thành List
 
 //    @OneToMany
 //    @JoinTable(

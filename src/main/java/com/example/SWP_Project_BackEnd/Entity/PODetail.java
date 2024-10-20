@@ -30,7 +30,7 @@ public class PODetail {
     private KoiVariety variety;
 
     // Liên kết với Koifarm (OneToOne)
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "farm_id", referencedColumnName = "farm_id")
     @JsonManagedReference
     private KoiFarm farm;

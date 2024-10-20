@@ -35,6 +35,7 @@ public class Trip {
     private String imageUrl;
 
     @OneToMany(mappedBy = "trip", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<TripDetail> tripDetails = new ArrayList<>();
 
 

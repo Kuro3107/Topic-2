@@ -40,7 +40,7 @@ public class TripDetail {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "trip_id", nullable = false)
-    @JsonIgnore
+    @JsonBackReference
     private Trip trip;
 
 //    @OneToMany(mappedBy = "tripDetails", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
