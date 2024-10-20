@@ -17,7 +17,11 @@ import ManageBooking from "./pages/admin/manage-booking";
 import Sales from "./pages/staff/sales";
 import Payment from "./pages/payment";
 import Consulting from "./pages/staff/consulting";
+// <<<<<<< HEAD
 import ManageAccounts from "./pages/admin/manage-accounts";
+// =======
+import Delivery from "./pages/staff/delivery";
+// >>>>>>> c84449d237d4d9277b12f7ddfabacd3be3f6d2aa
 
 function App() {
   const router = createBrowserRouter([
@@ -54,11 +58,6 @@ function App() {
         { path: "booking", element: <ManageBooking /> },
       ],
     },
-    // {
-    //   path: "/salesdashboard",
-    //   element: <SalesDashBoard />,
-    //   children: [{ path: "form", element: <ManageForm /> }],
-    // },
     {
       path: "/product",
       element: <Product />,
@@ -66,6 +65,10 @@ function App() {
     {
       path: "/sales",
       element: <Sales />,
+    },
+    {
+      path: "/delivery",
+      element: <Delivery />,
     },
     {
       path: "/payment",
