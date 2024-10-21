@@ -105,7 +105,7 @@ public class AccountService {
             existingAccount.setPhone(accountDetails.getPhone());
             existingAccount.setEmail(accountDetails.getEmail());
             existingAccount.setImageUrl(accountDetails.getImageUrl());
-//            existingAccount.setRoleId(accountDetails.getRoleId());
+            existingAccount.setRoleId(accountDetails.getRoleId());
             existingAccount.setStatus(accountDetails.getStatus());
             existingAccount.setFullName(accountDetails.getFullName());
             return accountRepository.save(existingAccount);
@@ -157,6 +157,8 @@ public class AccountService {
         return "some_generated_token"; // Replace with actual token generation logic
     }
     public Account createAccount(Account account) {
+        // Mã hóa mật khẩu trước khi lưu
+        account.setPassword(passwordEncoder.encode(account.getPassword()));
         return accountRepository.save(account);
     }
 }
