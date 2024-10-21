@@ -56,7 +56,7 @@ const Header = () => {
           </li>
           <li>
             <Link className="header-link" onClick={handleBookTripClick}>
-              Book a trip
+              Book for yourself
             </Link>
           </li>
 
@@ -74,11 +74,18 @@ const Header = () => {
               </button>
             </li>
           ) : (
-            <li>
-              <Link to="/login" className="header-link">
-                Log in
-              </Link>
-            </li>
+            <>
+              <li>
+                <Link to="/login" className="header-link">
+                  Log in
+                </Link>
+              </li>
+              <li>
+                <Link to="/register" className="header-link">
+                  Register
+                </Link>
+              </li>
+            </>
           )}
         </ul>
       </nav>

@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -21,6 +22,7 @@ import {
   LockOutlined,
   EditOutlined,
   ShoppingOutlined,
+   
   UploadOutlined,
   CameraOutlined,
   PictureOutlined,
@@ -55,10 +57,7 @@ function Profile() {
   const [comments, setComments] = useState("");
   const [feedbackId, setFeedbackId] = useState(null); // Thêm state để lưu feedbackId
   const [isEditMode, setIsEditMode] = useState(false); // Thêm state để quản lý chế độ chỉnh sửa
-<<<<<<< HEAD
   const [backgroundImage, setBackgroundImage] = useState(defaultBackgrounds[0]);
-=======
->>>>>>> 885751ffdb5a08e4674af83a6659efca4ef99a21
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -107,7 +106,8 @@ function Profile() {
         }
       } catch (error) {
         console.error("Error fetching user info:", error);
-        toast.error("An error occurred while fetching user information.");
+        // Xóa dòng này để không hiển thị thông báo lỗi
+        // toast.error("An error occurred while fetching user information.");
       } finally {
         setLoading(false);
       }
@@ -145,7 +145,7 @@ function Profile() {
 
   const handleViewBooking = async (orderId) => {
     const bookingDetails = orders.find((order) => order.bookingId === orderId);
-    setSelectedBooking(bookingDetails); // L��u thông tin booking vào state
+    setSelectedBooking(bookingDetails); // Lu thông tin booking vào state
 
     // Kiểm tra tripId và lấy thông tin trip nếu có
     if (bookingDetails.tripId) {
@@ -225,6 +225,7 @@ function Profile() {
     }
   };
 
+   
   const handleImageChange = async (info) => {
     if (info.file.status === "done") {
       await handleImageUpload(info.file.originFileObj);
@@ -326,7 +327,6 @@ function Profile() {
       toast.error("An error occurred while submitting feedback.");
     }
   };
-<<<<<<< HEAD
 
   const handleBackgroundUpload = async (file) => {
     try {
@@ -382,8 +382,6 @@ function Profile() {
       </Upload>
     </div>
   );
-=======
->>>>>>> 885751ffdb5a08e4674af83a6659efca4ef99a21
 
   if (loading) {
     return (
@@ -578,25 +576,28 @@ function Profile() {
           </div>
         </Card>
 
-        <Card
-          title={
-            <h2>
-              <ShoppingOutlined /> Your Order
-            </h2>
-          }
-        >
-          <div>
-            {loading ? (
-              <Spin />
-            ) : (
-              <Table
-                columns={columns}
-                dataSource={orders} // Đảm bảo s dụng orders ở ây
-                rowKey="bookingId"
-              />
-            )}
-          </div>
-        </Card>
+        {/* Chỉ hiển thị phần "Your Order" nếu roleId là 5 */}
+        {user.roleId === 5 && (
+          <Card
+            title={
+              <h2>
+                <ShoppingOutlined /> Your Order
+              </h2>
+            }
+          >
+            <div>
+              {loading ? (
+                <Spin />
+              ) : (
+                <Table
+                  columns={columns}
+                  dataSource={orders} // Đảm bảo sử dụng orders ở đây
+                  rowKey="bookingId"
+                />
+              )}
+            </div>
+          </Card>
+        )}
         <Modal
           title="Booking Details"
           visible={isModalVisible}

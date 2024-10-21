@@ -18,12 +18,9 @@ import Sales from "./pages/staff/sales";
 import Payment from "./pages/payment";
 import Consulting from "./pages/staff/consulting";
 import Delivery from "./pages/staff/delivery";
-<<<<<<< HEAD
 import Introduce from "./pages/introduce";
-=======
 import ManageAccounts from "./pages/admin/manage-accounts";
 import ManageFeedback from "./pages/admin/manage-feedback";
->>>>>>> 885751ffdb5a08e4674af83a6659efca4ef99a21
 
 function App() {
   const router = createBrowserRouter([
