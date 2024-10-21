@@ -1,15 +1,14 @@
 import React, { useState } from "react";
 import {
   DesktopOutlined,
-  FileOutlined,
-  PieChartOutlined,
-  TeamOutlined,
-  UserOutlined,
+  FileOutlined
 } from "@ant-design/icons";
 import { Breadcrumb, Layout, Menu, theme } from "antd";
 import ManageFarm from "../../pages/admin/manage-farm";
 import ManageTrip from "../../pages/admin/manage-trip";
 import ManageBooking from "../../pages/admin/manage-booking";
+import ManageAccounts from "../../pages/admin/manage-accounts";
+import ManageFeedback from "../../pages/admin/manage-feedback";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -23,16 +22,11 @@ function getItem(label, key, icon, children) {
 }
 
 const items = [
-  getItem("Option 1", "1", <PieChartOutlined />),
-  getItem("Option 2", "2", <DesktopOutlined />),
-  getItem("User", "sub1", <UserOutlined />, [
-    getItem("Tom", "3"),
-    getItem("Bill", "4"),
-    getItem("Alex", "5"),
-  ]),
   getItem("Manage Booking", "Booking", <DesktopOutlined />),
   getItem("Manage Trip", "Trip", <FileOutlined />),
   getItem("Manage Farm", "Farm", <DesktopOutlined />),
+  getItem("Manage Accounts", "Accounts", <DesktopOutlined />),
+  getItem("Manage Feedback", "Feedback", <DesktopOutlined />),
 ];
 
 const Dashboard = () => {
@@ -50,6 +44,10 @@ const Dashboard = () => {
         return <ManageTrip />;
       case "Booking":
         return <ManageBooking />;
+      case "Accounts":
+        return <ManageAccounts />;
+      case "Feedback":
+        return <ManageFeedback />;
       // Thêm các case khác cho các menu item khác nếu cần
       default:
         return <div>Select a menu item</div>;
@@ -76,8 +74,6 @@ const Dashboard = () => {
         <Header style={{ padding: 0, background: colorBgContainer }} />
         <Content style={{ margin: "0 16px" }}>
           <Breadcrumb style={{ margin: "16px 0" }}>
-            <Breadcrumb.Item>User</Breadcrumb.Item>
-            <Breadcrumb.Item>Bill</Breadcrumb.Item>
           </Breadcrumb>
           <div
             style={{

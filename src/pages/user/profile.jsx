@@ -55,7 +55,10 @@ function Profile() {
   const [comments, setComments] = useState("");
   const [feedbackId, setFeedbackId] = useState(null); // Thêm state để lưu feedbackId
   const [isEditMode, setIsEditMode] = useState(false); // Thêm state để quản lý chế độ chỉnh sửa
+<<<<<<< HEAD
   const [backgroundImage, setBackgroundImage] = useState(defaultBackgrounds[0]);
+=======
+>>>>>>> 885751ffdb5a08e4674af83a6659efca4ef99a21
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -323,6 +326,7 @@ function Profile() {
       toast.error("An error occurred while submitting feedback.");
     }
   };
+<<<<<<< HEAD
 
   const handleBackgroundUpload = async (file) => {
     try {
@@ -378,6 +382,8 @@ function Profile() {
       </Upload>
     </div>
   );
+=======
+>>>>>>> 885751ffdb5a08e4674af83a6659efca4ef99a21
 
   if (loading) {
     return (
@@ -434,8 +440,8 @@ function Profile() {
       key: "email",
     },
     {
-      title: "Action",
-      key: "action",
+      title: "Feedback",
+      key: "Feedback",
       render: (_, record) => {
         return (
           <>

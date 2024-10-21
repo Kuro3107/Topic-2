@@ -81,7 +81,9 @@ function LoginPage() {
      else if (role_id === 3) {
       navigate("/consulting"); // Staff
     }
-      
+    else if (role_id === 4) {
+      navigate("/delivery"); // Delivery
+    }
       
     } catch (error) {
       console.error("Login error:", error);
