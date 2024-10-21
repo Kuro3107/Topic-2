@@ -18,6 +18,7 @@ import Sales from "./pages/staff/sales";
 import Payment from "./pages/payment";
 import Consulting from "./pages/staff/consulting";
 import Delivery from "./pages/staff/delivery";
+import Introduce from "./pages/introduce";
 
 function App() {
   const router = createBrowserRouter([
@@ -73,6 +74,10 @@ function App() {
     {
       path: "/consulting",
       element: <Consulting />,
+    },
+    {
+      path: "/introduce",
+      element: <Introduce />,
     },
   ]);
   return (

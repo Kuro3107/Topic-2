@@ -9,7 +9,7 @@ import Banner from "../../components/banner";
 function HomePage() {
   const [koiVarieties, setKoiVarieties] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const itemsPerPage = 4; // Số lượng giống cá Koi hiển thị mỗi trang
+  const itemsPerPage = 3; // Thay đổi số lượng cá Koi hiển thị mỗi trang thành 3
 
   const fetchKoiVarieties = async () => {
     try {
@@ -40,7 +40,10 @@ function HomePage() {
     setCurrentIndex((prev) => (prev - 1 + totalPages) % totalPages);
   };
 
-  const currentKois = koiVarieties.slice(currentIndex * itemsPerPage, (currentIndex + 1) * itemsPerPage);
+  const currentKois = koiVarieties.slice(
+    currentIndex * itemsPerPage,
+    (currentIndex + 1) * itemsPerPage
+  );
 
   return (
     <div className="home-page">
@@ -63,9 +66,11 @@ function HomePage() {
                     alt={koi.varietyName}
                     className="koi-avatar"
                   />
-                  <p>Loại: {koi.varietyName}</p>
-                  <p>Giá: {koi.koiPrice} VNĐ</p>
-                  <p>Mô tả: {koi.description}</p>
+                  <div className="koi-info">
+                    <p>Loại: {koi.varietyName}</p>
+                    <p>Giá: {koi.koiPrice.toLocaleString()} VNĐ</p>
+                    <p>Mô tả: {koi.description}</p>
+                  </div>
                 </div>
               ))}
             </div>

@@ -2,25 +2,27 @@
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    background-color: #f5f5f5;
+    font-family: 'Arial', sans-serif;
 }
 
 main {
     flex: 1;
-    padding: 20px;
+    padding: 40px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 main h1 {
     text-align: center;
-    margin-bottom: 30px;
-    color: #FF3366; /* Màu đỏ RGB chủ đạo */
-    font-size: 2.5em;
+    margin-bottom: 40px;
+    color: #FF3366;
+    font-size: 3em;
     font-weight: bold;
     text-transform: uppercase;
     letter-spacing: 2px;
     position: relative;
     padding-bottom: 15px;
-    padding-top: 20px;
-    border-bottom: 2px solid #FF3366; /* Thêm đường viền dưới tiêu đề */
 }
 
 main h1::after {
@@ -39,18 +41,131 @@ main h1:hover {
     transition: all 0.3s ease;
 }
 
-/* Thêm các style khác tùy theo nhu cầu của bạn */
+.koi-container {
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    margin-top: 40px;
+    display: flex;
+    align-items: center;
+}
 
-/* Thêm style mới cho các liên kết trong header */
+.koi-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    width: 100%;
+}
+
+.koi-card {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.koi-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+}
+
+.koi-avatar {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.koi-info {
+    padding: 15px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.koi-info p {
+    margin: 0 0 10px 0;
+    font-size: 0.9em;
+    color: #333;
+    line-height: 1.4;
+    padding-left: 15px;
+    position: relative;
+}
+
+.koi-info p::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: #FF3366;
+}
+
+.koi-info p:first-of-type {
+    font-weight: bold;
+    color: #FF3366;
+    font-size: 1.1em;
+    margin-bottom: 15px;
+    padding-left: 0;
+}
+
+.koi-info p:first-of-type::before {
+    content: none;
+}
+
+.koi-container button {
+    background-color: #FF3366;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    font-size: 1.2em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    border-radius: 5px;
+    margin: 0 10px;
+}
+
+.koi-container button:hover {
+    background-color: #E61E4D;
+}
+
+.koi-container button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+    main {
+        padding: 20px 10px;
+    }
+
+    main h1 {
+        font-size: 2.5em;
+    }
+
+    .koi-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .koi-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Thêm styles mới cho các liên kết trong header */
 .header-link {
     font-weight: bold;
     text-decoration: none;
-    color: #FF3366; /* Màu đỏ RGB đẹp */
+    color: #FF3366;
     transition: color 0.3s ease;
 }
 
 .header-link:hover {
-    color: #FF6699; /* Màu đỏ nhạt hơn khi di chuột qua */
+    color: #FF6699;
 }
 
 /* Style cho nút đăng xuất */
@@ -60,7 +175,7 @@ main h1:hover {
     color: #FF3366;
     background-color: transparent;
     border: 2px solid #FF3366;
-    padding: 5px 10px;
+    padding: 8px 15px;
     border-radius: 5px;
     transition: all 0.3s ease;
 }
@@ -69,4 +184,3 @@ main h1:hover {
     color: white;
     background-color: #FF3366;
 }
-
