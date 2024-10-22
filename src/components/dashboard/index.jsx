@@ -1,8 +1,5 @@
 import React, { useState } from "react";
-import {
-  DesktopOutlined,
-  FileOutlined
-} from "@ant-design/icons";
+import { DesktopOutlined, FileOutlined } from "@ant-design/icons";
 import { Breadcrumb, Layout, Menu, theme } from "antd";
 import ManageFarm from "../../pages/admin/manage-farm";
 import ManageTrip from "../../pages/admin/manage-trip";
@@ -54,6 +51,7 @@ const Dashboard = () => {
     }
   };
 
+
   return (
     <Layout style={{ minHeight: "100vh" }}>
       <Sider
@@ -71,10 +69,9 @@ const Dashboard = () => {
         />
       </Sider>
       <Layout>
-        <Header style={{ padding: 0, background: colorBgContainer }} />
+        <Header />
         <Content style={{ margin: "0 16px" }}>
-          <Breadcrumb style={{ margin: "16px 0" }}>
-          </Breadcrumb>
+          <Breadcrumb></Breadcrumb>
           <div
             style={{
               padding: 24,
