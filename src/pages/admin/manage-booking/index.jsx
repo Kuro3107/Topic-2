@@ -227,7 +227,13 @@ function ManageBooking() {
   return (
     <div>
       <h1>Manage Booking</h1>
-    
+      <Button
+        onClick={() => showModal()}
+        type="primary"
+        style={{ marginBottom: 16 }}
+      >
+        Thêm đặt chỗ mới
+      </Button> */
       <Table columns={columns} dataSource={bookings} rowKey="BookingID" />
       <Modal
         title={editingBooking ? "Sửa đặt chỗ" : "Thêm đặt chỗ mới"}
