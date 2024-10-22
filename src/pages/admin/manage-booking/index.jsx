@@ -233,7 +233,7 @@ function ManageBooking() {
         style={{ marginBottom: 16 }}
       >
         Thêm đặt chỗ mới
-      </Button> */}
+      </Button> */
       <Table columns={columns} dataSource={bookings} rowKey="BookingID" />
       <Modal
         title={editingBooking ? "Sửa đặt chỗ" : "Thêm đặt chỗ mới"}

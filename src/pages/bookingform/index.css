@@ -48,7 +48,7 @@
   .form-group label {
     display: block;
     margin-bottom: 5px;
-    color: white;
+    color: rgb(0, 0, 0);
   }
   
   .form-group input, select, textarea {
@@ -58,7 +58,7 @@
     border-radius: 4px;
     border: 1px solid #ccc;
     background-color: rgba(255, 255, 255, 0.2);
-    color: white;
+    color: rgb(0, 0, 0);
   }
   
   .form-group textarea {
