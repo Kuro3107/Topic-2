@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
-import { Table, Button, Modal, message } from "antd";
+import { Button, Table, Modal, message, Rate } from "antd";
+import { useEffect, useState } from "react";
+import api from "../../../config/axios";
 import axios from "axios";
 import dayjs from "dayjs";
 
@@ -38,117 +39,80 @@ function ManageFeedback() {
 
   // Fetch both feedback and booking data on component mount
   useEffect(() => {
-    fetchFeedbackData();
-    fetchBookingData();
+    const fetchData = async () => {
+      try {
+        // Lấy dữ liệu từ API cho booking và feedback
+        const feedbackResponse = await api.get("/feedbacks");
+        const bookingResponse = await api.get("/bookings");
+        
+        setFeedbackData(feedbackResponse.data); // Set feedback data
+        setBookingData(bookingResponse.data); // Set booking data
+      } catch (error) {
+        console.error("Error fetching feedback or booking data:", error);
+      }
+    };
+
+    fetchData();
   }, []);
 
-  // View Trip Details function
-  const handleViewTripDetails = async (bookingId) => {
-    try {
-      const booking = bookingData.find(b => b.bookingId === bookingId);
-      if (!booking) {
-        message.warning("No booking found.");
-        return;
-      }
-
-      const tripResponse = await axios.get(tripsApi);
-      const tripDetails = tripResponse.data.find(trip => trip.tripId === booking.tripId);
-
-      if (tripDetails) {
-        setSelectedTripDetails(tripDetails);
-        setIsTripModalVisible(true);
-      } else {
-        message.warning("No trip details found for this booking.");
-      }
-    } catch (error) {
-      console.error("Error fetching trip details:", error);
-      message.error("Could not fetch trip details.");
-    }
-  };
-
-  // Define table columns
+  // Định nghĩa các cột cho bảng
   const columns = [
     {
-      title: "No",
-      dataIndex: "id",
-      key: "id",
-      render: (text, record, index) => index + 1,
+      title: "Booking ID",
+      dataIndex: "bookingId",
+      key: "bookingId",
     },
     {
       title: "Booking Date",
       dataIndex: "bookingDate",
       key: "bookingDate",
-      render: (text, record) => {
-        const booking = bookingData.find(b => b.bookingId === record.bookingId);
-        return booking ? dayjs(booking.bookingDate).format("DD/MM/YYYY") : "N/A";
-      },
+    },
+    {
+      title: "Full Name",
+      dataIndex: "fullName",
+      key: "fullName",
+    },
+    {
+      title: "Phone",
+      dataIndex: "phone",
+      key: "phone",
+    },
+    {
+      title: "Email",
+      dataIndex: "email",
+      key: "email",
     },
     {
       title: "Rating",
       dataIndex: "rating",
       key: "rating",
+      render: (text) => <Rate disabled value={text} />, // Hiển thị đánh giá bằng hình ngôi sao
     },
     {
-      title: "Comments",
-      dataIndex: "comments",
-      key: "comments",
-    },
-    {
-      title: "Actions",
-      key: "actions",
-      render: (_, record) => (
-        <>
-          <Button onClick={() => handleViewTripDetails(record.bookingId)}>
-            View Trip Details
-          </Button>
-        </>
-      ),
+      title: "Comment",
+      dataIndex: "comment",
+      key: "comment",
     },
   ];
+
+  // Kết hợp dữ liệu booking và feedback
+  const combinedData = bookingData.map(booking => {
+    const feedback = feedbackData.find(f => f.feedbackId === booking.feedbackId) || {};
+    return {
+      bookingId: booking.bookingId,
+      bookingDate: booking.bookingDate,
+      fullName: booking.fullname,
+      phone: booking.phone,
+      email: booking.email,
+      rating: feedback.rating || 0, // Đảm bảo giá trị mặc định là 0
+      comment: feedback.comments || 'N/A',
+    };
+  });
 
   return (
     <div>
       <h1>Manage Feedback</h1>
-      <Table columns={columns} dataSource={feedbackData} rowKey="id" />
-
-      {/* Modal for Viewing Trip Details */}
-      <Modal
-        title="Trip Details"
-        visible={isTripModalVisible}
-        onCancel={() => setIsTripModalVisible(false)}
-        footer={null}
-      >
-        {selectedTripDetails ? (
-          <div>
-            <p><strong>Trip Name:</strong> {selectedTripDetails.tripName}</p>
-            <p><strong>Total Price:</strong> {selectedTripDetails.priceTotal} VNĐ</p>
-            <img
-              src={selectedTripDetails.imageUrl}
-              alt={selectedTripDetails.tripName}
-              style={{ width: "100%", height: "auto" }}
-            />
-            <h4>Trip Details:</h4>
-            {selectedTripDetails.tripDetails.map(detail => (
-              <div key={detail.tripDetailId}>
-                <p>Day: {detail.day}</p>
-                <p>Main Topic: {detail.mainTopic}</p>
-                <p>Sub Topic: {detail.subTopic || "None"}</p>
-                <p>Price Note: {detail.notePrice} VNĐ</p>
-              </div>
-            ))}
-            <h4>Koi Farms:</h4>
-            {selectedTripDetails.koiFarms.map(farm => (
-              <div key={farm.farmId}>
-                <p>Farm Name: {farm.farmName}</p>
-                <p>Location: {farm.location}</p>
-                <p>Contact Info: {farm.contactInfo}</p>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p>Loading trip details...</p>
-        )}
-      </Modal>
+      <Table columns={columns} dataSource={combinedData} rowKey="bookingId" />
     </div>
   );
 }
