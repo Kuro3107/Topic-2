@@ -137,16 +137,13 @@ function Consulting() {
       const newPoId = response.data.po_id; // Đảm bảo API trả về po_id
 
       // Cập nhật PO ID cho booking
-      const currentBooking = bookings.find(
-        (booking) => booking.bookingId === bookingId
+      const updatedBookings = bookings.map((booking) =>
+        booking.bookingId === bookingId
+          ? { ...booking, poId: newPoId }
+          : booking
       );
-      if (!currentBooking) {
-        throw new Error("Booking not found");
-      }
-      await api.put(`/bookings/${bookingId}`, {
-        ...currentBooking,
-        poId: newPoId,
-      });
+      setBookings(updatedBookings);
+
       message.success("Purchase Order created successfully.");
       fetchBookings();
     } catch (error) {
@@ -338,11 +335,20 @@ function Consulting() {
           )}
 
           {record.status === "checkin" && (
-            <Button
-              onClick={() => handleStatusChange(record.bookingId, "checkout")}
-            >
-              Check Out
-            </Button>
+            <>
+              <Button
+                onClick={() => handleStatusChange(record.bookingId, "checkout")}
+              >
+                Check Out
+              </Button>
+              {!record.poId && (
+                <Button
+                  onClick={() => createPurchaseOrder(record.bookingId)}
+                >
+                  Create Purchase Order
+                </Button>
+              )}
+            </>
           )}
 
           {record.status === "checkout" && (

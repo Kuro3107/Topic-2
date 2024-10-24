@@ -475,7 +475,7 @@ function Profile() {
                 type="default"
                 style={{ fontWeight: "bold" }}
               >
-                Đ��nh giá
+                Đánh giá
               </Button>
             ) : (
               <Button
