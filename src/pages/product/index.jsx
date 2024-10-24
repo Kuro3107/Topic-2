@@ -149,11 +149,11 @@ const Product = () => {
   const handleBooking = (tripId) => {
     const userInfo = JSON.parse(localStorage.getItem("userInfo"));
     if (!userInfo) {
-      message.warning("Vui lòng đăng nhập để đặt tour.");
-      navigate("/login");
+        message.warning("Vui lòng đăng nhập để đặt tour.");
+        navigate("/login");
     } else {
-      // Chuyển hướng đến trang BookingForm với tripId
-      navigate(`/booking-form/${tripId}`);
+        setSelectedTour(tours.find(tour => tour.tripId === tripId)); // Lưu thông tin tour đã chọn
+        setIsBookingModalVisible(true); // Hiện modal booking
     }
   };
 
@@ -176,51 +176,52 @@ const Product = () => {
     const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
     if (!selectedTour) {
-      message.error("No tour selected. Please select a tour before booking.");
-      return;
+        message.error("No tour selected. Please select a tour before booking.");
+        return;
     }
 
     if (!bookingData.startDate) {
-      message.error("Please select a start date.");
-      return;
+        message.error("Please select a start date.");
+        return;
     }
 
     console.log("Booking Data:", bookingData); // Kiểm tra dữ liệu booking
 
     const newBooking = {
-      tripId: selectedTour.tripId,
-      customerId: userInfo.customerId,
-      bookingPaymentId: null,
-      feedbackId: null,
-      status: "Approved",
-      startDate: bookingData.startDate.format("YYYY-MM-DD"),
-      bookingDate: moment().format("YYYY-MM-DD"),
-      fullname: bookingData.fullname,
-      phone: bookingData.phone,
-      email: bookingData.email,
-      favoriteFarm: null,
-      favoriteKoi: null,
-      note: bookingData.note,
-      isActive: null,
+        tripId: selectedTour.tripId,
+        customerId: userInfo.customerId,
+        bookingPaymentId: null,
+        feedbackId: null,
+        status: "Approved",
+        startDate: bookingData.startDate.format("YYYY-MM-DD"),
+        endDate: null, // Đặt endDate là null
+        bookingDate: moment().format("YYYY-MM-DD"),
+        fullname: bookingData.fullname,
+        phone: bookingData.phone,
+        email: bookingData.email,
+        favoriteFarm: null,
+        favoriteKoi: null,
+        note: bookingData.note,
+        isActive: null,
     };
 
     console.log("Submitting booking:", newBooking);
 
     try {
-      const response = await axios.post(apiBooking, newBooking);
-      console.log("Booking created:", response.data);
-      message.success("Booking created successfully!");
-      setIsBookingModalVisible(false);
-      setBookingData({
-        fullname: "",
-        phone: "",
-        email: "",
-        startDate: null,
-        note: "",
-      });
+        const response = await axios.post(apiBooking, newBooking);
+        console.log("Booking created:", response.data);
+        message.success("Booking created successfully!");
+        setIsBookingModalVisible(false);
+        setBookingData({
+            fullname: "",
+            phone: "",
+            email: "",
+            startDate: null,
+            note: "",
+        });
     } catch (error) {
-      console.error("Error creating booking:", error);
-      message.error("Failed to create booking. Please try again.");
+        console.error("Error creating booking:", error);
+        message.error("Failed to create booking. Please try again.");
     }
   };
 
@@ -239,7 +240,7 @@ const Product = () => {
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
-    // Không cần gọi fetchTours ��� đây vì useEffect sẽ tự động gọi khi currentPage thay đổi
+    // Không cần gọi fetchTours  đây vì useEffect sẽ tự động gọi khi currentPage thay đổi
   };
 
   // Cập nhật hàm handleFilterChange

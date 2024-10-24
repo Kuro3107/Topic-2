@@ -91,6 +91,14 @@ function BookingForm() {
       );
       setFilteredFarmOptions(filteredFarms); // Cập nhật danh sách farm đã lọc
     }
+
+    // Nếu không có koi được chọn, reset farm
+    if (actionMeta.name === "favoriteFarm" && formData.favoriteKoi.length === 0) {
+      setFormData((prevData) => ({
+        ...prevData,
+        favoriteFarm: [], // Reset farm nếu không có koi
+      }));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -239,7 +247,7 @@ function BookingForm() {
                 <h3 className="section-title">Your Preferences</h3>
                 <div className="form-grid">
                   <div className="form-group">
-                    <label className="form-label">Favorite Koi Varieties</label>
+                    <label className="form-label">Choose Your Favorite Koi First</label>
                     <div className="select-container">
                       <Select
                         isMulti
@@ -266,7 +274,7 @@ function BookingForm() {
                       <Select
                         isMulti
                         name="favoriteFarm"
-                        options={filteredFarmOptions}
+                        options={formData.favoriteKoi.length > 0 ? filteredFarmOptions : []} // Chỉ hiển thị farm nếu có koi được chọn
                         className="basic-multi-select"
                         classNamePrefix="select"
                         onChange={(selectedOptions) =>

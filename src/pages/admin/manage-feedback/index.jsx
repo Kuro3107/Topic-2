@@ -98,16 +98,20 @@ function ManageFeedback() {
   // Kết hợp dữ liệu booking và feedback
   const combinedData = bookingData.map(booking => {
     const feedback = feedbackData.find(f => f.feedbackId === booking.feedbackId) || {};
-    return {
-      bookingId: booking.bookingId,
-      bookingDate: booking.bookingDate,
-      fullName: booking.fullname,
-      phone: booking.phone,
-      email: booking.email,
-      rating: feedback.rating || 0, // Đảm bảo giá trị mặc định là 0
-      comment: feedback.comments || 'N/A',
-    };
-  });
+    // Chỉ hiển thị booking nếu có rating
+    if (feedback.rating) {
+      return {
+        bookingId: booking.bookingId,
+        bookingDate: booking.bookingDate,
+        fullName: booking.fullname,
+        phone: booking.phone,
+        email: booking.email,
+        rating: feedback.rating || 0, // Đảm bảo giá trị mặc định là 0
+        comment: feedback.comments || 'N/A',
+      };
+    }
+    return null; // Trả về null nếu không có rating
+  }).filter(item => item !== null); // Lọc bỏ các booking không có rating
 
   return (
     <div>

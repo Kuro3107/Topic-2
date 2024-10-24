@@ -279,6 +279,7 @@ const Delivery = () => {
           <Select value={status} onChange={setStatus} style={{ width: "100%" }}>
             <Option value="delivering">delivering</Option>
             <Option value="delivered">delivered</Option>
+            <Option value="deny">deny</Option>
           </Select>
         </div>
       </Modal>

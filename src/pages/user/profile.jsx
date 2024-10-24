@@ -475,7 +475,7 @@ function Profile() {
                 type="default"
                 style={{ fontWeight: "bold" }}
               >
-                Đánh giá
+                Đ��nh giá
               </Button>
             ) : (
               <Button
@@ -632,7 +632,7 @@ function Profile() {
               </p>
               <p>
                 <strong>End Date:</strong>{" "}
-                {new Date(selectedBooking.endDate).toLocaleDateString()}
+                {selectedBooking.endDate ? new Date(selectedBooking.endDate).toLocaleDateString() : "N/A"}
               </p>
               <p>
                 <strong>Status:</strong> {selectedBooking.status}

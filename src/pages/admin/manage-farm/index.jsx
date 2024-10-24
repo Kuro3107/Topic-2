@@ -173,6 +173,14 @@ const ManageFarm = () => {
       key: "contactInfo",
     },
     {
+      title: "Koi In Farm",
+      dataIndex: "koiVarieties",
+      key: "koiVarieties",
+      render: (koiVarieties) => (
+        <span>{koiVarieties.map(koi => koi.varietyName).join(', ')}</span> // Hiển thị varietyName
+      ),
+    },
+    {
       title: "Action",
       key: "action",
       render: (_, record) => (
@@ -186,14 +194,6 @@ const ManageFarm = () => {
             Xóa
           </Button>
         </>
-      ),
-    },
-    {
-      title: "Koi In Farm",
-      dataIndex: "koiVarieties",
-      key: "koiVarieties",
-      render: (koiVarieties) => (
-        <span>{koiVarieties.map(koi => koi.varietyName).join(', ')}</span> // Hiển thị varietyName
       ),
     },
   ];

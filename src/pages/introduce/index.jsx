@@ -8,8 +8,8 @@ import Banner from "../../components/banner";
 
 function Introduce() {
   const [koiVarieties, setKoiVarieties] = useState([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const itemsPerPage = 3; // Thay đổi số lượng cá Koi hiển thị mỗi trang thành 3
+  const [currentPage, setCurrentPage] = useState(1);
+  const koisPerPage = 6; // Số lượng Koi hiển thị mỗi trang
 
   const fetchKoiVarieties = async () => {
     try {
@@ -18,9 +18,7 @@ function Introduce() {
         throw new Error("Unable to get Koi varieties data");
       }
       const data = await response.json();
-      // Trộn dữ liệu ngẫu nhiên
-      const shuffledData = data.sort(() => 0.5 - Math.random());
-      setKoiVarieties(shuffledData);
+      setKoiVarieties(data);
     } catch (error) {
       console.error("Không thể lấy dữ liệu giống cá Koi", error);
     }
@@ -30,20 +28,13 @@ function Introduce() {
     fetchKoiVarieties();
   }, []);
 
-  const totalPages = Math.ceil(koiVarieties.length / itemsPerPage);
+  // Tính toán Koi cho trang hiện tại
+  const indexOfLastKoi = currentPage * koisPerPage;
+  const indexOfFirstKoi = indexOfLastKoi - koisPerPage;
+  const currentKois = koiVarieties.slice(indexOfFirstKoi, indexOfLastKoi);
 
-  const handleNext = () => {
-    setCurrentIndex((prev) => (prev + 1) % totalPages);
-  };
-
-  const handlePrev = () => {
-    setCurrentIndex((prev) => (prev - 1 + totalPages) % totalPages);
-  };
-
-  const currentKois = koiVarieties.slice(
-    currentIndex * itemsPerPage,
-    (currentIndex + 1) * itemsPerPage
-  );
+  // Thay đổi trang
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
     <div className="home-page">
@@ -52,29 +43,43 @@ function Introduce() {
       <main>
         <Banner />
 
-        <h1>Danh sách trang trại nổi tiếng</h1>
+        <h1>Danh sách trang trại</h1>
         <ProductList />
         <div>
-          <h1>Popular koi varieties</h1>
-          <div className="koi-container">
-            <button onClick={handlePrev} disabled={currentIndex === 0}>&lt;</button>
-            <div className="koi-grid">
-              {currentKois.map((koi) => (
-                <div key={koi.varietyId} className="koi-card">
-                  <img
-                    src={koi.imageUrl}
-                    alt={koi.varietyName}
-                    className="koi-avatar"
-                  />
-                  <div className="koi-info">
-                    <p>Loại: {koi.varietyName}</p>
-                    <p>Giá: {koi.koiPrice.toLocaleString()} VNĐ</p>
-                    <p>Mô tả: {koi.description}</p>
-                  </div>
+          <h1>Các giống Koi</h1>
+          <div className="koi-grid">
+            {currentKois.map((koi) => (
+              <div key={koi.varietyId} className="koi-card">
+                <img
+                  src={koi.imageUrl}
+                  alt={koi.varietyName}
+                  className="koi-avatar"
+                />
+                <div className="koi-info">
+                  <p>Loại: {koi.varietyName}</p>
+                  <p>Giá: {koi.koiPrice.toLocaleString()} VNĐ</p>
+                  <p>Mô tả: {koi.description}</p>
                 </div>
-              ))}
-            </div>
-            <button onClick={handleNext} disabled={currentIndex === totalPages - 1}>&gt;</button>
+              </div>
+            ))}
+          </div>
+          <div className="pagination">
+            {Array.from(
+              { length: Math.ceil(koiVarieties.length / koisPerPage) },
+              (_, i) => (
+                <button
+                  key={i}
+                  onClick={() => paginate(i + 1)}
+                  style={{
+                    fontWeight: currentPage === i + 1 ? 'bold' : 'normal',
+                    backgroundColor: currentPage === i + 1 ? '#007bff' : '#fff',
+                    color: currentPage === i + 1 ? '#fff' : '#000',
+                  }}
+                >
+                  {i + 1}
+                </button>
+              )
+            )}
           </div>
         </div>
       </main>

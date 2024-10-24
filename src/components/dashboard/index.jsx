@@ -6,6 +6,7 @@ import ManageTrip from "../../pages/admin/manage-trip";
 import ManageBooking from "../../pages/admin/manage-booking";
 import ManageAccounts from "../../pages/admin/manage-accounts";
 import ManageFeedback from "../../pages/admin/manage-feedback";
+import ManageKoi from "../../pages/admin/manage-koi";
 import "../dashboard/index.css"
 
 const { Header, Content, Footer, Sider } = Layout;
@@ -25,6 +26,7 @@ const items = [
   getItem("Manage Farm", "Farm", <DesktopOutlined />),
   getItem("Manage Accounts", "Accounts", <DesktopOutlined />),
   getItem("Manage Feedback", "Feedback", <DesktopOutlined />),
+  getItem("Manage Koi", "Koi", <DesktopOutlined />),
 ];
 
 const Dashboard = () => {
@@ -46,7 +48,8 @@ const Dashboard = () => {
         return <ManageAccounts />;
       case "Feedback":
         return <ManageFeedback />;
-      // Thêm các case khác cho các menu item khác nếu cần
+      case "Koi":
+        return <ManageKoi />;
       default:
         return <div>Select a menu item</div>;
     }
@@ -58,7 +61,6 @@ const Dashboard = () => {
     // Redirect to the login page
     window.location.href = "/login"; // Navigate to the login page
   };
-
 
   return (
     <Layout className={`ant-layout-has-sider ${collapsed ? 'sider-collapsed' : ''}`}>

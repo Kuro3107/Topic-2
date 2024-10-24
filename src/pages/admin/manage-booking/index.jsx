@@ -121,10 +121,10 @@ function ManageBooking() {
       render: (date) => dayjs(date).format("DD/MM/YYYY"),
     },
     {
-      title: "Ngày kết thc",
+      title: "Ngày kết thúc",
       dataIndex: "endDate",
       key: "endDate",
-      render: (date) => dayjs(date).format("DD/MM/YYYY"),
+      render: (date) => date ? dayjs(date).format("DD/MM/YYYY") : null, // Chấp nhận null và không hiển thị nếu không có dữ liệu
     },
     { title: "Koi yêu thích", dataIndex: "favoriteKoi", key: "favoriteKoi" },
     {
@@ -227,13 +227,6 @@ function ManageBooking() {
   return (
     <div>
       <h1>Manage Booking</h1>
-      <Button
-        onClick={() => showModal()}
-        type="primary"
-        style={{ marginBottom: 16 }}
-      >
-        Add new booking
-      </Button> 
       <Table columns={columns} dataSource={bookings} rowKey="BookingID" />
       <Modal
         title={editingBooking ? "Edit booking" : "Add new booking"}
