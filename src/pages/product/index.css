@@ -156,3 +156,123 @@ h1 {
     height: 200px;
   }
 }
+
+/* Modal container styles */
+.tour-detail-modal {
+  width: 80vw !important;
+  max-width: 1200px;
+}
+
+.tour-detail-modal .ant-modal-body {
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 24px;
+}
+
+/* Section styles */
+.tour-detail-section {
+  margin-bottom: 24px;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.tour-detail-section h3 {
+  color: #1890ff;
+  margin-bottom: 16px;
+  font-size: 20px;
+}
+
+/* Tour basic info */
+.tour-basic-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.tour-description {
+  margin: 16px 0;
+  line-height: 1.6;
+}
+
+/* Trip details section */
+.trip-detail-item {
+  background: white;
+  padding: 16px;
+  margin-bottom: 12px;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* Farm section */
+.farm-section {
+  margin-bottom: 20px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 20px;
+}
+
+.farm-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.farm-image {
+  width: 200px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin: 10px 0;
+}
+
+/* Koi varieties section */
+.koi-varieties-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  margin-top: 16px;
+}
+
+.koi-variety-card {
+  background: white;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.koi-variety-image {
+  width: 150px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin: 10px 0;
+}
+
+/* Price and details */
+.price-tag {
+  font-size: 18px;
+  color: #f5222d;
+  font-weight: bold;
+}
+
+.detail-label {
+  font-weight: 600;
+  color: #595959;
+  margin-right: 8px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .tour-detail-modal {
+    width: 95vw !important;
+  }
+  
+  .koi-varieties-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .tour-basic-info {
+    flex-direction: column;
+  }
+}

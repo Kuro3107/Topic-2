@@ -36,10 +36,10 @@ function ProductList() {
         throw new Error("Unable to get Koi varieties data");
       }
       const data = await response.json();
-      console.log("Dữ liệu Koi nhận được:", data); // Kiểm tra dữ liệu nhận được
+      console.log("Koi Data Received:", data); // Kiểm tra dữ liệu nhận được
       setKois(data); // Lưu trữ toàn bộ dữ liệu trả về
     } catch (error) {
-      console.error("Không thể lấy dữ liệu giống cá Koi", error);
+      console.error("Cannot get Koi fish data", error);
     }
   };
 

@@ -149,11 +149,11 @@ const Product = () => {
   const handleBooking = (tripId) => {
     const userInfo = JSON.parse(localStorage.getItem("userInfo"));
     if (!userInfo) {
-        message.warning("Vui lòng đăng nhập để đặt tour.");
-        navigate("/login");
+      message.warning("Vui lòng đăng nhập để đặt tour.");
+      navigate("/login");
     } else {
-        setSelectedTour(tours.find(tour => tour.tripId === tripId)); // Lưu thông tin tour đã chọn
-        setIsBookingModalVisible(true); // Hiện modal booking
+      setSelectedTour(tours.find((tour) => tour.tripId === tripId)); // Lưu thông tin tour đã chọn
+      setIsBookingModalVisible(true); // Hiện modal booking
     }
   };
 
@@ -176,52 +176,52 @@ const Product = () => {
     const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
     if (!selectedTour) {
-        message.error("No tour selected. Please select a tour before booking.");
-        return;
+      message.error("No tour selected. Please select a tour before booking.");
+      return;
     }
 
     if (!bookingData.startDate) {
-        message.error("Please select a start date.");
-        return;
+      message.error("Please select a start date.");
+      return;
     }
 
     console.log("Booking Data:", bookingData); // Kiểm tra dữ liệu booking
 
     const newBooking = {
-        tripId: selectedTour.tripId,
-        customerId: userInfo.customerId,
-        bookingPaymentId: null,
-        feedbackId: null,
-        status: "Approved",
-        startDate: bookingData.startDate.format("YYYY-MM-DD"),
-        endDate: null, // Đặt endDate là null
-        bookingDate: moment().format("YYYY-MM-DD"),
-        fullname: bookingData.fullname,
-        phone: bookingData.phone,
-        email: bookingData.email,
-        favoriteFarm: null,
-        favoriteKoi: null,
-        note: bookingData.note,
-        isActive: null,
+      tripId: selectedTour.tripId,
+      customerId: userInfo.customerId,
+      bookingPaymentId: null,
+      feedbackId: null,
+      status: "Approved",
+      startDate: bookingData.startDate.format("YYYY-MM-DD"),
+      endDate: null, // Đặt endDate là null
+      bookingDate: moment().format("YYYY-MM-DD"),
+      fullname: bookingData.fullname,
+      phone: bookingData.phone,
+      email: bookingData.email,
+      favoriteFarm: null,
+      favoriteKoi: null,
+      note: bookingData.note,
+      isActive: null,
     };
 
     console.log("Submitting booking:", newBooking);
 
     try {
-        const response = await axios.post(apiBooking, newBooking);
-        console.log("Booking created:", response.data);
-        message.success("Booking created successfully!");
-        setIsBookingModalVisible(false);
-        setBookingData({
-            fullname: "",
-            phone: "",
-            email: "",
-            startDate: null,
-            note: "",
-        });
+      const response = await axios.post(apiBooking, newBooking);
+      console.log("Booking created:", response.data);
+      message.success("Booking created successfully!");
+      setIsBookingModalVisible(false);
+      setBookingData({
+        fullname: "",
+        phone: "",
+        email: "",
+        startDate: null,
+        note: "",
+      });
     } catch (error) {
-        console.error("Error creating booking:", error);
-        message.error("Failed to create booking. Please try again.");
+      console.error("Error creating booking:", error);
+      message.error("Failed to create booking. Please try again.");
     }
   };
 
@@ -397,76 +397,94 @@ const Product = () => {
       {/* Modal hiển thị thông tin chi tiết của tour */}
       <Modal
         title={selectedTour ? selectedTour.tripName : ""}
-        visible={isTourDetailModalVisible} // Sử dụng biến trạng thái cho modal chi tiết tour
+        visible={isTourDetailModalVisible}
         onCancel={handleCloseModal}
         footer={null}
+        className="tour-detail-modal"
+        width={1000}
       >
         {selectedTour && (
           <div>
-            <p>
-              <strong>Price:</strong>{" "}
-              {selectedTour.priceTotal?.toLocaleString()} VND
-            </p>
-            <p>
-              <strong>Description:</strong>{" "}
-              {selectedTour.description || "No description available."}
-            </p>
-            <h3>Trip Details:</h3>
-            {selectedTour.tripDetails.map((detail) => (
-              <div key={detail.tripDetailId}>
-                <p>
-                  <strong>Main Topic:</strong> {detail.mainTopic}
-                </p>
-                <p>
-                  <strong>Sub Topic:</strong> {detail.subTopic}
-                </p>
-                <p>
-                  <strong>Note Price:</strong> {detail.notePrice}
-                </p>
-                <p>
-                  <strong>Day:</strong> {detail.day}
-                </p>
+            <div className="tour-basic-info">
+              <div>
+                <span className="price-tag">
+                  Price: {selectedTour.priceTotal?.toLocaleString()} VND
+                </span>
               </div>
-            ))}
-            <h3>Koi Farms:</h3>
-            {selectedTour.koiFarms.map((farm) => (
-              <div key={farm.farmId}>
-                <p>
-                  <strong>Farm Name:</strong> {farm.farmName}
-                </p>
-                <p>
-                  <strong>Location:</strong> {farm.location}
-                </p>
-                <p>
-                  <strong>Contact Info:</strong> {farm.contactInfo}
-                </p>
-                <img
-                  src={farm.imageUrl}
-                  alt={farm.farmName}
-                  style={{ width: "100px" }}
-                />
-                <h4>Koi Varieties:</h4>
-                {farm.koiVarieties.map((variety) => (
-                  <div key={variety.varietyId}>
-                    <p>
-                      <strong>Variety Name:</strong> {variety.varietyName}
-                    </p>
-                    <p>
-                      <strong>Description:</strong> {variety.description}
-                    </p>
-                    <p>
-                      <strong>Price:</strong>{" "}
-                      {variety.koiPrice?.toLocaleString()} VND
-                    </p>
-                    <img
-                      src={variety.imageUrl}
-                      alt={variety.varietyName}
-                      style={{ width: "100px" }}
-                    />
+            </div>
+
+            <div className="tour-detail-section">
+              <h3>Description</h3>
+              <div className="tour-description">
+                {selectedTour.description || "No description available."}
+              </div>
+            </div>
+
+            <div className="tour-detail-section">
+              <h3>Trip Details</h3>
+              {selectedTour.tripDetails.map((detail) => (
+                <div key={detail.tripDetailId} className="trip-detail-item">
+                  <p>
+                    <span className="detail-label">Main Topic:</span>
+                    {detail.mainTopic}
+                  </p>
+                  <p>
+                    <span className="detail-label">Sub Topic:</span>
+                    {detail.subTopic}
+                  </p>
+                  <p>
+                    <span className="detail-label">Note Price:</span>
+                    {detail.notePrice}
+                  </p>
+                  <p>
+                    <span className="detail-label">Day:</span>
+                    {detail.day}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            <div className="tour-detail-section">
+              <h3>Koi Farms</h3>
+              {selectedTour.koiFarms.map((farm) => (
+                <div key={farm.farmId} className="farm-section">
+                  <div className="farm-header">
+                    <h4>{farm.farmName}</h4>
                   </div>
-                ))}
-              </div>
-            ))}
+                  <p>
+                    <span className="detail-label">Location:</span>
+                    {farm.location}
+                  </p>
+                  <p>
+                    <span className="detail-label">Contact:</span>
+                    {farm.contactInfo}
+                  </p>
+                  <img
+                    src={farm.imageUrl}
+                    alt={farm.farmName}
+                    className="farm-image"
+                  />
+
+                  <h4>Koi Varieties</h4>
+                  <div className="koi-varieties-grid">
+                    {farm.koiVarieties.map((variety) => (
+                      <div key={variety.varietyId} className="koi-variety-card">
+                        <h5>{variety.varietyName}</h5>
+                        <img
+                          src={variety.imageUrl}
+                          alt={variety.varietyName}
+                          className="koi-variety-image"
+                        />
+                        <p>{variety.description}</p>
+                        <p className="price-tag">
+                          {variety.koiPrice?.toLocaleString()} VND
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </Modal>
