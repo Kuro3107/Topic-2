@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { DesktopOutlined, FileOutlined } from "@ant-design/icons";
-import { Breadcrumb, Layout, Menu, theme } from "antd";
+import { DesktopOutlined, FileOutlined, LogoutOutlined } from "@ant-design/icons";
+import { Breadcrumb, Button, Layout, Menu, theme } from "antd";
 import ManageFarm from "../../pages/admin/manage-farm";
 import ManageTrip from "../../pages/admin/manage-trip";
 import ManageBooking from "../../pages/admin/manage-booking";
 import ManageAccounts from "../../pages/admin/manage-accounts";
 import ManageFeedback from "../../pages/admin/manage-feedback";
+import "../dashboard/index.css"
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -51,9 +52,16 @@ const Dashboard = () => {
     }
   };
 
+  // Hàm để xử lý đăng xuất
+  const handleLogout = () => {
+    localStorage.removeItem("authToken"); // Assuming you store your token here
+    // Redirect to the login page
+    window.location.href = "/login"; // Navigate to the login page
+  };
+
 
   return (
-    <Layout style={{ minHeight: "100vh" }}>
+    <Layout className={`ant-layout-has-sider ${collapsed ? 'sider-collapsed' : ''}`}>
       <Sider
         collapsible
         collapsed={collapsed}
@@ -69,20 +77,22 @@ const Dashboard = () => {
         />
       </Sider>
       <Layout>
-        <Header />
-        <Content style={{ margin: "0 16px" }}>
-          <Breadcrumb></Breadcrumb>
-          <div
-            style={{
-              padding: 24,
-              minHeight: 360,
-              background: colorBgContainer,
-            }}
+        <Header>
+        <Button
+            type="primary"
+            icon={<LogoutOutlined />} // Icon logout
+            onClick={handleLogout}
+            style={{ float: "right" }} // Căn phải
           >
+            Đăng xuất
+          </Button>
+        </Header>
+        <Content>
+          <div className="content-wrapper">
             {renderContent()}
           </div>
         </Content>
-        <Footer style={{ textAlign: "center" }}>
+        <Footer>
           Ant Design ©2023 Created by Ant UED
         </Footer>
       </Layout>

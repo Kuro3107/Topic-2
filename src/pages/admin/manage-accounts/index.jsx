@@ -33,7 +33,7 @@ const ManageAccounts = () => {
       // Đảm bảo rằng tất cả các trường được thiết lập đúng
       form.setFieldsValue({
         username: account.username,
-        password: '', // Không hiển thị password khi chỉnh sửa
+        password: "", // Không hiển thị password khi chỉnh sửa
         phone: account.phone,
         email: account.email,
         roleId: account.roleId,
@@ -60,7 +60,10 @@ const ManageAccounts = () => {
 
         if (editingAccount) {
           // Sử dụng editingAccount.accountId thay vì editingAccount.id
-          await axios.put(`http://localhost:8080/api/accounts/${editingAccount.accountId}`, accountData);
+          await axios.put(
+            `http://localhost:8080/api/accounts/${editingAccount.accountId}`,
+            accountData
+          );
           message.success("Account updated successfully");
         } else {
           await axios.post("http://localhost:8080/api/accounts", accountData);
@@ -138,22 +141,28 @@ const ManageAccounts = () => {
       : accounts.filter((account) => account.roleId === 5); // "Customers"
 
   return (
-    <div>
+    <div className="account-management-container">
       <h1>Manage Accounts</h1>
-      <Tabs activeKey={activeTab} onChange={setActiveTab}>
-        <TabPane tab="Sales Staff" key="sales" />
-        <TabPane tab="Consulting Staff" key="consulting" />
-        <TabPane tab="Delivery Staff" key="delivery" />
-        <TabPane tab="Customers" key="customer" />
-      </Tabs>
+      <div className="content-wrapper">
+        <Tabs activeKey={activeTab} onChange={setActiveTab}>
+          <TabPane tab="Sales Staff" key="sales" />
+          <TabPane tab="Consulting Staff" key="consulting" />
+          <TabPane tab="Delivery Staff" key="delivery" />
+          <TabPane tab="Customers" key="customer" />
+        </Tabs>
 
-      {activeTab !== "customer" && (
-        <Button onClick={() => showModal()} style={{ marginBottom: 16 }}>
-          Create New Account
-        </Button>
-      )}
+        {activeTab !== "customer" && (
+          <Button
+            onClick={() => showModal()}
+            className="create-button"
+            type="primary"
+          >
+            Create New Account
+          </Button>
+        )}
 
-      <Table columns={columns} dataSource={filteredAccounts} rowKey="id" />
+        <Table columns={columns} dataSource={filteredAccounts} rowKey="id" />
+      </div>
 
       <Modal
         title={editingAccount ? "Edit Account" : "Create New Account"}
@@ -171,12 +180,12 @@ const ManageAccounts = () => {
           </Form.Item>
           {/* Bỏ trường Password */}
           {/* <Form.Item
-            name="password"
-            label="Password"
-            rules={[{ required: false }]} // Không bắt buộc
-          >
-            <Input.Password />
-          </Form.Item> */}
+              name="password"
+              label="Password"
+              rules={[{ required: false }]} // Không bắt buộc
+            >
+              <Input.Password />
+            </Form.Item> */}
           <Form.Item
             name="phone"
             label="Phone"

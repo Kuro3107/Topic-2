@@ -1,20 +1,178 @@
-html, body, #root, .ant-layout {
-  height: 100%;
-}
-
+/* Layout styles */
 .ant-layout {
-  display: flex;
-  flex-direction: column;
+  min-height: 100vh;
 }
 
-.ant-layout-content {
-  flex-grow: 1; /* Để content co giãn theo chiều cao */
-  margin: 24px 16px;
+/* Sidebar styles */
+.ant-layout-sider {
+  background: #001529;
+}
+
+.demo-logo {
+  height: 32px;
+  margin: 16px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+}
+
+/* Header styles */
+.deli-header {
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  height: 64px;
+  line-height: 64px;
+}
+
+.deli-header h5{
+  color: white;
+}
+
+/* Content area styles */
+.deli-content {
   padding: 24px;
-  background: #fff;
+  background: #f5f5f5;
+  min-height: calc(100vh - 64px - 70px);
 }
 
 .site-layout-background {
-  height: 100%;
-  min-height: 100%;
+  background: #fff;
+  padding: 24px;
+  border-radius: 8px;
+}
+
+/* Card styles */
+.ant-card {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.ant-card-head {
+  border-bottom: 1px solid #f0f0f0;
+  padding: 0 24px;
+  min-height: 48px;
+}
+
+.ant-card-head-title {
+  padding: 12px 0;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* Table styles */
+.ant-table-wrapper {
+  margin-top: -1px;  /* Remove double border with card header */
+}
+
+.ant-table {
+  background: #fff;
+}
+
+.ant-table-thead > tr > th {
+  background: #fafafa;
+  padding: 12px 16px;
+  font-weight: 500;
+  border-bottom: 1px solid #f0f0f0;
+  text-align: left;
+  color: #262626;
+}
+
+.ant-table-tbody > tr > td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.ant-table-tbody > tr:hover > td {
+  background: #fafafa;
+}
+
+/* Button styles */
+.ant-btn {
+  border-radius: 4px;
+  padding: 4px 15px;
+  height: 32px;
+}
+
+.ant-btn-primary {
+  background: #1890ff;
+  border-color: #1890ff;
+}
+
+/* Action buttons in table */
+.ant-table-tbody > tr > td:last-child .ant-btn {
+  margin-right: 8px;
+}
+
+.ant-table-tbody > tr > td:last-child .ant-btn:last-child {
+  margin-right: 0;
+}
+
+/* Navigation menu styles */
+.ant-layout-sider .ant-menu-dark {
+  background: #001529;
+}
+
+.ant-menu-dark .ant-menu-item {
+  padding-left: 24px !important;
+  margin: 4px 0;
+}
+
+.ant-menu-dark .ant-menu-item:hover {
+  background: #1890ff !important;
+}
+
+.ant-menu-dark .ant-menu-item-selected {
+  background: #1890ff !important;
+}
+
+/* Modal styles */
+.ant-modal-header {
+  border-bottom: 1px solid #f0f0f0;
+  padding: 16px 24px;
+}
+
+.ant-modal-body {
+  padding: 24px;
+}
+
+.ant-modal-footer {
+  border-top: 1px solid #f0f0f0;
+  padding: 10px 16px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .deli-content {
+    padding: 16px;
+  }
+  
+  .site-layout-background {
+    padding: 16px;
+  }
+  
+  .ant-table-thead > tr > th,
+  .ant-table-tbody > tr > td {
+    padding: 8px;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #999;
 }

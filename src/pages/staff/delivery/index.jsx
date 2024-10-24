@@ -222,7 +222,7 @@ const Delivery = () => {
       </Sider>
       <Layout>
         <Header className="deli-header">
-          Chi tiết đơn hàng
+          <h5>Chi tiết đơn hàng</h5>
           <Button
             type="primary"
             icon={<LogoutOutlined />} // Icon logout

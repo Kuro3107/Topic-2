@@ -1,4 +1,4 @@
-.introduce-page {
+.home-page {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -6,211 +6,181 @@
   font-family: 'Arial', sans-serif;
 }
 
-.introduce-container {
+main {
   flex: 1;
+  padding: 40px 20px;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 60px 20px;
 }
 
-.hero-section {
+main h1 {
   text-align: center;
-  margin-bottom: 80px;
-  background: linear-gradient(135deg, #ff6b6b, #e22d4e);
-  padding: 120px 20px;
-  border-radius: 20px;
-  color: white;
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+  margin-bottom: 40px;
+  color: #FF3366;
+  font-size: 3em;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 2px;
   position: relative;
-  overflow: hidden;
+  padding-bottom: 15px;
 }
 
-.hero-section::before {
+main h1::after {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
   bottom: 0;
-  background: url('path/to/koi-pattern.png') repeat;
-  opacity: 0.1;
-  z-index: 1;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 3px;
+  background-color: #FF3366;
 }
 
-.hero-section h1 {
-  font-size: 4.5em;
-  margin-bottom: 30px;
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-  color: #ffffff;
-  font-weight: 800;
-  letter-spacing: 3px;
-  line-height: 1.2;
-  position: relative;
-  z-index: 2;
+main h1:hover {
+  text-shadow: 2px 2px 4px rgba(255, 51, 102, 0.3);
+  transition: all 0.3s ease;
 }
 
-.hero-section p {
-  font-size: 1.8em;
-  max-width: 800px;
-  margin: 0 auto;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
-  color: #f8f8f8;
-  line-height: 1.6;
-  font-weight: 300;
-  position: relative;
-  z-index: 2;
-}
-
-.content-section {
-  margin-bottom: 80px;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-}
-
-.info-card {
-  flex-basis: calc(33.333% - 20px);
-  margin-bottom: 40px;
+.koi-container {
   background-color: #ffffff;
   border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  margin-top: 40px;
+  display: flex;
+  align-items: center;
+}
+
+.koi-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  width: 100%;
+}
+
+.koi-card {
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
   overflow: hidden;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-  transition: all 0.4s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   display: flex;
   flex-direction: column;
   height: 100%;
 }
 
-.info-card:hover {
-  transform: translateY(-15px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+.koi-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
 }
 
-.card-image {
-  height: 250px;
-  object-fit: cover;
+.koi-avatar {
   width: 100%;
-  transition: all 0.4s ease;
+  height: 200px;
+  object-fit: cover;
 }
 
-.info-card:hover .card-image {
-  transform: scale(1.1);
-}
-
-.info-card .ant-card-body {
-  padding: 30px;
+.koi-info {
+  padding: 15px;
   flex-grow: 1;
   display: flex;
   flex-direction: column;
 }
 
-.card-icon {
-  font-size: 3em;
-  color: #ff6b6b;
-  margin-bottom: 20px;
-}
-
-.info-card h3 {
-  font-size: 2em;
+.koi-info p {
+  margin: 0 0 10px 0;
+  font-size: 0.9em;
   color: #333;
-  margin-bottom: 15px;
-}
-
-.info-card p {
-  font-size: 1.1em;
-  color: #666;
-  line-height: 1.6;
-  flex-grow: 1;
-}
-
-.description-section, .system-introduction {
-  background-color: #ffffff;
-  padding: 60px;
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  margin-bottom: 80px;
-}
-
-.description-section h2, .system-introduction h2 {
-  color: #ff6b6b;
-  margin-bottom: 30px;
-  font-size: 2.8em;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-  font-weight: 700;
-}
-
-.description-section p, .system-introduction p {
-  color: #444;
-  line-height: 1.8;
-  font-size: 1.2em;
-  margin-bottom: 20px;
-  text-align: justify;
-}
-
-.description-section ul, .system-introduction ul {
-  margin-left: 30px;
-  margin-bottom: 30px;
-  list-style-type: none;
-}
-
-.description-section li, .system-introduction li {
-  margin-bottom: 15px;
-  color: #555;
-  font-size: 1.1em;
-  line-height: 1.6;
+  line-height: 1.4;
+  padding-left: 15px;
   position: relative;
-  padding-left: 25px;
 }
 
-.description-section li::before, .system-introduction li::before {
-  content: '•';
-  color: #ff6b6b;
-  font-size: 1.5em;
+.koi-info p::before {
+  content: "•";
   position: absolute;
   left: 0;
-  top: -5px;
+  color: #FF3366;
 }
 
-.system-introduction h3 {
-  color: #444;
-  margin-top: 40px;
-  margin-bottom: 20px;
-  font-size: 2.2em;
-  font-weight: 600;
+.koi-info p:first-of-type {
+  font-weight: bold;
+  color: #FF3366;
+  font-size: 1.1em;
+  margin-bottom: 15px;
+  padding-left: 0;
 }
 
-.system-introduction strong {
-  color: #ff6b6b;
-  font-weight: 600;
+.koi-info p:first-of-type::before {
+  content: none;
+}
+
+.koi-container button {
+  background-color: #FF3366;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  font-size: 1.2em;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  border-radius: 5px;
+  margin: 0 10px;
+}
+
+.koi-container button:hover {
+  background-color: #E61E4D;
+}
+
+.koi-container button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
 }
 
 @media (max-width: 768px) {
-  .hero-section {
-    padding: 80px 20px;
+  main {
+      padding: 20px 10px;
   }
 
-  .hero-section h1 {
-    font-size: 3.2em;
+  main h1 {
+      font-size: 2.5em;
   }
 
-  .hero-section p {
-    font-size: 1.4em;
+  .koi-grid {
+      grid-template-columns: 1fr;
   }
+}
 
-  .info-card {
-    flex-basis: 100%;
-  
+@media (max-width: 480px) {
+  .koi-grid {
+      grid-template-columns: 1fr;
   }
- 
-  .description-section, .system-introduction {
-    padding: 40px 20px;
-  }
+}
 
-  .description-section h2, .system-introduction h2 {
-    font-size: 2.2em;
-  }
+/* Thêm styles mới cho các liên kết trong header */
+.header-link {
+  font-weight: bold;
+  text-decoration: none;
+  color: #FF3366;
+  transition: color 0.3s ease;
+}
 
-  .system-introduction h3 {
-    font-size: 1.8em;
-  }
+.header-link:hover {
+  color: #FF6699;
+}
+
+/* Style cho nút đăng xuất */
+.logout-button {
+  font-weight: bold;
+  text-decoration: none;
+  color: #FF3366;
+  background-color: transparent;
+  border: 2px solid #FF3366;
+  padding: 8px 15px;
+  border-radius: 5px;
+  transition: all 0.3s ease;
+}
+
+.logout-button:hover {
+  color: white;
+  background-color: #FF3366;
 }

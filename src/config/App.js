@@ -17,7 +17,7 @@ const App = () => {
                     {user && user.role_id === 1 && ( // Kiểm tra vai trò manager
                         <Link to="/dashboard">Dashboard</Link>
                     )}
-                    <Link to="/login">Đăng nhập</Link> {/* Thêm liên kết đến trang đăng nhập */}
+                    <Link to="/login">Login</Link> {/* Thêm liên kết đến trang đăng nhập */}
                 </nav>
                 <Switch>
                     <Route path="/" exact component={Home} />

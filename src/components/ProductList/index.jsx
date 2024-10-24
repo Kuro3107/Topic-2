@@ -75,7 +75,7 @@ function ProductList() {
           />
           <p>Location: {selectedFarm.location}</p>
           <p>Contact Info: {selectedFarm.contactInfo}</p>
-          <h3>Các loại cá Koi:</h3>
+          <h3>Types of Koi fish:</h3>
           <div className="koi-grid">
             {filteredKois.length > 0 ? (
               filteredKois.map((koi) => (
@@ -91,7 +91,7 @@ function ProductList() {
                 </div>
               ))
             ) : (
-              <p>Không có dữ liệu cá Koi cho trang trại này.</p>
+              <p>No Koi data available for this farm.</p>
             )}
           </div>
           <button onClick={() => setSelectedFarm(null)}>

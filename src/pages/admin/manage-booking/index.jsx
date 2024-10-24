@@ -215,11 +215,11 @@ function ManageBooking() {
                 onOk() {},
             });
         } else {
-            message.warning("Không có chuyến đi nào cho đặt chỗ này.");
+            message.warning("There are no trips available for this booking.");
         }
     } catch (error) {
-        console.error("Lỗi khi lấy thông tin chuyến đi:", error);
-        message.error("Không thể lấy thông tin chuyến đi");
+        console.error("Error retrieving trip information:", error);
+        message.error("Unable to get trip information");
     }
 };
 
@@ -232,11 +232,11 @@ function ManageBooking() {
         type="primary"
         style={{ marginBottom: 16 }}
       >
-        Thêm đặt chỗ mới
+        Add new booking
       </Button> 
       <Table columns={columns} dataSource={bookings} rowKey="BookingID" />
       <Modal
-        title={editingBooking ? "Sửa đặt chỗ" : "Thêm đặt chỗ mới"}
+        title={editingBooking ? "Edit booking" : "Add new booking"}
         visible={isModalVisible}
         onOk={handleOk}
         onCancel={() => setIsModalVisible(false)}
@@ -244,14 +244,14 @@ function ManageBooking() {
         <Form form={form} layout="vertical">
           <Form.Item
             name="fullname"
-            label="Tên đầy đủ"
+            label="fullname"
             rules={[{ required: true }]}
           >
             <Input />
           </Form.Item>
           <Form.Item
             name="status"
-            label="Trạng thái"
+            label="status"
             rules={[{ required: true }]}
           >
             <Select>
@@ -264,21 +264,21 @@ function ManageBooking() {
           </Form.Item>
           <Form.Item
             name="startDate"
-            label="Ngày bắt đầu"
+            label="startDate"
             rules={[{ required: true }]}
           >
             <DatePicker />
           </Form.Item>
           <Form.Item
             name="endDate"
-            label="Ngày kết thúc"
+            label="endDate"
             rules={[{ required: true }]}
           >
             <DatePicker />
           </Form.Item>
           <Form.Item
             name="phone"
-            label="Số điện thoại"
+            label="phone"
             rules={[{ required: true }]}
           >
             <Input />
@@ -290,17 +290,17 @@ function ManageBooking() {
           >
             <Input />
           </Form.Item>
-          <Form.Item name="favoriteKoi" label="Koi yêu thích">
+          <Form.Item name="favoriteKoi" label="favoriteKoi">
             <Input />
           </Form.Item>
-          <Form.Item name="favoriteFarm" label="Trang trại yêu thích">
+          <Form.Item name="favoriteFarm" label="favoriteFarm">
             <Input />
           </Form.Item>
-          <Form.Item name="note" label="Ghi chú">
+          <Form.Item name="note" label="note">
             <Input.TextArea />
           </Form.Item>
         
-          <Form.Item name="isActive" label="Hoạt động" valuePropName="checked">
+          <Form.Item name="isActive" label="Active" valuePropName="checked">
             <Switch disabled />
           </Form.Item>
         </Form>

@@ -28,7 +28,7 @@ const Header = () => {
       navigate("/bookingform");
     }
   };
-    
+
   return (
     <header className="header">
       <div className="logo-container">
@@ -40,13 +40,13 @@ const Header = () => {
       <nav className="nav">
         <ul>
           <li>
-            <Link to="/introduce" className="header-link">
-              Introduce
+            <Link to="/" className="header-link">
+              Home
             </Link>
           </li>
           <li>
-            <Link to="/" className="header-link">
-              Home
+            <Link to="/introduce" className="header-link">
+              Introduce
             </Link>
           </li>
           <li>

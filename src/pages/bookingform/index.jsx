@@ -31,10 +31,14 @@ function BookingForm() {
   useEffect(() => {
     const fetchKoiOptions = async () => {
       try {
-        const response = await axios.get("http://localhost:8080/api/koi-varieties");
-        const options = response.data.map(koi => ({
+        const response = await axios.get(
+          "http://localhost:8080/api/koi-varieties"
+        );
+        const options = response.data.map((koi) => ({
           value: koi.varietyId,
-          label: `${koi.varietyName || "Tên không xác định"} - ${koi.koiPrice ? `${koi.koiPrice} VNĐ` : "Giá không xác định"}`,
+          label: `${koi.varietyName || "Tên không xác định"} - ${
+            koi.koiPrice ? `${koi.koiPrice} VNĐ` : "Giá không xác định"
+          }`,
         }));
         setKoiOptions(options);
       } catch (error) {
@@ -46,9 +50,11 @@ function BookingForm() {
     const fetchFarmOptions = async () => {
       try {
         const response = await axios.get("http://localhost:8080/api/farms");
-        const options = response.data.map(farm => ({
+        const options = response.data.map((farm) => ({
           value: farm.farmId,
-          label: `${farm.farmName || "Tên không xác định"} - ${farm.location || "Địa điểm không xác định"}`,
+          label: `${farm.farmName || "Tên không xác định"} - ${
+            farm.location || "Địa điểm không xác định"
+          }`,
           koiVarieties: farm.koiVarieties, // Lưu trữ thông tin về các loại cá trong farm
         }));
         setFarmOptions(options);
@@ -79,9 +85,9 @@ function BookingForm() {
 
     // Nếu người dùng chọn cá koi, lọc farm
     if (actionMeta.name === "favoriteKoi") {
-      const selectedKoiIds = selectedOptions.map(option => option.value);
-      const filteredFarms = farmOptions.filter(farm =>
-        farm.koiVarieties.some(koi => selectedKoiIds.includes(koi.varietyId))
+      const selectedKoiIds = selectedOptions.map((option) => option.value);
+      const filteredFarms = farmOptions.filter((farm) =>
+        farm.koiVarieties.some((koi) => selectedKoiIds.includes(koi.varietyId))
       );
       setFilteredFarmOptions(filteredFarms); // Cập nhật danh sách farm đã lọc
     }
@@ -102,21 +108,31 @@ function BookingForm() {
 
       // Kiểm tra xem customerId có phải là undefined không
       if (!customerId) {
-        console.error("Customer ID is undefined. Please check the userInfo in localStorage.");
+        console.error(
+          "Customer ID is undefined. Please check the userInfo in localStorage."
+        );
         toast.error("Không tìm thấy thông tin khách hàng.");
         return;
       }
 
       // Chuyển đổi favoriteKoi và favoriteFarm từ ID sang tên
-      const favoriteKoiNames = formData.favoriteKoi.map(id => {
-        const koi = koiOptions.find(option => option.value === id);
-        return koi ? koi.label.split(" - ")[0] : null; // Lấy tên cá koi
-      }).filter(name => name).join(", "); // Chuyển đổi thành chuỗi
+      const favoriteKoiNames = formData.favoriteKoi
+        .map((id) => {
+          const koi = koiOptions.find((option) => option.value === id);
+          return koi ? koi.label.split(" - ")[0] : null; // Lấy tên cá koi
+        })
+        .filter((name) => name)
+        .join(", "); // Chuyển đổi thành chuỗi
 
-      const favoriteFarmNames = formData.favoriteFarm.map(id => {
-        const farm = filteredFarmOptions.find(option => option.value === id);
-        return farm ? farm.label.split(" - ")[0] : null; // Lấy tên farm
-      }).filter(name => name).join(", "); // Chuyển đổi thành chuỗi
+      const favoriteFarmNames = formData.favoriteFarm
+        .map((id) => {
+          const farm = filteredFarmOptions.find(
+            (option) => option.value === id
+          );
+          return farm ? farm.label.split(" - ")[0] : null; // Lấy tên farm
+        })
+        .filter((name) => name)
+        .join(", "); // Chuyển đổi thành chuỗi
 
       const dataToSend = {
         ...formData,
@@ -130,7 +146,7 @@ function BookingForm() {
       const response = await axios.post(api, dataToSend);
       if (response.status === 201) {
         toast.success("Đặt chỗ thành công! Chúng tôi sẽ liên hệ với bạn sớm.");
-        
+
         // Quay về trang home sau 1 giây
         setTimeout(() => {
           navigate("/"); // Điều hướng về trang home
@@ -149,146 +165,180 @@ function BookingForm() {
         });
       }
     } catch (error) {
-      console.error("Lỗi khi gửi dữ liệu:", error.response ? error.response.data : error.message);
-      toast.error("Đã xảy ra lỗi trong quá trình đặt chỗ. Vui lòng thử lại sau.");
+      console.error(
+        "Lỗi khi gửi dữ liệu:",
+        error.response ? error.response.data : error.message
+      );
+      toast.error(
+        "Đã xảy ra lỗi trong quá trình đặt chỗ. Vui lòng thử lại sau."
+      );
     }
   };
 
   return (
-    <div className="booking-form">
+    <div>
       <Header />
-      <main className="form-background">
-        <div className="form-container">
-          <h1>Booking Form</h1>
-          <form onSubmit={handleSubmit}>
-            <div className="form-row">
-              <div className="form-column">
-                <div className="form-group">
-                  <label>Full Name:</label>
-                  <input
-                    type="text"
-                    name="fullname"
-                    value={formData.fullname}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-              </div>
-              <div className="form-column">
-                <div className="form-group">
-                  <label>Phone Number:</label>
-                  <input
-                    type="text"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-              </div>
-            </div>
+      <div className="min-h-screen">
+        <div className="booking-card">
+          <div className="card-header">
+            <h2 className="card-title">Book Your Koi Experience</h2>
+            <p className="card-description">
+              Fill in the details below to schedule your visit to our koi farms
+            </p>
+          </div>
 
-            <div className="form-row">
-              <div className="form-column">
+          <div className="card-content">
+            <form className="form-container" onSubmit={handleSubmit}>
+              {/* Personal Information Section */}
+              <div className="form-section">
+                <h3 className="section-title">Personal Information</h3>
+                <div className="form-grid">
+                  <div className="form-group">
+                    <label className="form-label">Full Name</label>
+                    <input
+                      type="text"
+                      name="fullname"
+                      className="form-input"
+                      value={formData.fullname}
+                      onChange={handleChange}
+                      required
+                      placeholder="Enter your full name"
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Phone Number</label>
+                    <input
+                      type="tel"
+                      name="phone"
+                      className="form-input"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      required
+                      placeholder="Enter your phone number"
+                    />
+                  </div>
+                </div>
+
                 <div className="form-group">
-                  <label>Email:</label>
+                  <label className="form-label">Email Address</label>
                   <input
                     type="email"
                     name="email"
+                    className="form-input"
                     value={formData.email}
                     onChange={handleChange}
                     required
+                    placeholder="Enter your email address"
                   />
                 </div>
               </div>
-              
-            </div>
 
-            <div className="form-row">
-              <div className="form-column">
-                <div className="form-group">
-                  <label>Favorite fish:</label>
-                  <Select
-                    isMulti
-                    name="favoriteKoi"
-                    options={koiOptions}
-                    className="basic-multi-select"
-                    classNamePrefix="select"
-                    onChange={(selectedOptions) =>
-                      handleSelectChange(selectedOptions, {
-                        name: "favoriteKoi",
-                      })
-                    }
-                    value={koiOptions.filter((option) =>
-                      formData.favoriteKoi.includes(option.value)
-                    )}
-                  />
-                </div>
-              </div>
-              <div className="form-column">
-                <div className="form-group">
-                  <label>Favorite farm:</label>
-                  <Select
-                    isMulti
-                    name="favoriteFarm"
-                    options={filteredFarmOptions} // Sử dụng danh sách farm đã lọc
-                    className="basic-multi-select"
-                    classNamePrefix="select"
-                    onChange={(selectedOptions) =>
-                      handleSelectChange(selectedOptions, {
-                        name: "favoriteFarm",
-                      })
-                    }
-                    value={filteredFarmOptions.filter((option) =>
-                      formData.favoriteFarm.includes(option.value)
-                    )}
-                  />
-                </div>
-              </div>
-            </div>
+              {/* Preferences Section */}
+              <div className="form-section">
+                <h3 className="section-title">Your Preferences</h3>
+                <div className="form-grid">
+                  <div className="form-group">
+                    <label className="form-label">Favorite Koi Varieties</label>
+                    <div className="select-container">
+                      <Select
+                        isMulti
+                        name="favoriteKoi"
+                        options={koiOptions}
+                        className="basic-multi-select"
+                        classNamePrefix="select"
+                        onChange={(selectedOptions) =>
+                          handleSelectChange(selectedOptions, {
+                            name: "favoriteKoi",
+                          })
+                        }
+                        value={koiOptions.filter((option) =>
+                          formData.favoriteKoi.includes(option.value)
+                        )}
+                        placeholder="Select koi varieties"
+                      />
+                    </div>
+                  </div>
 
-            <div className="form-row">
-              <div className="form-column">
+                  <div className="form-group">
+                    <label className="form-label">Preferred Farms</label>
+                    <div className="select-container">
+                      <Select
+                        isMulti
+                        name="favoriteFarm"
+                        options={filteredFarmOptions}
+                        className="basic-multi-select"
+                        classNamePrefix="select"
+                        onChange={(selectedOptions) =>
+                          handleSelectChange(selectedOptions, {
+                            name: "favoriteFarm",
+                          })
+                        }
+                        value={filteredFarmOptions.filter((option) =>
+                          formData.favoriteFarm.includes(option.value)
+                        )}
+                        placeholder="Select farms"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Visit Dates Section */}
+              <div className="form-section">
+                <h3 className="section-title">Visit Dates</h3>
+                <div className="form-grid">
+                  <div className="form-group">
+                    <label className="form-label">Start Date</label>
+                    <div className="calendar-wrapper">
+                      <input
+                        type="date"
+                        name="startDate"
+                        className="form-input"
+                        value={formData.startDate}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">End Date</label>
+                    <div className="calendar-wrapper">
+                      <input
+                        type="date"
+                        name="endDate"
+                        className="form-input"
+                        value={formData.endDate}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Additional Notes Section */}
+              <div className="form-section">
+                <h3 className="section-title">Additional Notes</h3>
                 <div className="form-group">
-                  <label>Start Date:</label>
-                  <input
-                    type="date"
-                    name="startDate"
-                    value={formData.startDate}
+                  <textarea
+                    name="note"
+                    className="form-textarea"
+                    value={formData.note}
                     onChange={handleChange}
-                    required
+                    placeholder="Any special requests or additional information..."
                   />
                 </div>
               </div>
-              <div className="form-column">
-                <div className="form-group">
-                  <label>End Date:</label>
-                  <input
-                    type="date"
-                    name="endDate"
-                    value={formData.endDate}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-              </div>
-            </div>
 
-            <div className="form-full-width">
-              <div className="form-group">
-                <label>Note:</label>
-                <textarea
-                  name="note"
-                  value={formData.note}
-                  onChange={handleChange}
-                ></textarea>
-              </div>
-            </div>
-
-            <button type="submit">Send Request</button>
-          </form>
+              <button type="submit" className="submit-button">
+                Submit Booking Request
+              </button>
+            </form>
+          </div>
         </div>
-      </main>
+      </div>
       <Footer />
     </div>
   );
