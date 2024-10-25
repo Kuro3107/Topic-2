@@ -220,7 +220,6 @@ function SalesDashboard() {
                   })
                   .catch((error) => {
                     console.error("Error adding farm:", error);
-                    message.error("Unable to add farm");
                   });
               });
 
@@ -691,7 +690,7 @@ function SalesDashboard() {
               <Select>
                 <Select.Option value="pending">Pending</Select.Option>
                 <Select.Option value="detailed">Detailed</Select.Option>
-                <Select.Option value="rejected">Rejected</Select.Option>
+                {/* <Select.Option value="rejected">Rejected</Select.Option> */}
               </Select>
             </Form.Item>
             <Form.Item name="startDate" label="Start Date">

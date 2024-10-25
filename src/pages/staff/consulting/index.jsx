@@ -327,7 +327,7 @@ function Consulting() {
       title: "End Date",
       dataIndex: "endDate",
       key: "endDate",
-      render: (date) => new Date(date).toLocaleDateString(),
+      render: (date) => date ? new Date(date).toLocaleDateString() : null,
     },
     { title: "Status", dataIndex: "status", key: "status" },
     { title: "Note", dataIndex: "note", key: "note" },
@@ -454,7 +454,7 @@ function Consulting() {
                   </p>
                   <p>
                     <strong>End Date:</strong>{" "}
-                    {new Date(selectedBooking.endDate).toLocaleDateString()}
+                    {selectedBooking.endDate ? new Date(selectedBooking.endDate).toLocaleDateString() : null}
                   </p>
                   <p>
                     <strong>Status:</strong> {selectedBooking.status}

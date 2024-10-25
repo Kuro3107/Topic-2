@@ -132,12 +132,12 @@ function ManageBooking() {
       dataIndex: "favoriteFarm",
       key: "favoriteFarm",
     },
-    {
-      title: "Hoạt động",
-      dataIndex: "isActive",
-      key: "isActive",
-      render: (isActive) => (isActive ? "Có" : "Không"),
-    },
+    // {
+    //   title: "Hoạt động",
+    //   dataIndex: "isActive",
+    //   key: "isActive",
+    //   render: (isActive) => (isActive ? "Có" : "Không"),
+    // },
     { title: "Trạng thái", dataIndex: "status", key: "status" },
     {
       title: "Hành động",

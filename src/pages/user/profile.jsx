@@ -542,36 +542,18 @@ function Profile() {
                 <Button icon={<CameraOutlined />} className="avatar-edit" />
               </div>
             </Popover>
-            <InfoItem
-              icon={<UserOutlined />}
-              label="fullName"
-              value={user.fullName || "Not Updated!"}
-            />
-            <InfoItem
-              icon={<UserOutlined />}
-              label="Username"
-              value={user.username || "N/A"}
-            />
-            <InfoItem
-              icon={<MailOutlined />}
-              label="Email"
-              value={user.email || "N/A"}
-            />
-            <InfoItem
-              icon={<PhoneOutlined />}
-              label="Phone"
-              value={user.phone || "N/A"}
-            />
-            <InfoItem
-              icon={<LockOutlined />}
-              label="Status"
-              value={user.status || "N/A"}
-            />
-            <InfoItem
-              icon={<UserOutlined />}
-              label="Role"
-              value={user.roleId ? roleMapping[user.roleId] : "N/A"}
-            />
+            <div style={{ marginBottom: '10px' }}>
+              <strong>Full Name:</strong> {user.fullName || 'Not Updated!'}
+            </div>
+            <div style={{ marginBottom: '10px' }}>
+              <strong>Username:</strong> {user.username || 'N/A'}
+            </div>
+            <div style={{ marginBottom: '10px' }}>
+              <strong>Email:</strong> {user.email || 'Not Updated!'}
+            </div>
+            <div style={{ marginBottom: '10px' }}>
+              <strong>Phone:</strong> {user.phone || 'Not Updated!'}
+            </div>
           </div>
         </Card>
 

@@ -52,6 +52,10 @@ function Payment() {
     }
   };
 
+  const handleCancelPayment = () => {
+    navigate("/profile"); // Quay lại trang hồ sơ
+  };
+
   if (loading) {
     return (
       <div className="payment-container">
@@ -101,9 +105,7 @@ function Payment() {
           <Descriptions.Item label="Status" span={3}>
             {booking.status || "N/A"}
           </Descriptions.Item>
-          <Descriptions.Item label="Total Amount" span={3}>
-            ${booking.totalAmount || "N/A"}
-          </Descriptions.Item>
+         
         </Descriptions>
         <Button
           type="primary"
@@ -112,6 +114,13 @@ function Payment() {
           disabled={booking.status === "purchased"}
         >
           {booking.status === "purchased" ? "Purchased" : "Purchase Now"}
+        </Button>
+        <Button
+          type="default"
+          onClick={handleCancelPayment}
+          className="cancel-button"
+        >
+          Cancel Payment
         </Button>
       </Card>
     </div>
