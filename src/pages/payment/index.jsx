@@ -18,16 +18,16 @@ function Payment() {
       try {
         const bookingId = location.state?.order?.bookingId;
         if (!bookingId) {
-          message.error("Không tìm thấy thông tin đơn hàng.");
-          navigate('/profile');
+          message.error("Order information not found.");
+          navigate("/profile");
           return;
         }
         const response = await api.get(`/bookings/${bookingId}`);
         console.log("Fetched booking data:", response.data);
         setBooking(response.data);
       } catch (error) {
-        console.error('Lỗi khi tải thông tin đơn hàng:', error);
-        message.error('Có lỗi xảy ra khi tải thông tin đơn hàng.');
+        console.error("Error loading order information:", error);
+        message.error("An error occurred while loading order information.");
       } finally {
         setLoading(false);
       }
@@ -38,12 +38,17 @@ function Payment() {
 
   const handlePayment = async () => {
     try {
-      await api.put(`/bookings/${booking.bookingId}`, { ...booking, status: 'purchased' });
-      message.success('Thanh toán thành công!');
-      navigate('/profile');
+      await api.put(`/bookings/${booking.bookingId}`, {
+        ...booking,
+        status: "purchased",
+      });
+      message.success("Payment successful!");
+      navigate("/profile");
     } catch (error) {
-      console.error('Lỗi khi thanh toán:', error);
-      message.error('Có lỗi xảy ra khi thanh toán. Vui lòng thử lại.');
+      console.error("Error when paying:", error);
+      message.error(
+        "An error occurred while making payment. Please try again."
+      );
     }
   };
 
@@ -56,26 +61,57 @@ function Payment() {
   }
 
   if (!booking) {
-    return <div className="payment-container">Không có thông tin đơn hàng</div>;
+    return <div className="payment-container">No order information</div>;
   }
 
   return (
     <div className="payment-container">
       <Card className="payment-card">
-        <Title level={2} className="payment-title">Thanh toán đơn hàng</Title>
+        <Title level={2} className="payment-title">
+          Order Payment
+        </Title>
         <Descriptions bordered>
-          <Descriptions.Item label="Mã đơn hàng" span={3}>{booking.bookingId}</Descriptions.Item>
-          <Descriptions.Item label="Ngày đặt" span={3}>{booking.bookingDate ? new Date(booking.bookingDate).toLocaleDateString() : 'N/A'}</Descriptions.Item>
-          <Descriptions.Item label="Họ tên" span={3}>{booking.fullname || 'N/A'}</Descriptions.Item>
-          <Descriptions.Item label="Email" span={3}>{booking.email || 'N/A'}</Descriptions.Item>
-          <Descriptions.Item label="Số điện thoại" span={3}>{booking.phone || 'N/A'}</Descriptions.Item>
-          <Descriptions.Item label="Ngày bắt đầu" span={3}>{booking.startDate ? new Date(booking.startDate).toLocaleDateString() : 'N/A'}</Descriptions.Item>
-          <Descriptions.Item label="Ngày kết thúc" span={3}>{booking.endDate ? new Date(booking.endDate).toLocaleDateString() : 'N/A'}</Descriptions.Item>
-          <Descriptions.Item label="Trạng thái" span={3}>{booking.status || 'N/A'}</Descriptions.Item>
-          <Descriptions.Item label="Tổng tiền" span={3}>{booking.totalAmount || 'N/A'} VND</Descriptions.Item>
+          <Descriptions.Item label="Order ID" span={3}>
+            {booking.bookingId}
+          </Descriptions.Item>
+          <Descriptions.Item label="Booking Date" span={3}>
+            {booking.bookingDate
+              ? new Date(booking.bookingDate).toLocaleDateString()
+              : "N/A"}
+          </Descriptions.Item>
+          <Descriptions.Item label="Full Name" span={3}>
+            {booking.fullname || "N/A"}
+          </Descriptions.Item>
+          <Descriptions.Item label="Email" span={3}>
+            {booking.email || "N/A"}
+          </Descriptions.Item>
+          <Descriptions.Item label="Phone Number" span={3}>
+            {booking.phone || "N/A"}
+          </Descriptions.Item>
+          <Descriptions.Item label="Start Date" span={3}>
+            {booking.startDate
+              ? new Date(booking.startDate).toLocaleDateString()
+              : "N/A"}
+          </Descriptions.Item>
+          <Descriptions.Item label="End Date" span={3}>
+            {booking.endDate
+              ? new Date(booking.endDate).toLocaleDateString()
+              : "N/A"}
+          </Descriptions.Item>
+          <Descriptions.Item label="Status" span={3}>
+            {booking.status || "N/A"}
+          </Descriptions.Item>
+          <Descriptions.Item label="Total Amount" span={3}>
+            ${booking.totalAmount || "N/A"}
+          </Descriptions.Item>
         </Descriptions>
-        <Button type="primary" onClick={handlePayment} className="payment-button" disabled={booking.status === 'purchased'}>
-          {booking.status === 'purchased' ? 'Đã thanh toán' : 'Thanh toán ngay'}
+        <Button
+          type="primary"
+          onClick={handlePayment}
+          className="payment-button"
+          disabled={booking.status === "purchased"}
+        >
+          {booking.status === "purchased" ? "Purchased" : "Purchase Now"}
         </Button>
       </Card>
     </div>

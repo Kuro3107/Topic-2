@@ -85,9 +85,9 @@ function ProductList() {
                     alt={koi.varietyName}
                     className="koi-avatar"
                   />
-                  <p>Loại: {koi.varietyName}</p>
-                  <p>Giá: {koi.koiPrice} VNĐ</p>
-                  <p>Mô tả: {koi.description}</p>
+                  <p>Type: {koi.varietyName}</p>
+                  <p>Price: {koi.koiPrice} VNĐ</p>
+                  <p>Describe: {koi.description}</p>
                 </div>
               ))
             ) : (
@@ -113,7 +113,7 @@ function ProductList() {
                   className="farm-avatar"
                 />
                 <h3>{farm.farmName}</h3>
-                <p>Địa điểm: {farm.location}</p>
+                <p>Location: {farm.location}</p>
               </div>
             ))}
           </div>

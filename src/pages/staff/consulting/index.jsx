@@ -408,7 +408,7 @@ function Consulting() {
             onClick={handleLogout}
             style={{ float: "right" }} // Căn phải
           >
-            Đăng xuất
+            Logout
           </Button>
         </Header>
         <h1>Consulting Staff Dashboard</h1>

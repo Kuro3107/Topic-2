@@ -131,8 +131,8 @@ const Product = () => {
 
       setTours(filteredTours);
     } catch (error) {
-      message.error("Không thể tải danh sách các chuyến đi");
-      console.error("Lỗi khi tải các chuyến đi:", error);
+      message.error("Unable to load trip list");
+      console.error("Error loading trips:", error);
       setTours([]);
       setUniqueFarms([]);
       setUniqueVarieties([]);
@@ -149,7 +149,7 @@ const Product = () => {
   const handleBooking = (tripId) => {
     const userInfo = JSON.parse(localStorage.getItem("userInfo"));
     if (!userInfo) {
-      message.warning("Vui lòng đăng nhập để đặt tour.");
+      message.warning("Please login to book tour.");
       navigate("/login");
     } else {
       setSelectedTour(tours.find((tour) => tour.tripId === tripId)); // Lưu thông tin tour đã chọn
@@ -270,20 +270,20 @@ const Product = () => {
       <div className="filters">
         <Select
           style={{ width: 200, marginRight: 8 }}
-          placeholder="Chọn loại tìm kiếm"
+          placeholder="Select search type"
           onChange={(value) => handleFilterChange("searchType", value)}
           value={filters.searchType}
         >
-          <Option value="farm">Trang trại</Option>
-          <Option value="variety">Giống cá</Option>
+          <Option value="farm">Farm</Option>
+          <Option value="variety">Koi Breeds</Option>
         </Select>
         {filters.searchType && (
           <Select
             style={{ width: 200, marginRight: 8 }}
             placeholder={
               filters.searchType === "farm"
-                ? "Chọn trang trại"
-                : "Chọn giống cá"
+                ? "Choose Farm"
+                : "Choose Koi Breeds"
             }
             onChange={(value) => handleFilterChange("searchValue", value)}
             value={filters.searchValue}
@@ -306,13 +306,13 @@ const Product = () => {
         )}
         <InputNumber
           style={{ width: 120, marginRight: 8 }}
-          placeholder="Giá tối thiểu"
+          placeholder="Min Price"
           onChange={(value) => handleFilterChange("minPrice", value)}
           value={filters.minPrice}
         />
         <InputNumber
           style={{ width: 120, marginRight: 8 }}
-          placeholder="Giá tối đa"
+          placeholder="Max Price"
           onChange={(value) => handleFilterChange("maxPrice", value)}
           value={filters.maxPrice}
         />
@@ -408,7 +408,7 @@ const Product = () => {
             <div className="tour-basic-info">
               <div>
                 <span className="price-tag">
-                  Price: {selectedTour.priceTotal?.toLocaleString()} VND
+                  Price: ${selectedTour.priceTotal?.toLocaleString()}
                 </span>
               </div>
             </div>
@@ -477,7 +477,7 @@ const Product = () => {
                         />
                         <p>{variety.description}</p>
                         <p className="price-tag">
-                          {variety.koiPrice?.toLocaleString()} VND
+                          ${variety.koiPrice?.toLocaleString()}
                         </p>
                       </div>
                     ))}

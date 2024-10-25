@@ -217,10 +217,10 @@ function Profile() {
       );
 
       setUser((prevUser) => ({ ...prevUser, imageUrl: downloadURL }));
-      message.success("Ảnh đại diện đã được cập nhật thành công!");
+      message.success("Avatar has been updated successfully!");
     } catch (error) {
-      console.error("Lỗi khi tải lên ảnh:", error);
-      message.error("Đã xảy ra lỗi khi cập nhật ảnh đại diện.");
+      console.error("Error uploading photo:", error);
+      message.error("An error occurred while updating the avatar.");
     }
   };
 
@@ -300,7 +300,7 @@ function Profile() {
       // Gửi yêu cầu chỉ cập nhật feedbackId và status cho booking hiện tại
       await api.patch(`/bookings/${selectedBooking.bookingId}`, {
         feedbackId: newFeedbackId,
-        status: "kết thúc", // Cập nhật status thành "kết thúc"
+        status: "Finished", // Cập nhật status thành "kết thúc"
       });
 
       // Cập nhật lại state để hiển thị feedback đã được gửi
@@ -312,7 +312,7 @@ function Profile() {
                 feedbackId: newFeedbackId,
                 rating,
                 comments,
-                status: "kết thúc",
+                status: "Finished",
               }
             : order
         )
@@ -340,10 +340,10 @@ function Profile() {
       );
 
       setBackgroundImage(downloadURL);
-      message.success("Ảnh nền đã được cập nhật thành công!");
+      message.success("Avatar has been updated successfully!");
     } catch (error) {
-      console.error("Lỗi khi tải lên ảnh nền:", error);
-      message.error("Đã xảy ra lỗi khi cập nhật ảnh nền.");
+      console.error("Error uploading photo:", error);
+      message.error("An error occurred while updating the avatar.");
     }
   };
 
@@ -376,7 +376,7 @@ function Profile() {
           return false;
         }}
       >
-        <Button icon={<CameraOutlined />}>Thay đổi ảnh đại diện</Button>
+        <Button icon={<CameraOutlined />}>Change Avatar</Button>
       </Upload>
     </div>
   );
@@ -446,7 +446,7 @@ function Profile() {
               icon={<ShoppingOutlined />}
               style={{ marginRight: 8 }}
             >
-              Xem lại
+              View
             </Button>
             {record.status && record.status.toLowerCase() === "approved" && (
               <Button
@@ -454,7 +454,7 @@ function Profile() {
                 type="primary"
                 style={{ marginRight: 8 }}
               >
-                Thanh toán
+                Pay
               </Button>
             )}
             {record.feedbackId ? (
@@ -463,7 +463,7 @@ function Profile() {
                 type="default"
                 style={{ fontWeight: "bold" }}
               >
-                Xem đánh giá
+                View Feedback
               </Button>
             ) : record.status &&
               (record.status.toLowerCase() === "checkin" ||
@@ -473,14 +473,14 @@ function Profile() {
                 type="default"
                 style={{ fontWeight: "bold" }}
               >
-                Đánh giá
+                Feedback
               </Button>
             ) : (
               <Button
                 onClick={() => handleCancelOrder(record.bookingId)}
                 danger
               >
-                Hủy
+                Cancel
               </Button>
             )}
           </>
@@ -500,7 +500,7 @@ function Profile() {
           title={
             <div className="card-header">
               <h1>
-                <UserOutlined /> Thông tin tài khoản
+                <UserOutlined /> Account Information
               </h1>
             </div>
           }
@@ -513,7 +513,7 @@ function Profile() {
                 icon={<EditOutlined />}
                 style={{ marginRight: "10px" }}
               >
-                Chỉnh sửa thông tin
+                Edit Information
               </Button>
               <Popover
                 content={backgroundPopoverContent}
@@ -521,7 +521,7 @@ function Profile() {
                 trigger="click"
                 placement="bottom"
               >
-                <Button icon={<PictureOutlined />}>Thay đổi ảnh nền</Button>
+                <Button icon={<PictureOutlined />}>Change Background</Button>
               </Popover>
             </div>
           }
@@ -604,7 +604,7 @@ function Profile() {
           className="booking-modal"
           footer={[
             <Button key="close" onClick={handleCloseModal}>
-              Đóng
+              Close
             </Button>,
           ]}
         >
@@ -764,12 +764,12 @@ function Profile() {
         </Modal>
 
         <Modal
-          title={isEditMode ? "Sửa đánh giá" : "Xem đánh giá"}
+          title={isEditMode ? "Edit Feedback" : "View Feedback"}
           visible={isFeedbackModalVisible}
           onCancel={handleCloseFeedbackModal}
           footer={[
             <Button key="cancel" onClick={handleCloseFeedbackModal}>
-              Hủy
+              Cancel
             </Button>,
             isEditMode ? (
               <Button
@@ -777,11 +777,11 @@ function Profile() {
                 type="primary"
                 onClick={handleSubmitFeedback}
               >
-                Gửi đánh giá
+                Send Feedback
               </Button>
             ) : (
               <Button key="edit" type="default" onClick={handleEditReview}>
-                Sửa đánh giá
+                Edit Feedback
               </Button>
             ),
           ]}

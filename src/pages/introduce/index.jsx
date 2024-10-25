@@ -20,7 +20,7 @@ function Introduce() {
       const data = await response.json();
       setKoiVarieties(data);
     } catch (error) {
-      console.error("Không thể lấy dữ liệu giống cá Koi", error);
+      console.error("Cannot get Koi fish data", error);
     }
   };
 
@@ -43,10 +43,10 @@ function Introduce() {
       <main>
         <Banner />
 
-        <h1>Danh sách trang trại</h1>
+        <h1>Farm List</h1>
         <ProductList />
         <div>
-          <h1>Các giống Koi</h1>
+          <h1>Koi Breeds</h1>
           <div className="koi-grid">
             {currentKois.map((koi) => (
               <div key={koi.varietyId} className="koi-card">
@@ -56,9 +56,9 @@ function Introduce() {
                   className="koi-avatar"
                 />
                 <div className="koi-info">
-                  <p>Loại: {koi.varietyName}</p>
-                  <p>Giá: {koi.koiPrice.toLocaleString()} VNĐ</p>
-                  <p>Mô tả: {koi.description}</p>
+                  <p>Type: {koi.varietyName}</p>
+                  <p>Price: {koi.koiPrice.toLocaleString()} VNĐ</p>
+                  <p>Describe: {koi.description}</p>
                 </div>
               </div>
             ))}

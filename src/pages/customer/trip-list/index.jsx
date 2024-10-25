@@ -38,7 +38,7 @@ const TripList = () => {
               hoverable
               cover={<img alt={trip.tripName} src={trip.imageUrl || "https://via.placeholder.com/300"} />}
             >
-              <Meta title={trip.tripName} description={`Price: ${trip.priceTotal?.toLocaleString()} VND`} />
+              <Meta title={trip.tripName} description={`Price: ${trip.priceTotal?.toLocaleString()}`} />
               <Button 
                 type="primary" 
                 style={{ marginTop: "10px" }}

@@ -604,7 +604,7 @@ function SalesDashboard() {
             onClick={handleLogout}
             style={{ float: "right" }} // Căn phải
           >
-            Đăng xuất
+            Logout
           </Button>
         </Header>
         <h1>Sales Staff Dashboard</h1>
@@ -843,7 +843,7 @@ function SalesDashboard() {
           </Form>
         </Modal>
         <Footer style={{ textAlign: "center" }}>
-          Ant Design ©{new Date().getFullYear()} Được tạo bởi Ant UED
+          © 2024 LOOKOI. TRUST ALWAYS COMES FIRST.
         </Footer>
       </Layout>
     </Layout>
