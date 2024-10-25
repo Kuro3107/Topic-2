@@ -48,7 +48,7 @@ const Delivery = () => {
       const varietiesData = await varietiesResponse.json();
       setVarieties(varietiesData);
     } catch (error) {
-      console.error("Có lỗi khi gọi API farms hoặc varieties:", error);
+      console.error("Error calling farms or varieties API:", error);
     }
   };
 
@@ -67,10 +67,10 @@ const Delivery = () => {
         setPoData(deliveringPOs);
         setBookings(bookingData);
       } else {
-        console.error("Lỗi khi lấy dữ liệu:", poData, bookingData);
+        console.error("Error while retrieving data:", poData, bookingData);
       }
     } catch (error) {
-      console.error("Có lỗi khi gọi API:", error);
+      console.error("Error calling API:", error);
     } finally {
       setLoading(false);
     }
@@ -152,10 +152,10 @@ const Delivery = () => {
         setPoData(updatedPOs);
         setIsEditVisible(false);
       } else {
-        console.error("Lỗi khi cập nhật PO:", await response.json());
+        console.error("Error while updating PO:", await response.json());
       }
     } catch (error) {
-      console.error("Có lỗi khi gọi API:", error);
+      console.error("Error while get API:", error);
     }
   };
 
@@ -176,7 +176,7 @@ const Delivery = () => {
 
   // Hiển thị loading nếu dữ liệu chưa được tải
   if (loading) {
-    return <div>Đang tải dữ liệu...</div>;
+    return <div>Loading data...</div>;
   }
   // Define the columns for the table
   const columns = [
@@ -222,21 +222,21 @@ const Delivery = () => {
       </Sider>
       <Layout>
         <Header className="deli-header">
-          <h5>Chi tiết đơn hàng</h5>
+          <h5>Order details</h5>
           <Button
             type="primary"
             icon={<LogoutOutlined />} // Icon logout
             onClick={handleLogout}
             style={{ float: "right" }} // Căn phải
           >
-            Đăng xuất
+            Logout
           </Button>
         </Header>
         <Content className="deli-content">
           <div className="site-layout-background">
             <Row gutter={[16, 16]}>
               <Col span={24}>
-                <Card title="Danh Sách Đơn Hàng Đang Giao">
+                <Card title="List of Orders in Delivery">
                   <Table
                     dataSource={combinedData}
                     columns={columns}
@@ -249,7 +249,7 @@ const Delivery = () => {
           </div>
         </Content>
         <Footer style={{ textAlign: "center" }}>
-          Ant Design ©{new Date().getFullYear()} Được tạo bởi Ant UED
+          © 2024 LOOKOI. TRUST ALWAYS COMES FIRST.
         </Footer>
       </Layout>
 
@@ -260,10 +260,10 @@ const Delivery = () => {
         onCancel={handleCloseEdit}
         footer={[
           <Button key="cancel" onClick={handleCloseEdit}>
-            Hủy
+            Cancel
           </Button>,
           <Button key="submit" type="primary" onClick={handleUpdate}>
-            Cập nhật
+            Update
           </Button>,
         ]}
       >

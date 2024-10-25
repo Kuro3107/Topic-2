@@ -68,6 +68,7 @@ main h1:hover {
   flex-direction: column;
   height: auto; /* Thay đổi từ chiều cao cố định sang tự động */
   min-height: 300px; /* Đặt chiều cao tối thiểu để đảm bảo kích thước ô vuông */
+  min-width: 300px;
 }
 
 .koi-card:hover {

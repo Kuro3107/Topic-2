@@ -11,20 +11,20 @@ const api = "http://localhost:8080/api/bookings";
 
 function BookingForm() {
   const [formData, setFormData] = useState({
-    startDate: "", // Đảm bảo rằng tên trường khớp với DTO
-    endDate: "", // Đảm bảo rằng tên trường khớp với DTO
-    fullname: "", // Đảm bảo rằng tên trường khớp với DTO
-    phone: "", // Đảm bảo rằng tên trường khớp với DTO
-    email: "", // Đảm bảo rằng tên trường khớp với DTO
-    favoriteKoi: [], // Đảm bảo rằng tên trường khớp với DTO
-    favoriteFarm: [], // Đảm bảo rằng tên trường khớp với DTO
-    note: "", // Đảm bảo rằng tên trường khớp với DTO
-    status: "pending", // Đảm bảo rằng tên trường khớp với DTO
+    startDate: "", // Ensure field name matches with DTO
+    endDate: "", // Ensure field name matches with DTO
+    fullname: "", // Ensure field name matches with DTO
+    phone: "", // Ensure field name matches with DTO
+    email: "", // Ensure field name matches with DTO
+    favoriteKoi: [], // Ensure field name matches with DTO
+    favoriteFarm: [], // Ensure field name matches with DTO
+    note: "", // Ensure field name matches with DTO
+    status: "pending", // Ensure field name matches with DTO
   });
 
   const [koiOptions, setKoiOptions] = useState([]);
   const [farmOptions, setFarmOptions] = useState([]);
-  const [filteredFarmOptions, setFilteredFarmOptions] = useState([]); // State cho farm đã lọc
+  const [filteredFarmOptions, setFilteredFarmOptions] = useState([]); // State for filtered farms
 
   const navigate = useNavigate();
 
@@ -36,14 +36,14 @@ function BookingForm() {
         );
         const options = response.data.map((koi) => ({
           value: koi.varietyId,
-          label: `${koi.varietyName || "Tên không xác định"} - ${
-            koi.koiPrice ? `${koi.koiPrice} VNĐ` : "Giá không xác định"
+          label: `${koi.varietyName || "Undefined name"} - ${
+            koi.koiPrice ? `${koi.koiPrice}` : "Undefined price"
           }`,
         }));
         setKoiOptions(options);
       } catch (error) {
-        console.error("Lỗi khi tải dữ liệu cá koi:", error);
-        toast.error("Không thể tải dữ liệu cá koi.");
+        console.error("Error loading koi data:", error);
+        toast.error("Unable to load koi data.");
       }
     };
 
@@ -52,16 +52,16 @@ function BookingForm() {
         const response = await axios.get("http://localhost:8080/api/farms");
         const options = response.data.map((farm) => ({
           value: farm.farmId,
-          label: `${farm.farmName || "Tên không xác định"} - ${
-            farm.location || "Địa điểm không xác định"
+          label: `${farm.farmName || "Undefined name"} - ${
+            farm.location || "Undefined location"
           }`,
-          koiVarieties: farm.koiVarieties, // Lưu trữ thông tin về các loại cá trong farm
+          koiVarieties: farm.koiVarieties, // Store information about koi varieties in the farm
         }));
         setFarmOptions(options);
-        setFilteredFarmOptions(options); // Khởi tạo danh sách farm đã lọc
+        setFilteredFarmOptions(options); // Initialize filtered farm list
       } catch (error) {
-        console.error("Lỗi khi tải dữ liệu farm:", error);
-        toast.error("Không thể tải dữ liệu farm.");
+        console.error("Error loading farm data:", error);
+        toast.error("Unable to load farm data.");
       }
     };
 
@@ -83,81 +83,81 @@ function BookingForm() {
       [actionMeta.name]: selectedOptions.map((option) => option.value),
     }));
 
-    // Nếu người dùng chọn cá koi, lọc farm
+    // If user selects koi, filter farms
     if (actionMeta.name === "favoriteKoi") {
       const selectedKoiIds = selectedOptions.map((option) => option.value);
       const filteredFarms = farmOptions.filter((farm) =>
         farm.koiVarieties.some((koi) => selectedKoiIds.includes(koi.varietyId))
       );
-      setFilteredFarmOptions(filteredFarms); // Cập nhật danh sách farm đã lọc
+      setFilteredFarmOptions(filteredFarms); // Update filtered farm list
     }
 
-    // Nếu không có koi được chọn, reset farm
+    // If no koi selected, reset farm
     if (actionMeta.name === "favoriteFarm" && formData.favoriteKoi.length === 0) {
       setFormData((prevData) => ({
         ...prevData,
-        favoriteFarm: [], // Reset farm nếu không có koi
+        favoriteFarm: [], // Reset farm if no koi selected
       }));
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Gửi yêu cầu..."); // Thêm log để kiểm tra
+    console.log("Sending request..."); // Add log for checking
     if (!formData.fullname || !formData.phone || !formData.email) {
-      toast.error("Vui lòng điền đầy đủ thông tin.");
+      toast.error("Please fill in all required information.");
       return;
     }
     try {
-      // Lấy thông tin người dùng từ localStorage
+      // Get user information from localStorage
       const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-      const customerId = userInfo?.customerId; // Lấy customerId từ thông tin người dùng
-      console.log("Customer ID:", customerId); // Thêm log để kiểm tra customerId
+      const customerId = userInfo?.customerId; // Get customerId from user info
+      console.log("Customer ID:", customerId); // Add log to check customerId
 
-      // Kiểm tra xem customerId có phải là undefined không
+      // Check if customerId is undefined
       if (!customerId) {
         console.error(
           "Customer ID is undefined. Please check the userInfo in localStorage."
         );
-        toast.error("Không tìm thấy thông tin khách hàng.");
+        toast.error("Customer information not found.");
         return;
       }
 
-      // Chuyển đổi favoriteKoi và favoriteFarm từ ID sang tên
+      // Convert favoriteKoi and favoriteFarm from IDs to names
       const favoriteKoiNames = formData.favoriteKoi
         .map((id) => {
           const koi = koiOptions.find((option) => option.value === id);
-          return koi ? koi.label.split(" - ")[0] : null; // Lấy tên cá koi
+          return koi ? koi.label.split(" - ")[0] : null; // Get koi name
         })
         .filter((name) => name)
-        .join(", "); // Chuyển đổi thành chuỗi
+        .join(", "); // Convert to string
 
       const favoriteFarmNames = formData.favoriteFarm
         .map((id) => {
           const farm = filteredFarmOptions.find(
             (option) => option.value === id
           );
-          return farm ? farm.label.split(" - ")[0] : null; // Lấy tên farm
+          return farm ? farm.label.split(" - ")[0] : null; // Get farm name
         })
         .filter((name) => name)
-        .join(", "); // Chuyển đổi thành chuỗi
+        .join(", "); // Convert to string
 
       const dataToSend = {
         ...formData,
-        customerId: customerId, // Thêm customerId vào dữ liệu gửi đi
-        favoriteKoi: favoriteKoiNames, // Gửi chuỗi tên cá koi
-        favoriteFarm: favoriteFarmNames, // Gửi chuỗi tên farm
+        customerId: customerId, // Add customerId to data
+        favoriteKoi: favoriteKoiNames, // Send koi names string
+        favoriteFarm: favoriteFarmNames, // Send farm names string
       };
 
-      console.log("Dữ liệu gửi đi:", dataToSend); // In ra dữ liệu gửi đi
+      console.log("Data to send:", dataToSend); // Print data to be sent
 
       const response = await axios.post(api, dataToSend);
       if (response.status === 201) {
-        toast.success("Đặt chỗ thành công! Chúng tôi sẽ liên hệ với bạn sớm.");
+        toast.success("Booking successful! We will contact you soon.");
 
-        // Quay về trang home sau 1 giây
+        // Return to home page after 1 second
         setTimeout(() => {
-          navigate("/"); // Điều hướng về trang home
+          navigate("/"); // Navigate to home page
         }, 1000);
 
         setFormData({
@@ -174,11 +174,11 @@ function BookingForm() {
       }
     } catch (error) {
       console.error(
-        "Lỗi khi gửi dữ liệu:",
+        "Error sending data:",
         error.response ? error.response.data : error.message
       );
       toast.error(
-        "Đã xảy ra lỗi trong quá trình đặt chỗ. Vui lòng thử lại sau."
+        "An error occurred during the booking process. Please try again later."
       );
     }
   };
@@ -274,7 +274,7 @@ function BookingForm() {
                       <Select
                         isMulti
                         name="favoriteFarm"
-                        options={formData.favoriteKoi.length > 0 ? filteredFarmOptions : []} // Chỉ hiển thị farm nếu có koi được chọn
+                        options={formData.favoriteKoi.length > 0 ? filteredFarmOptions : []} // Only show farms if koi is selected
                         className="basic-multi-select"
                         classNamePrefix="select"
                         onChange={(selectedOptions) =>

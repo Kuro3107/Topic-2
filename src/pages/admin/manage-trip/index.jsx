@@ -285,7 +285,7 @@ const ManageTour = () => {
       title: "Total Price",
       dataIndex: "priceTotal",
       key: "priceTotal",
-      render: (price) => (price != null ? `${price.toLocaleString()} VND` : 'N/A'),
+      render: (price) => (price != null ? `${price.toLocaleString()}` : 'N/A'),
     },
     {
       title: "Image",

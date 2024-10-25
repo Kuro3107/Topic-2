@@ -22,7 +22,6 @@ import {
   LockOutlined,
   EditOutlined,
   ShoppingOutlined,
-   
   UploadOutlined,
   CameraOutlined,
   PictureOutlined,
@@ -38,7 +37,7 @@ const defaultBackgrounds = [
   "https://images.unsplash.com/photo-1518171802599-4cd16785f93a?q=80&w=2450&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
   "https://images.unsplash.com/photo-1454789548928-9efd52dc4031?q=80&w=2680&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
   "https://images.unsplash.com/photo-1504309092620-4d0ec726efa4?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-  "https://scontent-hkg1-2.xx.fbcdn.net/v/t39.30808-6/463915475_1889758918177483_6652777735107939029_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=833d8c&_nc_eui2=AeHadwfu8UN55EWm56paxASxVEnY-eRM_k5USdj55Ez-TuZHK2ueOZRCqznZWXzjwsr0Tyyu7WksQWov3wXSYvPb&_nc_ohc=7PVzRf7kRo0Q7kNvgHC04W-&_nc_zt=23&_nc_ht=scontent-hkg1-2.xx&_nc_gid=A3Gqn9CkIiCKAXWBBO83gSm&oh=00_AYDqPQ59s18jaKkcfUdeXvBM8C5SbcIRtj6vEG75gcz8Ng&oe=671B1570"
+  "https://scontent-hkg1-2.xx.fbcdn.net/v/t39.30808-6/463915475_1889758918177483_6652777735107939029_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=833d8c&_nc_eui2=AeHadwfu8UN55EWm56paxASxVEnY-eRM_k5USdj55Ez-TuZHK2ueOZRCqznZWXzjwsr0Tyyu7WksQWov3wXSYvPb&_nc_ohc=7PVzRf7kRo0Q7kNvgHC04W-&_nc_zt=23&_nc_ht=scontent-hkg1-2.xx&_nc_gid=A3Gqn9CkIiCKAXWBBO83gSm&oh=00_AYDqPQ59s18jaKkcfUdeXvBM8C5SbcIRtj6vEG75gcz8Ng&oe=671B1570",
 ];
 
 const defaultImageUrl = "/istockphoto-1495088043-612x612.jpg";
@@ -218,14 +217,13 @@ function Profile() {
       );
 
       setUser((prevUser) => ({ ...prevUser, imageUrl: downloadURL }));
-      message.success("Ảnh đại diện đã được cập nhật thành công!");
+      message.success("Avatar has been updated successfully!");
     } catch (error) {
-      console.error("Lỗi khi tải lên ảnh:", error);
-      message.error("Đã xảy ra lỗi khi cập nhật ảnh đại diện.");
+      console.error("Error uploading photo:", error);
+      message.error("An error occurred while updating the avatar.");
     }
   };
 
-   
   const handleImageChange = async (info) => {
     if (info.file.status === "done") {
       await handleImageUpload(info.file.originFileObj);
@@ -302,7 +300,7 @@ function Profile() {
       // Gửi yêu cầu chỉ cập nhật feedbackId và status cho booking hiện tại
       await api.patch(`/bookings/${selectedBooking.bookingId}`, {
         feedbackId: newFeedbackId,
-        status: "kết thúc", // Cập nhật status thành "kết thúc"
+        status: "Finished", // Cập nhật status thành "kết thúc"
       });
 
       // Cập nhật lại state để hiển thị feedback đã được gửi
@@ -314,7 +312,7 @@ function Profile() {
                 feedbackId: newFeedbackId,
                 rating,
                 comments,
-                status: "kết thúc",
+                status: "Finished",
               }
             : order
         )
@@ -342,10 +340,10 @@ function Profile() {
       );
 
       setBackgroundImage(downloadURL);
-      message.success("Ảnh nền đã được cập nhật thành công!");
+      message.success("Avatar has been updated successfully!");
     } catch (error) {
-      console.error("Lỗi khi tải lên ảnh nền:", error);
-      message.error("Đã xảy ra lỗi khi cập nhật ảnh nền.");
+      console.error("Error uploading photo:", error);
+      message.error("An error occurred while updating the avatar.");
     }
   };
 
@@ -378,7 +376,7 @@ function Profile() {
           return false;
         }}
       >
-        <Button icon={<CameraOutlined />}>Thay đổi ảnh đại diện</Button>
+        <Button icon={<CameraOutlined />}>Change Avatar</Button>
       </Upload>
     </div>
   );
@@ -448,7 +446,7 @@ function Profile() {
               icon={<ShoppingOutlined />}
               style={{ marginRight: 8 }}
             >
-              Xem lại
+              View
             </Button>
             {record.status && record.status.toLowerCase() === "approved" && (
               <Button
@@ -456,7 +454,7 @@ function Profile() {
                 type="primary"
                 style={{ marginRight: 8 }}
               >
-                Thanh toán
+                Pay
               </Button>
             )}
             {record.feedbackId ? (
@@ -465,7 +463,7 @@ function Profile() {
                 type="default"
                 style={{ fontWeight: "bold" }}
               >
-                Xem đánh giá
+                View Feedback
               </Button>
             ) : record.status &&
               (record.status.toLowerCase() === "checkin" ||
@@ -475,14 +473,14 @@ function Profile() {
                 type="default"
                 style={{ fontWeight: "bold" }}
               >
-                Đ��nh giá
+                Feedback
               </Button>
             ) : (
               <Button
                 onClick={() => handleCancelOrder(record.bookingId)}
                 danger
               >
-                Hủy
+                Cancel
               </Button>
             )}
           </>
@@ -492,14 +490,17 @@ function Profile() {
   ];
 
   return (
-    <div className="profile-page" style={{ backgroundImage: `url(${backgroundImage})` }}>
+    <div
+      className="profile-page"
+      style={{ backgroundImage: `url(${backgroundImage})` }}
+    >
       <Header />
       <main className="profile-content">
         <Card
           title={
             <div className="card-header">
               <h1>
-                <UserOutlined /> Thông tin tài khoản
+                <UserOutlined /> Account Information
               </h1>
             </div>
           }
@@ -510,9 +511,9 @@ function Profile() {
                 onClick={handleEdit}
                 type="primary"
                 icon={<EditOutlined />}
-                style={{ marginRight: '10px' }}
+                style={{ marginRight: "10px" }}
               >
-                Chỉnh sửa thông tin
+                Edit Information
               </Button>
               <Popover
                 content={backgroundPopoverContent}
@@ -520,9 +521,7 @@ function Profile() {
                 trigger="click"
                 placement="bottom"
               >
-                <Button icon={<PictureOutlined />}>
-                  Thay đổi ảnh nền
-                </Button>
+                <Button icon={<PictureOutlined />}>Change Background</Button>
               </Popover>
             </div>
           }
@@ -602,132 +601,175 @@ function Profile() {
           title="Booking Details"
           visible={isModalVisible}
           onCancel={handleCloseModal}
+          className="booking-modal"
           footer={[
             <Button key="close" onClick={handleCloseModal}>
-              Đóng
+              Close
             </Button>,
           ]}
         >
           {selectedBooking && (
             <div>
-              <p>
-                <strong>Booking ID:</strong> {selectedBooking.bookingId}
-              </p>
-              <p>
-                <strong>Booking Date:</strong>{" "}
-                {new Date(selectedBooking.bookingDate).toLocaleDateString()}
-              </p>
-              <p>
-                <strong>Full Name:</strong> {selectedBooking.fullname}
-              </p>
-              <p>
-                <strong>Email:</strong> {selectedBooking.email}
-              </p>
-              <p>
-                <strong>Phone:</strong> {selectedBooking.phone}
-              </p>
-              <p>
-                <strong>Start Date:</strong>{" "}
-                {new Date(selectedBooking.startDate).toLocaleDateString()}
-              </p>
-              <p>
-                <strong>End Date:</strong>{" "}
-                {selectedBooking.endDate ? new Date(selectedBooking.endDate).toLocaleDateString() : "N/A"}
-              </p>
-              <p>
-                <strong>Status:</strong> {selectedBooking.status}
-              </p>
-              <p>
-                <strong>Favorite Farms:</strong> {selectedBooking.favoriteFarm}
-              </p>
-              <p>
-                <strong>Favorite Koi:</strong> {selectedBooking.favoriteKoi}
-              </p>
-              <p>
-                <strong>Note:</strong> {selectedBooking.note}
-              </p>
-              {selectedBooking.poDetails && (
-                <div>
-                  <h3>PO Details</h3>
-                  <p>
-                    <strong>PO ID:</strong> {selectedBooking.poDetails.poId}
-                  </p>
-                  <p>
-                    <strong>Total Amount:</strong>{" "}
-                    {selectedBooking.poDetails.totalAmount}
-                  </p>
-                  <p>
-                    <strong>Koi Delivery Date:</strong>{" "}
-                    {new Date(
-                      selectedBooking.poDetails.koiDeliveryDate
-                    ).toLocaleDateString()}
-                  </p>
-                  <p>
-                    <strong>Status:</strong> {selectedBooking.poDetails.status}
-                  </p>
-                  <p>
-                    <strong>Address:</strong>{" "}
-                    {selectedBooking.poDetails.address}
-                  </p>
+              <section className="booking-details-section">
+                <h3>Booking Information</h3>
+                <div className="booking-info-grid">
+                  <div className="booking-info-item">
+                    <strong>Booking ID:</strong>
+                    <span>{selectedBooking.bookingId}</span>
+                  </div>
+                  <div className="booking-info-item">
+                    <strong>Booking Date:</strong>
+                    <span>
+                      {new Date(
+                        selectedBooking.bookingDate
+                      ).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <div className="booking-info-item">
+                    <strong>Full Name:</strong>
+                    <span>{selectedBooking.fullname}</span>
+                  </div>
+                  <div className="booking-info-item">
+                    <strong>Email:</strong>
+                    <span>{selectedBooking.email}</span>
+                  </div>
+                  <div className="booking-info-item">
+                    <strong>Phone:</strong>
+                    <span>{selectedBooking.phone}</span>
+                  </div>
+                  <div className="booking-info-item">
+                    <strong>Status:</strong>
+                    <span>{selectedBooking.status}</span>
+                  </div>
+                  <div className="booking-info-item">
+                    <strong>Start Date:</strong>
+                    <span>
+                      {new Date(selectedBooking.startDate).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <div className="booking-info-item">
+                    <strong>End Date:</strong>
+                    <span>
+                      {selectedBooking.endDate
+                        ? new Date(selectedBooking.endDate).toLocaleDateString()
+                        : "N/A"}
+                    </span>
+                  </div>
                 </div>
+
+                <div className="booking-info-grid">
+                  <div className="booking-info-item">
+                    <strong>Favorite Farms:</strong>
+                    <span>{selectedBooking.favoriteFarm}</span>
+                  </div>
+                  <div className="booking-info-item">
+                    <strong>Favorite Koi:</strong>
+                    <span>{selectedBooking.favoriteKoi}</span>
+                  </div>
+                </div>
+
+                <div className="booking-info-item">
+                  <strong>Note:</strong>
+                  <span>{selectedBooking.note}</span>
+                </div>
+              </section>
+
+              {selectedBooking.poDetails && (
+                <section className="booking-details-section">
+                  <h3>PO Details</h3>
+                  <div className="booking-info-grid">
+                    <div className="booking-info-item">
+                      <strong>PO ID:</strong>
+                      <span>{selectedBooking.poDetails.poId}</span>
+                    </div>
+                    <div className="booking-info-item">
+                      <strong>Total Amount:</strong>
+                      <span>{selectedBooking.poDetails.totalAmount}</span>
+                    </div>
+                    <div className="booking-info-item">
+                      <strong>Koi Delivery Date:</strong>
+                      <span>
+                        {new Date(
+                          selectedBooking.poDetails.koiDeliveryDate
+                        ).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <div className="booking-info-item">
+                      <strong>Status:</strong>
+                      <span>{selectedBooking.poDetails.status}</span>
+                    </div>
+                    <div className="booking-info-item">
+                      <strong>Address:</strong>
+                      <span>{selectedBooking.poDetails.address}</span>
+                    </div>
+                  </div>
+                </section>
               )}
+
               {selectedBooking.tripDetails && (
-                <div>
+                <section className="booking-details-section">
                   <h3>Trip Details</h3>
-                  <p>
-                    <strong>Trip ID:</strong>{" "}
-                    {selectedBooking.tripDetails.tripId}
-                  </p>
-                  <p>
-                    <strong>Trip Name:</strong>{" "}
-                    {selectedBooking.tripDetails.tripName}
-                  </p>
-                  <p>
-                    <strong>Total Price:</strong> $
-                    {selectedBooking.tripDetails.priceTotal}
-                  </p>
+                  <div className="booking-info-grid">
+                    <div className="booking-info-item">
+                      <strong>Trip ID:</strong>
+                      <span>{selectedBooking.tripDetails.tripId}</span>
+                    </div>
+                    <div className="booking-info-item">
+                      <strong>Trip Name:</strong>
+                      <span>{selectedBooking.tripDetails.tripName}</span>
+                    </div>
+                    <div className="booking-info-item">
+                      <strong>Total Price:</strong>
+                      <span>${selectedBooking.tripDetails.priceTotal}</span>
+                    </div>
+                  </div>
+
                   <img
                     src={selectedBooking.tripDetails.imageUrl}
                     alt="Trip"
-                    style={{ width: "100%", height: "auto" }}
+                    className="trip-image"
                   />
-                  <h4>Trip Itinerary:</h4>
-                  {selectedBooking.tripDetails.tripDetails.map((detail) => (
-                    <div key={detail.tripDetailId}>
-                      <p>
+
+                  <div className="trip-itinerary">
+                    <h4>Trip Itinerary:</h4>
+                    {selectedBooking.tripDetails.tripDetails.map((detail) => (
+                      <div key={detail.tripDetailId} className="itinerary-day">
                         <strong>Day {detail.day}:</strong> {detail.mainTopic} -{" "}
                         {detail.subTopic} (Price: ${detail.notePrice})
-                      </p>
-                    </div>
-                  ))}
-                  <h4>Koi Farms:</h4>
-                  {selectedBooking.tripDetails.koiFarms.map((farm) => (
-                    <div key={farm.farmId}>
-                      <h5>
-                        {farm.farmName} ({farm.location})
-                      </h5>
-                      <p>Contact: {farm.contactInfo}</p>
-                      <img
-                        src={farm.imageUrl}
-                        alt={farm.farmName}
-                        style={{ width: "100%", height: "auto" }}
-                      />
-                      {/* Xóa phần hiển thị koi varieties */}
-                    </div>
-                  ))}
-                </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="farm-section">
+                    <h4>Koi Farms:</h4>
+                    {selectedBooking.tripDetails.koiFarms.map((farm) => (
+                      <div key={farm.farmId} className="farm-section">
+                        <div className="farm-header">
+                          <h5>{farm.farmName}</h5>
+                          <span>({farm.location})</span>
+                        </div>
+                        <p>Contact: {farm.contactInfo}</p>
+                        <img
+                          src={farm.imageUrl}
+                          alt={farm.farmName}
+                          className="farm-image"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </section>
               )}
             </div>
           )}
         </Modal>
 
         <Modal
-          title={isEditMode ? "Sửa đánh giá" : "Xem đánh giá"}
+          title={isEditMode ? "Edit Feedback" : "View Feedback"}
           visible={isFeedbackModalVisible}
           onCancel={handleCloseFeedbackModal}
           footer={[
             <Button key="cancel" onClick={handleCloseFeedbackModal}>
-              Hủy
+              Cancel
             </Button>,
             isEditMode ? (
               <Button
@@ -735,11 +777,11 @@ function Profile() {
                 type="primary"
                 onClick={handleSubmitFeedback}
               >
-                Gửi đánh giá
+                Send Feedback
               </Button>
             ) : (
               <Button key="edit" type="default" onClick={handleEditReview}>
-                Sửa đánh giá
+                Edit Feedback
               </Button>
             ),
           ]}

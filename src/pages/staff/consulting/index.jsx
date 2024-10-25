@@ -1,9 +1,23 @@
 import { useState, useEffect } from "react";
-import { Table, Button, message, Space, Modal, Select, Layout, Menu } from "antd";
+import {
+  Table,
+  Button,
+  message,
+  Space,
+  Modal,
+  Select,
+  Layout,
+  Menu,
+} from "antd";
 import api from "../../../config/axios";
 import Sider from "antd/es/layout/Sider";
-import { LogoutOutlined, UserOutlined, VideoCameraOutlined } from "@ant-design/icons";
+import {
+  LogoutOutlined,
+  UserOutlined,
+  VideoCameraOutlined,
+} from "@ant-design/icons";
 import { Header } from "antd/es/layout/layout";
+import "../consulting/index.css"
 
 function Consulting() {
   const [bookings, setBookings] = useState([]);
@@ -137,16 +151,13 @@ function Consulting() {
       const newPoId = response.data.po_id; // Đảm bảo API trả về po_id
 
       // Cập nhật PO ID cho booking
-      const currentBooking = bookings.find(
-        (booking) => booking.bookingId === bookingId
+      const updatedBookings = bookings.map((booking) =>
+        booking.bookingId === bookingId
+          ? { ...booking, poId: newPoId }
+          : booking
       );
-      if (!currentBooking) {
-        throw new Error("Booking not found");
-      }
-      await api.put(`/bookings/${bookingId}`, {
-        ...currentBooking,
-        poId: newPoId,
-      });
+      setBookings(updatedBookings);
+
       message.success("Purchase Order created successfully.");
       fetchBookings();
     } catch (error) {
@@ -338,11 +349,18 @@ function Consulting() {
           )}
 
           {record.status === "checkin" && (
-            <Button
-              onClick={() => handleStatusChange(record.bookingId, "checkout")}
-            >
-              Check Out
-            </Button>
+            <>
+              <Button
+                onClick={() => handleStatusChange(record.bookingId, "checkout")}
+              >
+                Check Out
+              </Button>
+              {!record.poId && (
+                <Button onClick={() => createPurchaseOrder(record.bookingId)}>
+                  Create Purchase Order
+                </Button>
+              )}
+            </>
           )}
 
           {record.status === "checkout" && (
@@ -390,7 +408,7 @@ function Consulting() {
             onClick={handleLogout}
             style={{ float: "right" }} // Căn phải
           >
-            Đăng xuất
+            Logout
           </Button>
         </Header>
         <h1>Consulting Staff Dashboard</h1>
@@ -409,97 +427,118 @@ function Consulting() {
               Close
             </Button>,
           ]}
+          className="large-modal"
+          width={1200}
         >
           {selectedBooking && (
-            <div>
-              <p>
-                <strong>Booking ID:</strong> {selectedBooking.bookingId}
-              </p>
-              <p>
-                <strong>Customer Name:</strong> {selectedBooking.fullname}
-              </p>
-              <p>
-                <strong>Email:</strong> {selectedBooking.email}
-              </p>
-              <p>
-                <strong>Phone:</strong> {selectedBooking.phone}
-              </p>
-              <p>
-                <strong>Start Date:</strong>{" "}
-                {new Date(selectedBooking.startDate).toLocaleDateString()}
-              </p>
-              <p>
-                <strong>End Date:</strong>{" "}
-                {new Date(selectedBooking.endDate).toLocaleDateString()}
-              </p>
-              <p>
-                <strong>Status:</strong> {selectedBooking.status}
-              </p>
-              <p>
-                <strong>Favorite Farms:</strong>{" "}
-                {selectedBooking.favoriteFarm || "N/A"}
-              </p>
-              <p>
-                <strong>Favorite Koi:</strong>{" "}
-                {selectedBooking.favoriteKoi || "N/A"}
-              </p>
-              <p>
-                <strong>Note:</strong> {selectedBooking.note || "N/A"}
-              </p>
+            <div className="consulting-modal">
+              <div className="booking-info">
+                <div className="booking-info-item">
+                  <p>
+                    <strong>Booking ID:</strong> {selectedBooking.bookingId}
+                  </p>
+                  <p>
+                    <strong>Customer Name:</strong> {selectedBooking.fullname}
+                  </p>
+                  <p>
+                    <strong>Email:</strong> {selectedBooking.email}
+                  </p>
+                  <p>
+                    <strong>Phone:</strong> {selectedBooking.phone}
+                  </p>
+                </div>
+                <div className="booking-info-item">
+                  <p>
+                    <strong>Start Date:</strong>{" "}
+                    {new Date(selectedBooking.startDate).toLocaleDateString()}
+                  </p>
+                  <p>
+                    <strong>End Date:</strong>{" "}
+                    {new Date(selectedBooking.endDate).toLocaleDateString()}
+                  </p>
+                  <p>
+                    <strong>Status:</strong> {selectedBooking.status}
+                  </p>
+                </div>
+                <div className="booking-info-item">
+                  <p>
+                    <strong>Favorite Farms:</strong>{" "}
+                    {selectedBooking.favoriteFarm || "N/A"}
+                  </p>
+                  <p>
+                    <strong>Favorite Koi:</strong>{" "}
+                    {selectedBooking.favoriteKoi || "N/A"}
+                  </p>
+                  <p>
+                    <strong>Note:</strong> {selectedBooking.note || "N/A"}
+                  </p>
+                </div>
+              </div>
+
               {tripDetails && (
-                <div>
-                  <h3>Trip Details</h3>
-                  <p>
-                    <strong>Trip ID:</strong> {tripDetails.tripId}
-                  </p>
-                  <p>
-                    <strong>Trip Name:</strong> {tripDetails.tripName}
-                  </p>
-                  <p>
-                    <strong>Total Price:</strong> ${tripDetails.priceTotal}
-                  </p>
-                  <img
-                    src={tripDetails.imageUrl}
-                    alt="Trip"
-                    style={{ width: "100%", height: "auto" }}
-                  />
-                  <h4>Trip Itinerary:</h4>
-                  {tripDetails.tripDetails.map((detail) => (
-                    <div key={detail.tripDetailId}>
+                <div className="trip-details">
+                  <div className="trip-header">
+                    <div className="trip-info">
+                      <h3>Trip Details</h3>
                       <p>
-                        <strong>Day {detail.day}:</strong> {detail.mainTopic} -{" "}
-                        {detail.subTopic} (Price: ${detail.notePrice})
+                        <strong>Trip ID:</strong> {tripDetails.tripId}
+                      </p>
+                      <p>
+                        <strong>Trip Name:</strong> {tripDetails.tripName}
+                      </p>
+                      <p>
+                        <strong>Total Price:</strong> ${tripDetails.priceTotal}
                       </p>
                     </div>
-                  ))}
-                  <h4>Koi Farms:</h4>
-                  {tripDetails.koiFarms.map((farm) => (
-                    <div key={farm.farmId}>
-                      <h5>
-                        {farm.farmName} ({farm.location})
-                      </h5>
-                      <p>Contact: {farm.contactInfo}</p>
-                      <img
-                        src={farm.imageUrl}
-                        alt={farm.farmName}
-                        style={{ width: "100%", height: "auto" }}
-                      />
-                      <h6>Koi Varieties:</h6>
-                      {farm.koiVarieties.map((variety) => (
-                        <div key={variety.varietyId}>
-                          <p>
-                            <strong>{variety.varietyName}:</strong>{" "}
-                            {variety.description} (Price: ${variety.koiPrice})
-                          </p>
-                          <img
-                            src={variety.imageUrl}
-                            alt={variety.varietyName}
-                            style={{ width: "100%", height: "auto" }}
-                          />
+                    <img
+                      src={tripDetails.imageUrl}
+                      alt="Trip"
+                      className="trip-main-image"
+                    />
+                  </div>
+
+                  <div className="itinerary-section">
+                    <h4>Trip Itinerary:</h4>
+                    {tripDetails.tripDetails.map((detail) => (
+                      <div key={detail.tripDetailId} className="itinerary-item">
+                        <strong>Day {detail.day}:</strong> {detail.mainTopic} -{" "}
+                        {detail.subTopic}
+                        <div>Price: ${detail.notePrice}</div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="farms-section">
+                    {tripDetails.koiFarms.map((farm) => (
+                      <div key={farm.farmId} className="farm-card">
+                        <h5>{farm.farmName}</h5>
+                        <p>Location: {farm.location}</p>
+                        <p>Contact: {farm.contactInfo}</p>
+                        <img
+                          src={farm.imageUrl}
+                          alt={farm.farmName}
+                          className="farm-image"
+                        />
+                        <div className="koi-varieties">
+                          {farm.koiVarieties.map((variety) => (
+                            <div
+                              key={variety.varietyId}
+                              className="koi-variety-card"
+                            >
+                              <strong>{variety.varietyName}</strong>
+                              <p>{variety.description}</p>
+                              <p>Price: ${variety.koiPrice}</p>
+                              <img
+                                src={variety.imageUrl}
+                                alt={variety.varietyName}
+                                className="koi-image"
+                              />
+                            </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
-                  ))}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
