@@ -21,6 +21,7 @@ import Delivery from "./pages/staff/delivery";
 import Introduce from "./pages/introduce";
 import ManageAccounts from "./pages/admin/manage-accounts";
 import ManageFeedback from "./pages/admin/manage-feedback";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   const router = createBrowserRouter([
@@ -38,19 +39,35 @@ function App() {
     },
     {
       path: "/profile",
-      element: <Profile />,
+      element: (
+        <ProtectedRoute allowedRoles={['admin', 'sales', 'consulting', 'delivery', 'customer']}>
+          <Profile />
+        </ProtectedRoute>
+      ),
     },
     {
       path: "/edit-profile",
-      element: <EditProfile />,
+      element: (
+        <ProtectedRoute allowedRoles={['admin', 'sales', 'consulting', 'delivery', 'customer']}>
+          <EditProfile />
+        </ProtectedRoute>
+      ),
     },
     {
       path: "/bookingform",
-      element: <BookingForm />,
+      element: (
+        <ProtectedRoute allowedRoles={['customer']}>
+          <BookingForm />
+        </ProtectedRoute>
+      ),
     },
     {
       path: "/dashboard",
-      element: <Dashboard />,
+      element: (
+        <ProtectedRoute allowedRoles={['admin']}>
+          <Dashboard />
+        </ProtectedRoute>
+      ),
       children: [
         { path: "farm", element: <ManageFarm /> },
         { path: "trip", element: <ManageTrip /> },
@@ -65,25 +82,42 @@ function App() {
     },
     {
       path: "/sales",
-      element: <Sales />,
+      element: (
+        <ProtectedRoute allowedRoles={['sales']}>
+          <Sales />
+        </ProtectedRoute>
+      ),
     },
     {
       path: "/delivery",
-      element: <Delivery />,
+      element: (
+        <ProtectedRoute allowedRoles={['delivery']}>
+          <Delivery />
+        </ProtectedRoute>
+      ),
     },
     {
       path: "/payment",
-      element: <Payment />,
+      element: (
+        <ProtectedRoute allowedRoles={['admin', 'sales', 'consulting', 'delivery', 'customer']}>
+          <Payment />
+        </ProtectedRoute>
+      ),
     },
     {
       path: "/consulting",
-      element: <Consulting />,
+      element: (
+        <ProtectedRoute allowedRoles={['consulting']}>
+          <Consulting />
+        </ProtectedRoute>
+      ),
     },
     {
       path: "/introduce",
       element: <Introduce />,
     },
   ]);
+
   return (
     <>
       <RouterProvider router={router} />
