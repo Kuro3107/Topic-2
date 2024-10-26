@@ -13,7 +13,7 @@ const ProtectedRoute = ({ allowedRoles, children }) => {
 
     if (!allowedRoles.includes(userRole)) {
       message.error("Bạn không có quyền truy cập vào trang này.");
-      navigate('/');
+      navigate("/");
     }
   }, [allowedRoles, userRole, navigate]);
 

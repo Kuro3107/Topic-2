@@ -39,24 +39,16 @@ function App() {
     },
     {
       path: "/profile",
-      element: (
-        <ProtectedRoute allowedRoles={['admin', 'sales', 'consulting', 'delivery', 'customer']}>
-          <Profile />
-        </ProtectedRoute>
-      ),
+      element: <Profile />,
     },
     {
       path: "/edit-profile",
-      element: (
-        <ProtectedRoute allowedRoles={['admin', 'sales', 'consulting', 'delivery', 'customer']}>
-          <EditProfile />
-        </ProtectedRoute>
-      ),
+      element: <EditProfile />,
     },
     {
       path: "/bookingform",
       element: (
-        <ProtectedRoute allowedRoles={['customer']}>
+        <ProtectedRoute allowedRoles={["customer"]}>
           <BookingForm />
         </ProtectedRoute>
       ),
@@ -64,7 +56,7 @@ function App() {
     {
       path: "/dashboard",
       element: (
-        <ProtectedRoute allowedRoles={['admin']}>
+        <ProtectedRoute allowedRoles={["admin"]}>
           <Dashboard />
         </ProtectedRoute>
       ),
@@ -83,7 +75,7 @@ function App() {
     {
       path: "/sales",
       element: (
-        <ProtectedRoute allowedRoles={['sales']}>
+        <ProtectedRoute allowedRoles={["sales"]}>
           <Sales />
         </ProtectedRoute>
       ),
@@ -91,7 +83,7 @@ function App() {
     {
       path: "/delivery",
       element: (
-        <ProtectedRoute allowedRoles={['delivery']}>
+        <ProtectedRoute allowedRoles={["delivery"]}>
           <Delivery />
         </ProtectedRoute>
       ),
@@ -99,7 +91,15 @@ function App() {
     {
       path: "/payment",
       element: (
-        <ProtectedRoute allowedRoles={['admin', 'sales', 'consulting', 'delivery', 'customer']}>
+        <ProtectedRoute
+          allowedRoles={[
+            "admin",
+            "sales",
+            "consulting",
+            "delivery",
+            "customer",
+          ]}
+        >
           <Payment />
         </ProtectedRoute>
       ),
@@ -107,7 +107,7 @@ function App() {
     {
       path: "/consulting",
       element: (
-        <ProtectedRoute allowedRoles={['consulting']}>
+        <ProtectedRoute allowedRoles={["consulting"]}>
           <Consulting />
         </ProtectedRoute>
       ),
