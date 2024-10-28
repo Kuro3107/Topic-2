@@ -570,7 +570,7 @@ function Profile() {
               {loading ? (
                 <Spin />
               ) : (
-                <Table
+                <Table 
                   columns={columns}
                   dataSource={orders} // Đảm bảo sử dụng orders ở đây
                   rowKey="bookingId"

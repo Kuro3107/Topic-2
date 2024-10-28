@@ -8,6 +8,7 @@ import ManageAccounts from "../../pages/admin/manage-accounts";
 import ManageFeedback from "../../pages/admin/manage-feedback";
 import ManageKoi from "../../pages/admin/manage-koi";
 import "../dashboard/index.css"
+import Diagram from "../../pages/admin/Diagram";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -21,6 +22,7 @@ function getItem(label, key, icon, children) {
 }
 
 const items = [
+  getItem("Diagram", "Diagram", <DesktopOutlined />),
   getItem("Manage Booking", "Booking", <DesktopOutlined />),
   getItem("Manage Trip", "Trip", <FileOutlined />),
   getItem("Manage Farm", "Farm", <DesktopOutlined />),
@@ -38,6 +40,8 @@ const Dashboard = () => {
 
   const renderContent = () => {
     switch (selectedKey) {
+      case "Diagram":
+        return <Diagram />;
       case "Farm":
         return <ManageFarm />;
       case "Trip":

@@ -98,7 +98,7 @@
     transition: all 0.4s ease;
     display: flex;
     flex-direction: column;
-    height: 100%;
+    height: 100%; /* Đảm bảo tất cả các card có cùng chiều cao */
   }
   
   .info-card:hover {
@@ -106,15 +106,16 @@
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
   }
   
-  .card-image {
-    height: 250px;
-    object-fit: cover;
+  .info-card .ant-card-cover {
+    height: 450px; /* Đặt chiều cao cố định cho phần cover */
     width: 100%;
-    transition: all 0.4s ease;
+    overflow: hidden; /* Ẩn phần vượt quá */
   }
   
-  .info-card:hover .card-image {
-    transform: scale(1.1);
+  .info-card .ant-card-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Đảm bảo hình ảnh lấp đầy không gian mà không bị biến dạng */
   }
   
   .info-card .ant-card-body {

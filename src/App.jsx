@@ -22,6 +22,7 @@ import Introduce from "./pages/introduce";
 import ManageAccounts from "./pages/admin/manage-accounts";
 import ManageFeedback from "./pages/admin/manage-feedback";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Diagram from "./pages/admin/Diagram";
 
 function App() {
   const router = createBrowserRouter([
@@ -61,6 +62,7 @@ function App() {
         </ProtectedRoute>
       ),
       children: [
+        { path: "diagram", element: <Diagram /> },
         { path: "farm", element: <ManageFarm /> },
         { path: "trip", element: <ManageTrip /> },
         { path: "booking", element: <ManageBooking /> },
