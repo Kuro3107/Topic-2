@@ -289,6 +289,11 @@ const Delivery = () => {
         title="Chi Tiết PODetails"
         visible={isPODetailsVisible}
         onCancel={handleClosePODetails}
+        footer={[
+          <Button key="ok" type="primary" onClick={handleClosePODetails}>
+            OK
+          </Button>,
+        ]}
       >
         <Table
           dataSource={selectedPODetails}

@@ -420,9 +420,11 @@ function SalesDashboard() {
   const handleAddFarm = () => {
     Modal.confirm({
       title: "Select a farm to add",
+      width: 800,
       content: (
         <Select
           placeholder="Select a farm"
+          style={{ width: '100%', minHeight: '40px' }}
           onChange={(value) => {
             const selectedFarm = koiFarms.find((farm) => farm.farmId === value);
             if (selectedFarm) {
@@ -553,7 +555,10 @@ function SalesDashboard() {
       title: "Action",
       key: "action",
       render: (_, record) => (
-        <Button onClick={() => showModal(record)}>Update Booking</Button>
+        <>
+          <Button onClick={() => showModal(record)}>View Booking & Update Status</Button>
+          {/* <Button onClick={() => showBookingDetails(record)}>View Booking</Button> */}
+        </>
       ),
     },
     {
@@ -561,14 +566,12 @@ function SalesDashboard() {
       key: "tripDetail",
       render: (_, record) => {
         if (record.tripId) {
-          // Nu booking đã có tripId thì hiện nút "View & Edit Trip"
           return (
             <Button onClick={() => showTripModal(record)}>
               View & Edit Trip
             </Button>
           );
         }
-        // Nếu chưa có tripId thì hiện nút "Create Trip"
         return (
           <Button onClick={() => showTripModal(record)}>Create Trip</Button>
         );
@@ -580,6 +583,30 @@ function SalesDashboard() {
     localStorage.removeItem("authToken"); // Assuming you store your token here
     // Redirect to the login page
     window.location.href = "/login"; // Navigate to the login page
+  };
+
+  const showBookingDetails = (booking) => {
+    console.log("Booking details:", booking);
+    const favoriteKoi = Array.isArray(booking.favoriteKoi) ? booking.favoriteKoi : booking.favoriteKoi ? booking.favoriteKoi.split(",") : [];
+    const favoriteFarm = Array.isArray(booking.favoriteFarm) ? booking.favoriteFarm : booking.favoriteFarm ? booking.favoriteFarm.split(",") : [];
+    Modal.info({
+      title: "Booking Details",
+      content: (
+        <div>
+          <p><strong>ID:</strong> {booking.bookingId || "N/A"}</p>
+          <p><strong>Name:</strong> {booking.fullname || "N/A"}</p>
+          <p><strong>Phone:</strong> {booking.phone || "N/A"}</p>
+          <p><strong>Email:</strong> {booking.email || "N/A"}</p>
+          <p><strong>Status:</strong> {booking.status || "N/A"}</p>
+          <p><strong>Start Date:</strong> {dayjs(booking.startDate).format("DD/MM/YYYY") || "N/A"}</p>
+          <p><strong>End Date:</strong> {dayjs(booking.endDate).format("DD/MM/YYYY") || "N/A"}</p>
+          <p><strong>Note:</strong> {booking.note || "N/A"}</p>
+          <p><strong>Favorite Koi:</strong> {favoriteKoi.length > 0 ? favoriteKoi.join(", ") : "N/A"}</p>
+          <p><strong>Favorite Farm:</strong> {favoriteFarm.length > 0 ? favoriteFarm.join(", ") : "N/A"}</p>
+        </div>
+      ),
+      onOk() {},
+    });
   };
 
   return (
@@ -740,6 +767,13 @@ function SalesDashboard() {
                           <Space key={field.key} align="baseline">
                             <Form.Item
                               {...field}
+                              name={[field.name, "day"]}
+                              label="Day"
+                            >
+                              <InputNumber min={1} />
+                            </Form.Item>
+                            <Form.Item
+                              {...field}
                               name={[field.name, "mainTopic"]}
                               label="Main Topic"
                             >
@@ -758,13 +792,6 @@ function SalesDashboard() {
                               label="Price Note"
                             >
                               <Input placeholder="Enter price note" />
-                            </Form.Item>
-                            <Form.Item
-                              {...field}
-                              name={[field.name, "day"]}
-                              label="Day"
-                            >
-                              <InputNumber min={1} />
                             </Form.Item>
                             <Button
                               onClick={() => {

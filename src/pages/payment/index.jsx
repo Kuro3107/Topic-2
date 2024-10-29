@@ -40,7 +40,7 @@ function Payment() {
     try {
       await api.put(`/bookings/${booking.bookingId}`, {
         ...booking,
-        status: "purchased",
+        status: "Purchased",
       });
       message.success("Payment successful!");
       navigate("/profile");
@@ -111,9 +111,9 @@ function Payment() {
           type="primary"
           onClick={handlePayment}
           className="payment-button"
-          disabled={booking.status === "purchased"}
+          disabled={booking.status === "Purchased"}
         >
-          {booking.status === "purchased" ? "Purchased" : "Purchase Now"}
+          {booking.status === "Purchased" ? "Purchased" : "Purchase Now"}
         </Button>
         <Button
           type="default"

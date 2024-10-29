@@ -490,11 +490,13 @@ function Consulting() {
                         <strong>Total Price:</strong> ${tripDetails.priceTotal}
                       </p>
                     </div>
-                    <img
-                      src={tripDetails.imageUrl}
-                      alt="Trip"
-                      className="trip-main-image"
-                    />
+                    {tripDetails.imageUrl && ( // Kiểm tra nếu có imageUrl
+                      <img
+                        src={tripDetails.imageUrl}
+                        alt="Trip"
+                        className="trip-main-image"
+                      />
+                    )}
                   </div>
 
                   <div className="itinerary-section">
@@ -700,7 +702,9 @@ function Consulting() {
               onChange={setSelectedFarmId}
               placeholder="Select a farm"
             >
-              {farms.map((farm) => (
+              {tripDetails && tripDetails.koiFarms.map(tripFarm => (
+                farms.find(farm => farm.farmId === tripFarm.farmId) // Lọc farms theo trip
+              )).filter(farm => farm).map(farm => (
                 <Select.Option key={farm.farmId} value={farm.farmId}>
                   {farm.farmName}
                 </Select.Option>
@@ -714,11 +718,8 @@ function Consulting() {
               onChange={setSelectedVarietyId}
               placeholder="Select a koi variety"
             >
-              {koiVarieties.map((variety) => (
-                <Select.Option
-                  key={variety.varietyId}
-                  value={variety.varietyId}
-                >
+              {selectedFarmId && farms.find(farm => farm.farmId === selectedFarmId)?.koiVarieties.map(variety => (
+                <Select.Option key={variety.varietyId} value={variety.varietyId}>
                   {variety.varietyName}
                 </Select.Option>
               ))}

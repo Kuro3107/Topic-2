@@ -79,7 +79,7 @@ function ManageBooking() {
       fetchBookings();
     } catch (error) {
       console.error("Lỗi khi tạo đặt chỗ:", error);
-      message.error("Không thể tạo đặt chỗ mới");
+      message.error("Không th��� tạo đặt chỗ mới");
     }
   };
 
@@ -188,8 +188,9 @@ function ManageBooking() {
                                 <p>Trip ID: {trip.tripId}</p>
                                 <p>Tên chuyến đi: {trip.tripName}</p>
                                 <p>Tổng giá: {trip.priceTotal} VNĐ</p>
-                                <img src={trip.imageUrl} alt={trip.tripName} style={{ width: '100%', height: 'auto' }} />
-                                
+                                {trip.imageUrl && ( // Kiểm tra nếu có imageUrl
+                                    <img src={trip.imageUrl} alt={trip.tripName} style={{ width: '100%', height: 'auto' }} />
+                                )}
                                 <h4>Chi tiết chuyến đi:</h4>
                                 {trip.tripDetails.map(detail => (
                                     <div key={detail.tripDetailId}>
@@ -199,7 +200,6 @@ function ManageBooking() {
                                         <p>Giá ghi chú: {detail.notePrice} VNĐ</p>
                                     </div>
                                 ))}
-                                
                                 <h4>Trang trại Koi:</h4>
                                 {trip.koiFarms.map(farm => (
                                     <div key={farm.farmId}>

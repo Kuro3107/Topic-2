@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Table, Button, Modal, Form, Input, InputNumber, message, Select } from "antd";
+import { Table, Button, Modal, Form, Input, InputNumber, message, Select, Radio } from "antd";
 import axios from "axios";
 
 const ManageTour = () => {
@@ -19,6 +19,7 @@ const ManageTour = () => {
   const [editingTripDetail, setEditingTripDetail] = useState(null); // State cho trip detail đang chỉnh sửa
   const apiTour = "http://localhost:8080/api/trips";
   const [isCreatingTour, setIsCreatingTour] = useState(true); // Trạng thái để xác định bước tạo tour
+  const [viewMode, setViewMode] = useState("available"); // State để theo dõi chế độ xem
 
   const fetchTours = async () => {
     try {
@@ -316,7 +317,17 @@ const ManageTour = () => {
       title: "Farms",
       key: "farms",
       render: (_, record) => (
-        <Button onClick={() => showFarmsModal(record.tripId)}>View</Button>
+        <ul>
+          {record.koiFarms && record.koiFarms.length > 0 ? (
+            record.koiFarms.map(farm => (
+              <li key={farm.farmId}>
+                <strong>{farm.farmName}</strong> - Location: {farm.location}
+              </li>
+            ))
+          ) : (
+            <li>No farms available</li>
+          )}
+        </ul>
       ),
     },
     {
@@ -340,6 +351,14 @@ const ManageTour = () => {
   return (
     <div>
       <h1>Manage Tours</h1>
+      <Radio.Group 
+        value={viewMode} 
+        onChange={(e) => setViewMode(e.target.value)} 
+        style={{ marginBottom: 16 }}
+      >
+        <Radio value="available">Tour có sẵn</Radio>
+        <Radio value="custom">Tour của riêng khách hàng</Radio>
+      </Radio.Group>
       <Button
         onClick={() => {
           setIsModalVisible(true);
@@ -352,7 +371,7 @@ const ManageTour = () => {
       </Button>
       <Table 
         columns={columns} 
-        dataSource={tours} 
+        dataSource={viewMode === "available" ? tours.filter(tour => tour.imageUrl) : tours.filter(tour => !tour.imageUrl)} // Lọc dựa trên chế độ xem
         rowKey="tripId"
       />
       <Modal

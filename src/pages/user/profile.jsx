@@ -473,7 +473,7 @@ function Profile() {
                 type="default"
                 style={{ fontWeight: "bold" }}
               >
-                Feedback
+                Finish Tour & Send Feedback
               </Button>
             ) : (
               <Button
@@ -706,11 +706,13 @@ function Profile() {
                     </div>
                   </div>
 
-                  <img
-                    src={selectedBooking.tripDetails.imageUrl}
-                    alt="Trip"
-                    className="trip-image"
-                  />
+                  {selectedBooking.tripDetails.imageUrl && ( // Kiểm tra xem có hình ảnh không
+                    <img
+                      src={selectedBooking.tripDetails.imageUrl}
+                      alt="Trip"
+                      className="trip-image"
+                    />
+                  )}
 
                   <div className="trip-itinerary">
                     <h4>Trip Itinerary:</h4>
@@ -759,7 +761,7 @@ function Profile() {
                 type="primary"
                 onClick={handleSubmitFeedback}
               >
-                Send Feedback
+                Finish Tour & Send Feedback
               </Button>
             ) : (
               <Button key="edit" type="default" onClick={handleEditReview}>
