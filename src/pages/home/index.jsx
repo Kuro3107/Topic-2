@@ -5,7 +5,7 @@ import {
   HeartOutlined,
   EnvironmentOutlined,
 } from "@ant-design/icons";
-import Header from "../../components/Header";
+import Header from "../../components/header";
 import Footer from "../../components/Footer";
 import "./index.css";
 import { toast } from "react-toastify";
