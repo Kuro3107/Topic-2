@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Form, Input, Button, message } from "antd";
 import { useNavigate } from "react-router-dom";
 import api from "../../config/axios";
-import Header from "../../components/Header";
-import Footer from "../../components/Footer";
+import Header from "../../components/header/index";
+import Footer from "../../components/footer/index";
 import "./edit-profile.css";
 
 function EditProfile() {

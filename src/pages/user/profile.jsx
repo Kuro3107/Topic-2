@@ -2,8 +2,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import Header from "../../components/Header";
-import Footer from "../../components/Footer";
+import Header from "../../components/header/index";
+import Footer from "../../components/footer/index";
 import {
   Button,
   Spin,
