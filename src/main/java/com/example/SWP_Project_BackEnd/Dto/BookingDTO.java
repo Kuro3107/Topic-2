@@ -16,9 +16,9 @@ import java.util.List;
 @AllArgsConstructor
 public class BookingDTO {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long bookingId;
-    private Long customerId;
-    private Long tripId;
+    private Integer bookingId;
+    private Integer customerId;
+    private Integer tripId;
     private String fullname;
     private String phone;
     private String email;

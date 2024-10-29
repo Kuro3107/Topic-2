@@ -41,7 +41,7 @@ public class BookingController {
 
     // READ booking by ID
     @GetMapping("/{id}")
-    public ResponseEntity<Booking> getBookingById(@PathVariable Long id) {
+    public ResponseEntity<Booking> getBookingById(@PathVariable Integer id) {
         Optional<Booking> booking = bookingService.getBookingById(id);
         return booking.map(ResponseEntity::ok)
                 .orElseThrow(() -> new ResourceNotFoundException("Booking not found with ID: " + id));
@@ -49,14 +49,14 @@ public class BookingController {
 
     // UPDATE booking by ID
     @PutMapping("/{id}")
-    public ResponseEntity<Booking> updateBooking(@PathVariable Long id, @RequestBody BookingDTO bookingDTO) {
+    public ResponseEntity<Booking> updateBooking(@PathVariable Integer id, @RequestBody BookingDTO bookingDTO) {
         Booking updatedBooking = bookingService.updateBooking(id, bookingDTO);
         return ResponseEntity.ok(updatedBooking);
     }
 
     //Update booking with feedback
     @PatchMapping("/{id}")
-    public ResponseEntity<?> updateBookingFeedback(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
+    public ResponseEntity<?> updateBookingFeedback(@PathVariable Integer id, @RequestBody Map<String, Object> updates) {
         Optional<Booking> optionalBooking = bookingRepository.findById(id);
         if (!optionalBooking.isPresent()) {
             return ResponseEntity.notFound().build();
@@ -85,13 +85,13 @@ public class BookingController {
 
     // DELETE booking by ID
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteBooking(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteBooking(@PathVariable Integer id) {
         bookingService.deleteBooking(id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/by-account/{accountId}")
-    public ResponseEntity<List<Booking>> getBookingsByAccountId(@PathVariable Long accountId) {
+    public ResponseEntity<List<Booking>> getBookingsByAccountId(@PathVariable Integer accountId) {
         List<Booking> bookings = bookingService.findBookingsByAccountId(accountId);
         return ResponseEntity.ok(bookings);
     }

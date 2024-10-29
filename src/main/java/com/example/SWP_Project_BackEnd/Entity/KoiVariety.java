@@ -20,7 +20,7 @@ public class KoiVariety {
     @Id
     @Column(name = "variety_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long varietyId;
+    private Integer varietyId;
 
 
     @Column(name = "variety_name")

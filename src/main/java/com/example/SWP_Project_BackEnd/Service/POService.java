@@ -21,7 +21,7 @@ public class POService {
     private BookingService bookingService;
 
     @Transactional
-    public PO createPOForBooking(Long bookingId, PO po) {
+    public PO createPOForBooking(Integer bookingId, PO po) {
         // Lưu PO mới
         PO savedPO = poRepository.save(po);
 
@@ -42,7 +42,7 @@ public class POService {
     }
 
     // READ PO by ID
-    public Optional<PO> getPOById(Long poId) {
+    public Optional<PO> getPOById(Integer poId) {
         return poRepository.findById(poId);
     }
 
@@ -52,7 +52,7 @@ public class POService {
     }
 
     // UPDATE PO
-    public PO updatePO(Long poId, PO updatedPO) {
+    public PO updatePO(Integer poId, PO updatedPO) {
         Optional<PO> optionalPO = poRepository.findById(poId);
         if (optionalPO.isPresent()) {
             PO existingPO = optionalPO.get();
@@ -68,7 +68,7 @@ public class POService {
     }
 
     // DELETE PO
-    public void deletePO(Long poId) {
+    public void deletePO(Integer poId) {
         poRepository.deleteById(poId);
     }
 }

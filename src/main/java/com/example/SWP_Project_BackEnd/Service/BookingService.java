@@ -55,12 +55,12 @@ public class BookingService {
     }
 
     // READ booking by ID
-    public Optional<Booking> getBookingById(Long bookingId) {
+    public Optional<Booking> getBookingById(Integer bookingId) {
         return bookingRepository.findById(bookingId);
     }
 
     // UPDATE booking
-    public Booking updateBooking(Long bookingId, BookingDTO bookingDTO) {
+    public Booking updateBooking(Integer bookingId, BookingDTO bookingDTO) {
         Optional<Booking> optionalBooking = bookingRepository.findById(bookingId);
 
         if (optionalBooking.isPresent()) {
@@ -86,7 +86,7 @@ public class BookingService {
     }
 
     // Phương thức để cập nhật PO_ID cho Booking
-    public Booking updatePoId(Long bookingId, Long poId) {
+    public Booking updatePoId(Integer bookingId, Integer poId) {
         Optional<Booking> optionalBooking = bookingRepository.findById(bookingId);
 
         if (optionalBooking.isPresent()) {
@@ -99,14 +99,14 @@ public class BookingService {
     }
 
     // DELETE booking
-    public void deleteBooking(Long bookingId) {
+    public void deleteBooking(Integer bookingId) {
         if (bookingRepository.existsById(bookingId)) {
             bookingRepository.deleteById(bookingId);
         } else {
             throw new ResourceNotFoundException("Booking not found with ID: " + bookingId);
         }
     }
-    public List<Booking> findBookingsByAccountId(Long accountId) {
+    public List<Booking> findBookingsByAccountId(Integer accountId) {
         return bookingRepository.findByCustomerAccountId(accountId);
     }
 

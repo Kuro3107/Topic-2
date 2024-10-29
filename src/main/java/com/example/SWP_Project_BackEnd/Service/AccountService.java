@@ -93,11 +93,11 @@ public class AccountService {
         return accountRepository.findAll();
     }
 
-    public Optional<Account> getAccountById(Long id) {
+    public Optional<Account> getAccountById(Integer id) {
         return accountRepository.findById(id);
     }
 
-    public Account updateAccount(Long id, Account accountDetails) {
+    public Account updateAccount(Integer id, Account accountDetails) {
         Optional<Account> account = accountRepository.findById(id);
         if (account.isPresent()) {
             Account existingAccount = account.get();
@@ -113,7 +113,7 @@ public class AccountService {
         return null;
     }
 
-    public Account updateAccountByManager(Long id, Account accountDetails) {
+    public Account updateAccountByManager(Integer id, Account accountDetails) {
         Optional<Account> account = accountRepository.findById(id);
         if (account.isPresent()) {
             Account existingAccount = account.get();
@@ -129,7 +129,7 @@ public class AccountService {
         return null;
     }
 
-    public Account updateAccountImage(Long id, String imageUrl) {
+    public Account updateAccountImage(Integer id, String imageUrl) {
         Optional<Account> optionalAccount = accountRepository.findById(id);
         if (optionalAccount.isPresent()) {
             Account existingAccount = optionalAccount.get();
@@ -139,7 +139,7 @@ public class AccountService {
         return null;
     }
 
-    public void deleteAccount(Long id) {
+    public void deleteAccount(Integer id) {
         accountRepository.deleteById(id);
     }
 

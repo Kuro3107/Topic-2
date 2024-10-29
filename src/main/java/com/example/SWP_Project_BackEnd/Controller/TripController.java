@@ -38,7 +38,7 @@ public class TripController {
     }
 
     @GetMapping("/{tripId}")
-    public ResponseEntity<Trip> getTripById(@PathVariable Long tripId) {
+    public ResponseEntity<Trip> getTripById(@PathVariable Integer tripId) {
         Trip trip = tripService.getTripById(tripId);
         return new ResponseEntity<>(trip, HttpStatus.OK);
     }
@@ -68,20 +68,20 @@ public class TripController {
     }
 
     @PutMapping("/{tripId}")
-    public ResponseEntity<Trip> updateTrip(@PathVariable Long tripId, @RequestBody Trip tripDetails) {
+    public ResponseEntity<Trip> updateTrip(@PathVariable Integer tripId, @RequestBody Trip tripDetails) {
         Trip updatedTrip = tripService.updateTrip(tripId, tripDetails);
         return new ResponseEntity<>(updatedTrip, HttpStatus.OK);
     }
 
     @DeleteMapping("/{tripId}")
-    public ResponseEntity<Void> deleteTrip(@PathVariable Long tripId) {
+    public ResponseEntity<Void> deleteTrip(@PathVariable Integer tripId) {
         tripService.deleteTrip(tripId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     // Thêm farm vào trip
     @PostMapping("/{tripId}/farms")
-    public ResponseEntity<Void> addFarmToTrip(@PathVariable Long tripId, @RequestBody KoiFarm koiFarm) {
+    public ResponseEntity<Void> addFarmToTrip(@PathVariable Integer tripId, @RequestBody KoiFarm koiFarm) {
 
         // Thêm farm vào trip thông qua bảng trung gian
         tripService.addKoiFarmToTrip(tripId, koiFarm);
@@ -90,7 +90,7 @@ public class TripController {
 
     // Xóa farm khỏi trip
     @DeleteMapping("/{tripId}/farms/{farmId}")
-    public ResponseEntity<Void> removeFarmFromTrip(@PathVariable Long tripId, @PathVariable Long farmId) {
+    public ResponseEntity<Void> removeFarmFromTrip(@PathVariable Integer tripId, @PathVariable Integer farmId) {
 
         // Xóa farm khỏi trip
         tripService.removeKoiFarmFromTrip(tripId, farmId);
@@ -99,7 +99,7 @@ public class TripController {
 
     // Thêm trip detail vào trip
     @PostMapping("/{tripId}/trip-details")
-    public ResponseEntity<TripDetail> addTripDetail(@PathVariable Long tripId, @RequestBody TripDetail tripDetail) {
+    public ResponseEntity<TripDetail> addTripDetail(@PathVariable Integer tripId, @RequestBody TripDetail tripDetail) {
         System.out.println("Received TripDetail: " + tripDetail);
         TripDetail createdTripDetail = tripService.addTripDetail(tripId, tripDetail);
         return new ResponseEntity<>(createdTripDetail, HttpStatus.CREATED);
@@ -107,7 +107,7 @@ public class TripController {
 
     // Cập nhật trip detail
     @PutMapping("/{tripId}/trip-details/{tripDetailId}")
-    public ResponseEntity<TripDetail> updateTripDetail(@PathVariable Long tripId, @PathVariable Long tripDetailId, @RequestBody TripDetail tripDetail) {
+    public ResponseEntity<TripDetail> updateTripDetail(@PathVariable Integer tripId, @PathVariable Integer tripDetailId, @RequestBody TripDetail tripDetail) {
         System.out.println("Received TripDetail: " + tripDetail);
         TripDetail updatedTripDetail = tripService.updateTripDetail(tripId, tripDetailId, tripDetail);
         return new ResponseEntity<>(updatedTripDetail, HttpStatus.OK);
@@ -115,7 +115,7 @@ public class TripController {
 
     // Xóa trip detail
     @DeleteMapping("/{tripId}/trip-details/{tripDetailId}")
-    public ResponseEntity<Void> deleteTripDetail(@PathVariable Long tripId, @PathVariable Long tripDetailId) {
+    public ResponseEntity<Void> deleteTripDetail(@PathVariable Integer tripId, @PathVariable Integer tripDetailId) {
         tripService.deleteTripDetail(tripId, tripDetailId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

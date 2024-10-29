@@ -7,6 +7,7 @@ import com.example.SWP_Project_BackEnd.Exception.ResourceNotFoundException;
 import com.example.SWP_Project_BackEnd.Repository.KoiFarmRepository;
 import com.example.SWP_Project_BackEnd.Repository.TripDetailRepository;
 import com.example.SWP_Project_BackEnd.Repository.TripRepository;
+import jakarta.persistence.Id;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +30,7 @@ public class TripService {
         return tripRepository.findAll();
     }
 
-    public Trip getTripById(Long tripId) {
+    public Trip getTripById(Integer tripId) {
         return tripRepository.findById(tripId)
                 .orElseThrow(() -> new ResourceNotFoundException("Trip not found with id " + tripId));
     }
@@ -50,7 +51,7 @@ public class TripService {
     }
 
 
-    public Trip updateTrip(Long tripId, Trip tripDetails) {
+    public Trip updateTrip(Integer tripId, Trip tripDetails) {
         Trip trip = tripRepository.findById(tripId)
                 .orElseThrow(() -> new ResourceNotFoundException("Trip not found with id " + tripId));
 
@@ -61,13 +62,13 @@ public class TripService {
         return tripRepository.save(trip);
     }
 
-    public void deleteTrip(Long tripId) {
+    public void deleteTrip(Integer tripId) {
         Trip trip = tripRepository.findById(tripId)
                 .orElseThrow(() -> new ResourceNotFoundException("Trip not found with id " + tripId));
         tripRepository.delete(trip);
     }
 
-    public Trip addKoiFarmToTrip(Long tripId, KoiFarm koiFarm) {
+    public Trip addKoiFarmToTrip(Integer tripId, KoiFarm koiFarm) {
         Trip trip = tripRepository.findById(tripId)
                 .orElseThrow(() -> new ResourceNotFoundException("Trip not found with id " + tripId));
 
@@ -77,7 +78,7 @@ public class TripService {
         return tripRepository.save(trip); // Lưu trip để cập nhật
     }
 
-    public Trip removeKoiFarmFromTrip(Long tripId, Long farmId) {
+    public Trip removeKoiFarmFromTrip(Integer tripId, Integer farmId) {
         Trip trip = tripRepository.findById(tripId)
                 .orElseThrow(() -> new ResourceNotFoundException("Trip not found with id " + tripId));
 
@@ -91,7 +92,7 @@ public class TripService {
 
     }
 
-    public TripDetail addTripDetail(Long tripId, TripDetail tripDetail) {
+    public TripDetail addTripDetail(Integer tripId, TripDetail tripDetail) {
         Trip trip = tripRepository.findById(tripId)
                 .orElseThrow(() -> new ResourceNotFoundException("Trip not found with id " + tripId));
 
@@ -100,7 +101,7 @@ public class TripService {
         return tripDetailRepository.save(tripDetail);
     }
 
-    public TripDetail updateTripDetail(Long tripId, Long tripDetailId, TripDetail tripDetail) {
+    public TripDetail updateTripDetail(Integer tripId, Integer tripDetailId, TripDetail tripDetail) {
         // Tìm trip detail dựa trên tripId và tripDetailId
         TripDetail existingDetail = tripDetailRepository.findByTrip_TripIdAndTripDetailId(tripId, tripDetailId)
                 .orElseThrow(() -> new ResourceNotFoundException("Trip detail not found for this trip and detail id"));
@@ -118,7 +119,7 @@ public class TripService {
     }
 
 
-    public void deleteTripDetail(Long tripId, Long tripDetailId) {
+    public void deleteTripDetail(Integer tripId, Integer tripDetailId) {
         Trip trip = tripRepository.findById(tripId)
                 .orElseThrow(() -> new ResourceNotFoundException("Trip not found with id " + tripId));
 

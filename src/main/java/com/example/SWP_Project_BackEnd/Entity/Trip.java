@@ -26,7 +26,7 @@ public class Trip {
     @Id
     @Column(name = "trip_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long tripId;
+    private Integer tripId;
 
     @Column(name = "trip_name")
     private String tripName;

@@ -32,7 +32,7 @@ public class TripDetailService {
     }
 
 
-    public TripDetail getTripDetailById(Long tripDetailId) {
+    public TripDetail getTripDetailById(Integer tripDetailId) {
         // Tìm TripDetail theo ID
         TripDetail tripDetail = tripDetailRepository.findById(tripDetailId)
                 .orElseThrow(() -> new ResourceNotFoundException("TripDetail not found with id " + tripDetailId));
@@ -46,7 +46,7 @@ public class TripDetailService {
         return tripDetailRepository.save(tripDetail);
     }
 
-    public TripDetail updateTripDetail(Long tripDetailId, TripDetail tripDetailDetails) {
+    public TripDetail updateTripDetail(Integer tripDetailId, TripDetail tripDetailDetails) {
         TripDetail tripDetail = tripDetailRepository.findById(tripDetailId)
                 .orElseThrow(() -> new ResourceNotFoundException("TripDetail not found with id " + tripDetailId));
 
@@ -70,13 +70,13 @@ public class TripDetailService {
     }
 
 
-    public void deleteTripDetail(Long tripDetailId) {
+    public void deleteTripDetail(Integer tripDetailId) {
         TripDetail tripDetail = tripDetailRepository.findById(tripDetailId)
                 .orElseThrow(() -> new ResourceNotFoundException("TripDetail not found with id " + tripDetailId));
         tripDetailRepository.delete(tripDetail);
     }
 
-    public TripDetail addTripDetail(Long tripId, TripDetail tripDetail) {
+    public TripDetail addTripDetail(Integer tripId, TripDetail tripDetail) {
         Trip trip = tripRepository.findById(tripId)
                 .orElseThrow(() -> new ResourceNotFoundException("Trip not found with id " + tripId));
 
@@ -85,7 +85,7 @@ public class TripDetailService {
         return tripDetailRepository.save(tripDetail);
     }
 
-    public TripDetail updateTripDetail1(Long tripId, Long detailId, TripDetail tripDetail) {
+    public TripDetail updateTripDetail1(Integer tripId, Integer detailId, TripDetail tripDetail) {
         Trip trip = tripRepository.findById(tripId)
                 .orElseThrow(() -> new ResourceNotFoundException("Trip not found with id " + tripId));
 
@@ -101,7 +101,7 @@ public class TripDetailService {
         return tripDetailRepository.save(existingDetail);
     }
 
-    public void deleteTripDetail(Long tripId, Long detailId) {
+    public void deleteTripDetail(Integer tripId, Integer detailId) {
         Trip trip = tripRepository.findById(tripId)
                 .orElseThrow(() -> new ResourceNotFoundException("Trip not found with id " + tripId));
 

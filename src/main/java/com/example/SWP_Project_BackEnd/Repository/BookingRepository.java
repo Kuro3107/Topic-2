@@ -9,8 +9,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface BookingRepository extends JpaRepository<Booking, Long> {
+public interface BookingRepository extends JpaRepository<Booking, Integer> {
     @Query("SELECT b FROM Booking b WHERE b.customer.account.accountId = :accountId")
-    List<Booking> findByCustomerAccountId(@Param("accountId") Long accountId);
+    List<Booking> findByCustomerAccountId(@Param("accountId") Integer accountId);
 }
 

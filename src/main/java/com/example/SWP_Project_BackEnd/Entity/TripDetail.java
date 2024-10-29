@@ -27,7 +27,7 @@ public class TripDetail {
     @Id
     @Column(name = "trip_detail_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long tripDetailId;
+    private Integer tripDetailId;
 
     @Column(name = "main_topic")
     private String mainTopic;

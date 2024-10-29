@@ -16,7 +16,7 @@ public class KoiVarietyService {
         return koiVarietyRepository.findAll();
     }
 
-    public KoiVariety getKoiVarietyById(Long id) {
+    public KoiVariety getKoiVarietyById(Integer id) {
         return koiVarietyRepository.findById(id).orElse(null);
     }
 
@@ -24,7 +24,7 @@ public class KoiVarietyService {
         return koiVarietyRepository.save(koiVariety);
     }
 
-    public KoiVariety updateKoiVariety(Long id, KoiVariety koiVariety) {
+    public KoiVariety updateKoiVariety(Integer id, KoiVariety koiVariety) {
         KoiVariety existingVariety = koiVarietyRepository.findById(id).orElse(null);
         if (existingVariety != null) {
             existingVariety.setVarietyName(koiVariety.getVarietyName());
@@ -36,7 +36,7 @@ public class KoiVarietyService {
         return null;
     }
 
-    public void deleteKoiVariety(Long id) {
+    public void deleteKoiVariety(Integer id) {
         koiVarietyRepository.deleteById(id);
     }
 }

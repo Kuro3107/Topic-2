@@ -24,7 +24,7 @@ public class AccountController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Account> getAccountById(@PathVariable Long id) {
+    public ResponseEntity<Account> getAccountById(@PathVariable Integer id) {
         Optional<Account> account = accountService.getAccountById(id);
         if (account.isPresent()) {
             return ResponseEntity.ok(account.get());
@@ -39,7 +39,7 @@ public class AccountController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Account> updateAccount(@PathVariable Long id, @RequestBody Account accountDetails) {
+    public ResponseEntity<Account> updateAccount(@PathVariable Integer id, @RequestBody Account accountDetails) {
         Account updatedAccount = accountService.updateAccount(id, accountDetails);
         if (updatedAccount != null) {
             return ResponseEntity.ok(updatedAccount);
@@ -49,13 +49,13 @@ public class AccountController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteAccount(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteAccount(@PathVariable Integer id) {
         accountService.deleteAccount(id);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{id}/image")
-    public ResponseEntity<Account> updateAccountImage(@PathVariable Long id, @RequestBody Map<String, String> imageUrl) {
+    public ResponseEntity<Account> updateAccountImage(@PathVariable Integer id, @RequestBody Map<String, String> imageUrl) {
         Account updatedAccount = accountService.updateAccountImage(id, imageUrl.get("imageUrl"));
         if (updatedAccount != null) {
             return ResponseEntity.ok(updatedAccount);

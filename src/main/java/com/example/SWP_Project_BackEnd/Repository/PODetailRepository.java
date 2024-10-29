@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface PODetailRepository extends JpaRepository<PODetail, Long> {
-    List<PODetail> findByPoPoId(Long poId);
+public interface PODetailRepository extends JpaRepository<PODetail, Integer> {
+    List<PODetail> findByPoPoId(Integer poId);
 }
 

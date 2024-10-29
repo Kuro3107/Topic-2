@@ -24,7 +24,7 @@ public class KoiFarmService {
         return koiFarmRepository.findAll();
     }
 
-    public KoiFarm getFarmById(Long id) {
+    public KoiFarm getFarmById(Integer id) {
         return koiFarmRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Farm not found with id " + id));
     }
@@ -34,7 +34,7 @@ public class KoiFarmService {
         return koiFarmRepository.save(farm);
     }
 
-    public KoiFarm updateFarm(Long id, KoiFarm farmDetails) {
+    public KoiFarm updateFarm(Integer id, KoiFarm farmDetails) {
         KoiFarm existingFarm = getFarmById(id);
         existingFarm.setFarmName(farmDetails.getFarmName());
         existingFarm.setLocation(farmDetails.getLocation());
@@ -43,11 +43,11 @@ public class KoiFarmService {
         return koiFarmRepository.save(existingFarm);
     }
 
-    public void deleteFarm(Long id) {
+    public void deleteFarm(Integer id) {
         KoiFarm existingFarm = getFarmById(id);
         koiFarmRepository.delete(existingFarm);
     }
-    public List<KoiVariety> getKoiVarietiesForFarm(Long farmId) {
+    public List<KoiVariety> getKoiVarietiesForFarm(Integer farmId) {
         KoiFarm farm = koiFarmRepository.findById(farmId).orElse(null);
         if (farm != null) {
             return koiVarietyRepository.findByKoiFarms(farm);
@@ -55,7 +55,7 @@ public class KoiFarmService {
         return new ArrayList<>();
     }
 
-    public void addKoiVarietyToFarm(Long farmId, Long varietyId) {
+    public void addKoiVarietyToFarm(Integer farmId, Integer varietyId) {
         // Lấy farm và variety từ cơ sở dữ liệu
         KoiFarm farm = koiFarmRepository.findById(farmId)
                 .orElseThrow(() -> new ResourceNotFoundException("Farm not found with id " + farmId));
@@ -68,7 +68,7 @@ public class KoiFarmService {
     }
 
 
-    public KoiVariety updateKoiVarietyInFarm(Long farmId, Long varietyId, KoiVariety koiVarietyDetails) {
+    public KoiVariety updateKoiVarietyInFarm(Integer farmId, Integer varietyId, KoiVariety koiVarietyDetails) {
         KoiVariety existingVariety = koiVarietyRepository.findById(varietyId)
                 .orElseThrow(() -> new ResourceNotFoundException("Koi Variety not found with id " + varietyId));
 
@@ -79,7 +79,7 @@ public class KoiFarmService {
         return koiVarietyRepository.save(existingVariety);
     }
 
-    public void removeKoiVarietyFromFarm(Long farmId, Long varietyId) {
+    public void removeKoiVarietyFromFarm(Integer farmId, Integer varietyId) {
         // Tìm farm và variety
         KoiFarm farm = getFarmById(farmId);
         KoiVariety variety = koiVarietyRepository.findById(varietyId)

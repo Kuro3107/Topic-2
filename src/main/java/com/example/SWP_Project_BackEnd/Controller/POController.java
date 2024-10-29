@@ -19,7 +19,7 @@ public class POController {
 
     // Tạo PO mới và gán nó cho Booking
     @PostMapping("/{bookingId}")
-    public PO createPOForBooking(@PathVariable Long bookingId, @RequestBody PO po) {
+    public PO createPOForBooking(@PathVariable Integer bookingId, @RequestBody PO po) {
         return poService.createPOForBooking(bookingId, po);
     }
 
@@ -31,7 +31,7 @@ public class POController {
 
     // READ PO by ID
     @GetMapping("/{poId}")
-    public Optional<PO> getPOById(@PathVariable Long poId) {
+    public Optional<PO> getPOById(@PathVariable Integer poId) {
         return poService.getPOById(poId);
     }
 
@@ -43,13 +43,13 @@ public class POController {
 
     // UPDATE PO
     @PutMapping("/{poId}")
-    public PO updatePO(@PathVariable Long poId, @RequestBody PO po) {
+    public PO updatePO(@PathVariable Integer poId, @RequestBody PO po) {
         return poService.updatePO(poId, po);
     }
 
     // DELETE PO
     @DeleteMapping("/{poId}")
-    public ResponseEntity<?> deletePO(@PathVariable Long poId) {
+    public ResponseEntity<?> deletePO(@PathVariable Integer poId) {
         poService.deletePO(poId);
         return ResponseEntity.ok("PO deleted successfully");
     }

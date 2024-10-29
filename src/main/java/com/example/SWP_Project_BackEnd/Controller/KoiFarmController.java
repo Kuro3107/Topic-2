@@ -25,7 +25,7 @@ public class KoiFarmController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<KoiFarm> getFarmById(@PathVariable Long id) {
+    public ResponseEntity<KoiFarm> getFarmById(@PathVariable Integer id) {
         KoiFarm farm = koiFarmService.getFarmById(id);
         return ResponseEntity.ok(farm);
     }
@@ -37,25 +37,25 @@ public class KoiFarmController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<KoiFarm> updateFarm(@PathVariable Long id, @RequestBody KoiFarm farmDetails) {
+    public ResponseEntity<KoiFarm> updateFarm(@PathVariable Integer id, @RequestBody KoiFarm farmDetails) {
         KoiFarm updatedFarm = koiFarmService.updateFarm(id, farmDetails);
         return ResponseEntity.ok(updatedFarm);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteFarm(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteFarm(@PathVariable Integer id) {
         koiFarmService.deleteFarm(id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}/koi-varieties")
-    public List<KoiVariety> getKoiVarietiesForFarm(@PathVariable Long id) {
+    public List<KoiVariety> getKoiVarietiesForFarm(@PathVariable Integer id) {
         return koiFarmService.getKoiVarietiesForFarm(id);
     }
 
     @PostMapping("/{id}/koi-varieties")
-    public ResponseEntity<Void> addKoiVarietyToFarm(@PathVariable Long id, @RequestBody Map<String, Long> payload) {
-        Long varietyId = payload.get("varietyId");  // Lấy varietyId từ payload
+    public ResponseEntity<Void> addKoiVarietyToFarm(@PathVariable Integer id, @RequestBody Map<String, Integer> payload) {
+        Integer varietyId = payload.get("varietyId");  // Lấy varietyId từ payload
         koiFarmService.addKoiVarietyToFarm(id, varietyId);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -63,13 +63,13 @@ public class KoiFarmController {
 
 
     @PutMapping("/{id}/koi-varieties/{varietyId}")
-    public ResponseEntity<KoiVariety> updateKoiVarietyInFarm(@PathVariable Long id, @PathVariable Long varietyId, @RequestBody KoiVariety koiVarietyDetails) {
+    public ResponseEntity<KoiVariety> updateKoiVarietyInFarm(@PathVariable Integer id, @PathVariable Integer varietyId, @RequestBody KoiVariety koiVarietyDetails) {
         KoiVariety updatedVariety = koiFarmService.updateKoiVarietyInFarm(id, varietyId, koiVarietyDetails);
         return ResponseEntity.ok(updatedVariety);
     }
 
     @DeleteMapping("/{id}/koi-varieties/{varietyId}")
-    public ResponseEntity<Void> removeKoiVarietyFromFarm(@PathVariable Long id, @PathVariable Long varietyId) {
+    public ResponseEntity<Void> removeKoiVarietyFromFarm(@PathVariable Integer id, @PathVariable Integer varietyId) {
         koiFarmService.removeKoiVarietyFromFarm(id, varietyId);
         return ResponseEntity.noContent().build();
     }

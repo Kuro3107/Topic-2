@@ -19,24 +19,24 @@ public class PODetailController {
     private PODetailService poDetailService;
 
     @PostMapping("/po/{poId}")
-    public ResponseEntity<PODetail> createPODetail(@PathVariable Long poId, @RequestBody PODetail poDetail) {
+    public ResponseEntity<PODetail> createPODetail(@PathVariable Integer poId, @RequestBody PODetail poDetail) {
         PODetail createdPODetail = poDetailService.createPODetail(poId, poDetail);
         return new ResponseEntity<>(createdPODetail, HttpStatus.CREATED);
     }
 
     @GetMapping("/po/{poId}")
-    public List<PODetail> getPODetailsByPOId(@PathVariable Long poId) {
+    public List<PODetail> getPODetailsByPOId(@PathVariable Integer poId) {
         return poDetailService.getPODetailsByPOId(poId);
     }
 
     @PutMapping("/{poDetailId}")
-    public ResponseEntity<PODetail> updatePODetail(@PathVariable Long poDetailId, @RequestBody PODetail poDetail) {
+    public ResponseEntity<PODetail> updatePODetail(@PathVariable Integer poDetailId, @RequestBody PODetail poDetail) {
         PODetail updatedPODetail = poDetailService.updatePODetail(poDetailId, poDetail);
         return new ResponseEntity<>(updatedPODetail, HttpStatus.OK);
     }
 
     @DeleteMapping("/{poDetailId}")
-    public ResponseEntity<Void> deletePODetail(@PathVariable Long poDetailId) {
+    public ResponseEntity<Void> deletePODetail(@PathVariable Integer poDetailId) {
         poDetailService.deletePODetail(poDetailId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

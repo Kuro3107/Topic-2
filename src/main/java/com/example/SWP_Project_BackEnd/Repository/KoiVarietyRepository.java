@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface KoiVarietyRepository extends JpaRepository<KoiVariety, Long> {
+public interface KoiVarietyRepository extends JpaRepository<KoiVariety, Integer> {
     List<KoiVariety> findByKoiFarms(KoiFarm koiFarm);
 }

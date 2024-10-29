@@ -20,7 +20,7 @@ public class PODetail {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "po_detail_id")
-    private Long poDetailId;
+    private Integer poDetailId;
 
     // Liên kết với Koifish (OneToOne)
     @OneToOne

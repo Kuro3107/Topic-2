@@ -24,13 +24,13 @@ public class Booking {
     @Id
     @Column(name = "booking_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long bookingId;
+    private Integer bookingId;
     @Column(name = "trip_id")
-    private Long tripId;
+    private Integer tripId;
     @Column(name = "po_id")
-    private Long poId;
+    private Integer poId;
     @Column(name = "booking_payment_id")
-    private Long bookingPaymentId;
+    private Integer bookingPaymentId;
     @Column(name = "feedback_id")
     private Long feedbackId;
     @Column(name = "quote_sent_date")
@@ -41,7 +41,7 @@ public class Booking {
     private String status;
     @Column(name = "start_date")
     private Date startDate;
-    @Column(name = "end_date")
+    @Column(name = "end_date", nullable = true)
     private Date endDate;
     @Column(name = "quoted_amount", nullable = true)
     private Integer quotedAmount;

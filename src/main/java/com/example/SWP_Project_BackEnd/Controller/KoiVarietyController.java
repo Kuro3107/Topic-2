@@ -20,7 +20,7 @@ public class KoiVarietyController {
     }
 
     @GetMapping("/{id}")
-    public KoiVariety getKoiVarietyById(@PathVariable Long id) {
+    public KoiVariety getKoiVarietyById(@PathVariable Integer id) {
         return koiVarietyService.getKoiVarietyById(id);
     }
 
@@ -30,12 +30,12 @@ public class KoiVarietyController {
     }
 
     @PutMapping("/{id}")
-    public KoiVariety updateKoiVariety(@PathVariable Long id, @RequestBody KoiVariety koiVariety) {
+    public KoiVariety updateKoiVariety(@PathVariable Integer id, @RequestBody KoiVariety koiVariety) {
         return koiVarietyService.updateKoiVariety(id, koiVariety);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteKoiVariety(@PathVariable Long id) {
+    public void deleteKoiVariety(@PathVariable Integer id) {
         koiVarietyService.deleteKoiVariety(id);
     }
 }

@@ -20,7 +20,7 @@ public class PODetailService {
     @Autowired
     private PORepository poRepository;
 
-    public PODetail createPODetail(Long poId, PODetail poDetail) {
+    public PODetail createPODetail(Integer poId, PODetail poDetail) {
         Optional<PO> optionalPO = poRepository.findById(poId);
         if (optionalPO.isPresent()) {
             poDetail.setPo(optionalPO.get());
@@ -30,11 +30,11 @@ public class PODetailService {
         }
     }
 
-    public List<PODetail> getPODetailsByPOId(Long poId) {
+    public List<PODetail> getPODetailsByPOId(Integer poId) {
         return poDetailRepository.findByPoPoId(poId);
     }
 
-    public PODetail updatePODetail(Long poDetailId, PODetail updatedPODetail) {
+    public PODetail updatePODetail(Integer poDetailId, PODetail updatedPODetail) {
         Optional<PODetail> optionalPODetail = poDetailRepository.findById(poDetailId);
 
         if (optionalPODetail.isPresent()) {
@@ -54,7 +54,7 @@ public class PODetailService {
         }
     }
 
-    public void deletePODetail(Long poDetailId) {
+    public void deletePODetail(Integer poDetailId) {
         poDetailRepository.deleteById(poDetailId);
     }
 }

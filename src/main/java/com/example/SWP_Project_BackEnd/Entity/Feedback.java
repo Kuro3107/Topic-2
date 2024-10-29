@@ -31,7 +31,7 @@ public class Feedback {
     private String comments;
 
     @Column(name = "customer_id")
-    private Long customerId;
+    private Integer customerId;
 
     // Nếu cần liên kết với Customer
     @ManyToOne

@@ -15,7 +15,7 @@ public class FarmVariety {
     @Id
     @Column(name = "farm_variety_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long farmVarietyId;
+    private Integer farmVarietyId;
 
     @ManyToOne
     @JoinColumn(name = "farm_id")

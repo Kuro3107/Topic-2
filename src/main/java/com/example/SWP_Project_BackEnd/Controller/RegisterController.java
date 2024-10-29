@@ -25,7 +25,7 @@ public class RegisterController {
         if (registerRequest.getFullName() != null && !registerRequest.getFullName().trim().isEmpty()) {
             account.setFullName(registerRequest.getFullName().trim());
         } else {
-            account.setFullName(null); // hoặc chuỗi rỗng tùy theo thiết kế của bạn
+            account.setFullName(null); // hoặc chuỗi rỗng
         }
         account.setPhone(registerRequest.getPhone());
 

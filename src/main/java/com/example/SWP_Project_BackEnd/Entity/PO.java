@@ -24,7 +24,7 @@ public class PO {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "po_id")
-    private Long poId;
+    private Integer poId;
 
     @Column(name = "total_amount")
     private Double totalAmount;

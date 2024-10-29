@@ -23,7 +23,7 @@ public class KoiFarm {
     @Id
     @Column(name = "farm_id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long farmId;
+    private Integer farmId;
 
     @Column(name = "farm_name")
     private String farmName;
@@ -50,10 +50,10 @@ public class KoiFarm {
     private List<KoiVariety> koiVarieties = new ArrayList<>();
 
     // Liên kết OneToOne với PODetail
-    @OneToOne(mappedBy = "farm")
-//    @JsonBackReference
+    @OneToMany(mappedBy = "farm", fetch = FetchType.LAZY)
     @JsonIgnore
-    private PODetail poDetail;
+    private List<PODetail> poDetails = new ArrayList<>();
+
 //
 //    @ManyToMany(mappedBy = "koiFarms", fetch = FetchType.LAZY)
 //    @JsonIgnore

@@ -11,14 +11,14 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface TripDetailRepository extends JpaRepository<TripDetail, Long> {
+public interface TripDetailRepository extends JpaRepository<TripDetail, Integer> {
     // Phương thức tìm kiếm tất cả TripDetail theo tripId
-    List<TripDetail> findByTrip_TripId(Long tripId);
+    List<TripDetail> findByTrip_TripId(Integer tripId);
 
     // Phương thức tìm kiếm TripDetail theo tripId và mainTopic
-    Optional<TripDetail> findByTrip_TripIdAndMainTopic(Long tripId, String mainTopic);
+    Optional<TripDetail> findByTrip_TripIdAndMainTopic(Integer tripId, String mainTopic);
 
     // Phương thức tìm kiếm TripDetail theo tripId và tripDetailId
-    Optional<TripDetail> findByTrip_TripIdAndTripDetailId(Long tripId, Long tripDetailId);
+    Optional<TripDetail> findByTrip_TripIdAndTripDetailId(Integer tripId, Integer tripDetailId);
 }
 

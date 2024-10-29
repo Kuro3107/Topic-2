@@ -27,7 +27,7 @@ public class TripDetailController {
 
 
     @GetMapping("/{tripDetailId}")
-    public ResponseEntity<TripDetail> getTripDetailById(@PathVariable Long tripDetailId) {
+    public ResponseEntity<TripDetail> getTripDetailById(@PathVariable Integer tripDetailId) {
         TripDetail tripDetail = tripDetailService.getTripDetailById(tripDetailId);
 
         return new ResponseEntity<>(tripDetail, HttpStatus.OK);
@@ -41,13 +41,13 @@ public class TripDetailController {
     }
 
     @PutMapping("/{tripDetailId}")
-    public ResponseEntity<TripDetail> updateTripDetail(@PathVariable Long tripDetailId, @RequestBody TripDetail tripDetailDetails) {
+    public ResponseEntity<TripDetail> updateTripDetail(@PathVariable Integer tripDetailId, @RequestBody TripDetail tripDetailDetails) {
         TripDetail updatedTripDetail = tripDetailService.updateTripDetail(tripDetailId, tripDetailDetails);
         return new ResponseEntity<>(updatedTripDetail, HttpStatus.OK);
     }
 
     @DeleteMapping("/{tripDetailId}")
-    public ResponseEntity<Void> deleteTripDetail(@PathVariable Long tripDetailId) {
+    public ResponseEntity<Void> deleteTripDetail(@PathVariable Integer tripDetailId) {
         tripDetailService.deleteTripDetail(tripDetailId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
