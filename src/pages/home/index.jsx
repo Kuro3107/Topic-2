@@ -5,8 +5,8 @@ import {
   HeartOutlined,
   EnvironmentOutlined,
 } from "@ant-design/icons";
-import Header from "../../components/header";
-import Footer from "../../components/Footer";
+import Header from "../../components/header/index";
+import Footer from "../../components/footer/index";
 import "./index.css";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";

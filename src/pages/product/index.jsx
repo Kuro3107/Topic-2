@@ -16,8 +16,8 @@ import {
 } from "antd";
 import axios from "axios";
 import "./index.css";
-import Header from "../../components/Header";
-import Footer from "../../components/Footer";
+import Header from "../../components/header/index";
+import Footer from "../../components/footer/index";
 import { useNavigate } from "react-router-dom";
 import moment from "moment";
 

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import Header from "../../components/Header";
-import Footer from "../../components/Footer";
+import Header from "../../components/header/index";
+import Footer from "../../components/footer/index";
 import ProductList from "../../components/ProductList";
 
 import "./index.css";

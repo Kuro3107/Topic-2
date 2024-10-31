@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { DesktopOutlined, FileOutlined, LogoutOutlined } from "@ant-design/icons";
-import { Breadcrumb, Button, Layout, Menu, theme } from "antd";
+import { BarChartOutlined, CommentOutlined, ContainerOutlined, DatabaseOutlined, LogoutOutlined, ScheduleOutlined, ShoppingOutlined, UserOutlined } from "@ant-design/icons";
+import { Button, Layout, Menu, theme } from "antd";
 import ManageFarm from "../../pages/admin/manage-farm";
 import ManageTrip from "../../pages/admin/manage-trip";
 import ManageBooking from "../../pages/admin/manage-booking";
@@ -22,13 +22,13 @@ function getItem(label, key, icon, children) {
 }
 
 const items = [
-  getItem("Diagram", "Diagram", <DesktopOutlined />),
-  getItem("Manage Booking", "Booking", <DesktopOutlined />),
-  getItem("Manage Trip", "Trip", <FileOutlined />),
-  getItem("Manage Farm", "Farm", <DesktopOutlined />),
-  getItem("Manage Accounts", "Accounts", <DesktopOutlined />),
-  getItem("Manage Feedback", "Feedback", <DesktopOutlined />),
-  getItem("Manage Koi", "Koi", <DesktopOutlined />),
+  getItem("Diagram", "Diagram", <BarChartOutlined />),
+  getItem("Manage Booking", "Booking", <ContainerOutlined />),
+  getItem("Manage Trip", "Trip", <ScheduleOutlined />),
+  getItem("Manage Farm", "Farm", <DatabaseOutlined />),
+  getItem("Manage Accounts", "Accounts", <UserOutlined />),
+  getItem("Manage Feedback", "Feedback", <CommentOutlined />),
+  getItem("Manage Koi", "Koi", <ShoppingOutlined />),
 ];
 
 const Dashboard = () => {

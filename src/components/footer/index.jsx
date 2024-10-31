@@ -14,9 +14,9 @@ const Footer = () => {
         </div>
         <div className="footer-section">
           <h3>Contact</h3>
-          <p><MailOutlined /> Email: info@example.com</p>
-          <p><PhoneOutlined /> Phone: 123-456-7890</p>
-          <p><HomeOutlined /> Address: 123 ABC Street, XYZ City</p>
+          <p><MailOutlined /> Email: phqtuan2000@gmail.com</p>
+          <p><PhoneOutlined /> Phone: 094-424-6472</p>
+          <p><HomeOutlined /> Address: Lô E2a-7, Đường D1, Đ. D1, Long Thạnh Mỹ, Thành Phố Thủ Đức, Hồ Chí Minh 700000, Việt Nam</p>
         </div>
         <div className="footer-section">
           <h3>Follow Us</h3>

@@ -20,14 +20,12 @@ import {
   ShoppingCartOutlined,
   UserOutlined,
   CheckOutlined,
-  VideoCameraOutlined,
   LogoutOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import axios from "axios";
 import { Space } from "antd";
 import { Footer, Header } from "antd/es/layout/layout";
-import Sider from "antd/es/layout/Sider";
 
 function SalesDashboard() {
   const [bookings, setBookings] = useState([]);
@@ -611,17 +609,6 @@ function SalesDashboard() {
 
   return (
     <Layout>
-      <Sider breakpoint="lg" collapsedWidth="0">
-        <div className="demo-logo" />
-        <Menu theme="dark" mode="inline" defaultSelectedKeys={["1"]}>
-          <Menu.Item key="1" icon={<UserOutlined />}>
-            nav 1
-          </Menu.Item>
-          <Menu.Item key="2" icon={<VideoCameraOutlined />}>
-            nav 2
-          </Menu.Item>
-        </Menu>
-      </Sider>
       <Layout>
         <Header className="deli-header">
           <Button
