@@ -1,54 +1,52 @@
 /* Base layout styles */
 .min-h-screen {
   min-height: 100vh;
-  background-color: rgb(249, 250, 251);
+  background-color: #ffffff;
   padding: 3rem 1rem;
-}
-
-@media (min-width: 640px) {
-  .min-h-screen {
-    padding: 3rem 1.5rem;
-  }
-}
-
-@media (min-width: 1024px) {
-  .min-h-screen {
-    padding: 3rem 2rem;
-  }
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 /* Card container styles */
 .booking-card {
   max-width: 56rem;
   margin: 0 auto;
-  background: white;
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  background: #d5ff4f;
+  border-radius: 1.5rem;
+  padding: 2rem;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
 }
 
 .card-header {
-  padding: 1.5rem;
-  border-bottom: 1px solid rgb(229, 231, 235);
+  padding: 0 1.5rem;
+  border-bottom: none;
+  margin-bottom: 2rem;
 }
 
 .card-title {
   font-size: 2.5rem;
-  font-weight: 700;
-  text-align: center;
-  color: #F14D5D;
+  font-weight: 800;
+  color: #000;
+  margin: 0;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
 }
 
 .card-description {
-  margin-top: 0.5rem;
-  text-align: center;
-  color: rgb(107, 114, 128);
+  margin-top: 0.75rem;
+  color: #000;
+  font-size: 1rem;
+  line-height: 1.5;
+  opacity: 0.8;
 }
 
+/* Rest of the styles remain the same */
 .card-content {
-  padding: 1.5rem;
+  padding: 1.5rem 0;
 }
 
-/* Form layout */
 .form-container {
   display: flex;
   flex-direction: column;
@@ -59,12 +57,16 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  padding: 1.5rem;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .section-title {
-  font-size: 1.125rem;
+  font-size: 0.875rem;
   font-weight: 500;
-  color: rgb(17, 24, 39);
+  color: #000;
 }
 
 .form-grid {
@@ -76,6 +78,7 @@
 @media (min-width: 768px) {
   .form-grid {
     grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
   }
 }
 
@@ -89,38 +92,32 @@
 .form-label {
   font-size: 0.875rem;
   font-weight: 500;
-  color: rgb(17, 24, 39);
+  color: #000;
 }
 
-.form-input {
+.form-input,
+.select__control,
+.form-textarea {
   width: 100%;
-  padding: 0.5rem 0.75rem;
-  border-radius: 0.375rem;
-  border: 1px solid rgb(209, 213, 219);
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(0, 0, 0, 0.1);
   font-size: 0.875rem;
-  transition: border-color 0.15s ease-in-out;
+  background: white;
+  transition: all 0.2s ease;
 }
 
-.form-input:focus {
+.form-input:focus,
+.select__control--is-focused,
+.form-textarea:focus {
   outline: none;
-  border-color: rgb(59, 130, 246);
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+  border-color: rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .form-textarea {
-  width: 100%;
   height: 8rem;
-  padding: 0.5rem 0.75rem;
-  border-radius: 0.375rem;
-  border: 1px solid rgb(209, 213, 219);
-  font-size: 0.875rem;
   resize: vertical;
-}
-
-.form-textarea:focus {
-  outline: none;
-  border-color: rgb(59, 130, 246);
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
 }
 
 /* Select styles */
@@ -133,86 +130,93 @@
 }
 
 .select__control {
-  min-height: 2.5rem !important;
-  border-color: rgb(209, 213, 219) !important;
-}
-
-.select__control--is-focused {
-  border-color: rgb(59, 130, 246) !important;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1) !important;
+  min-height: 2.75rem !important;
+  background: white !important;
 }
 
 .select__multi-value {
-  background-color: rgb(243, 244, 246) !important;
+  background-color: rgba(0, 0, 0, 0.05) !important;
+  border-radius: 0.25rem !important;
 }
 
 .select__multi-value__label {
-  color: rgb(17, 24, 39) !important;
-}
-
-/* Date input container */
-.date-input-container {
-  position: relative;
-}
-
-.date-icon {
-  position: absolute;
-  right: 0.75rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: rgb(156, 163, 175);
-  pointer-events: none;
+  color: #000 !important;
 }
 
 /* Submit button */
 .submit-button {
   width: 100%;
-  padding: 0.625rem 1.25rem;
-  background-color: rgb(37, 99, 235);
+  padding: 0.875rem 1.25rem;
+  background-color: #000;
   color: white;
   font-weight: 500;
-  border-radius: 0.375rem;
-  transition: background-color 0.15s ease-in-out;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+  margin-top: 1rem;
 }
 
 .submit-button:hover {
-  background-color: rgb(29, 78, 216);
+  background-color: #222;
+  transform: translateY(-1px);
 }
 
 .submit-button:focus {
   outline: none;
-  box-shadow: 0 0 0 2px white, 0 0 0 4px rgb(37, 99, 235);
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
 }
 
-/* Responsive spacing utilities */
-.space-y-2 > * + * {
-  margin-top: 0.5rem;
+/* Date input styling */
+input[type="date"] {
+  appearance: none;
+  -webkit-appearance: none;
+  padding: 0.75rem 1rem;
 }
 
-.space-y-4 > * + * {
+/* Checkbox styling */
+input[type="checkbox"] {
+  accent-color: #000;
+  width: 1.125rem;
+  height: 1.125rem;
+  margin-right: 0.5rem;
+}
+
+/* Privacy policy text */
+.privacy-policy {
+  display: flex;
+  align-items: center;
+  font-size: 0.875rem;
+  color: #000;
   margin-top: 1rem;
 }
 
-.space-y-6 > * + * {
-  margin-top: 1.5rem;
+/* Logo section */
+.logo-section {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  align-items: center;
+  margin-top: 2rem;
+  opacity: 0.6;
 }
 
-/* Calendar icon wrapper */
-.calendar-wrapper {
-  position: relative;
+.logo-section img {
+  height: 1.5rem;
+  width: auto;
 }
 
-.calendar-wrapper input[type="date"] {
-  padding-right: 2.5rem;
-}
-
-.calendar-icon {
-  position: absolute;
-  right: 0.75rem;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 1.25rem;
-  height: 1.25rem;
-  color: rgb(156, 163, 175);
-  pointer-events: none;
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .booking-card {
+    padding: 1rem;
+  }
+  
+  .form-section {
+    padding: 1rem;
+  }
+  
+  .card-title {
+    font-size: 2rem;
+  }
 }

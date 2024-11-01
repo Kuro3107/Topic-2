@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import Select from "react-select";
 import Header from "../../components/header/index";
 import Footer from "../../components/footer/index";
-import "./index.css";
+import "../bookingform/index.css";
 import { useNavigate } from "react-router-dom";
 
 const api = "http://localhost:8080/api/bookings";
