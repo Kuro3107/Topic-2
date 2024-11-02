@@ -6,6 +6,7 @@ import com.example.SWP_Project_BackEnd.Entity.Customer;
 import com.example.SWP_Project_BackEnd.Exception.ResourceNotFoundException;
 import com.example.SWP_Project_BackEnd.Repository.BookingRepository;
 import com.example.SWP_Project_BackEnd.Repository.CustomerRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -84,6 +85,14 @@ public class BookingService {
             throw new ResourceNotFoundException("Booking not found with ID: " + bookingId);
         }
     }
+
+    public void updateStatus(Integer bookingId, String status) {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new EntityNotFoundException("Booking not found"));
+        booking.setStatus(status);
+        bookingRepository.save(booking);
+    }
+
 
     // Phương thức để cập nhật PO_ID cho Booking
     public Booking updatePoId(Integer bookingId, Integer poId) {

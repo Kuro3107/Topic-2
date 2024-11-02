@@ -96,6 +96,18 @@ public class BookingController {
         return ResponseEntity.ok(bookings);
     }
 
+    @PutMapping("{id}/status")
+    public ResponseEntity<?> updateBookingStatus(@PathVariable Integer bookingId, @RequestBody Map<String, String> request) {
+        String status = request.get("status");
+        try {
+            bookingService.updateStatus(bookingId, status);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update booking status.");
+        }
+    }
+
+
 }
 
 
