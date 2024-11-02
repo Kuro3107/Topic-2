@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from "react";
 import { Form, Input, Button, message } from "antd";
 import { useNavigate } from "react-router-dom";
@@ -13,32 +14,56 @@ function EditProfile() {
   useEffect(() => {
     const userInfo = JSON.parse(localStorage.getItem("userInfo"));
     if (userInfo) {
-      form.setFieldsValue(userInfo);
+      form.setFieldsValue({
+        username: userInfo.username,
+        password: userInfo.password,
+        fullName: userInfo.fullName,
+        email: userInfo.email,
+        phone: userInfo.phone,
+        imageUrl: userInfo.imageUrl,
+        roleId: userInfo.roleId,
+      });
     }
   }, [form]);
+
 
   const handleSave = async (values) => {
     try {
       const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-      const response = await api.put(`/accounts/${userInfo.id}`, values, {
+  
+      // Include all fields, preserving non-form fields from userInfo
+      const updateData = {
+        username: values.username || userInfo.username,
+        password: values.password || userInfo.password,
+        fullName: values.fullName,
+        email: values.email,
+        phone: values.phone || userInfo.phone,
+        imageUrl: values.imageUrl !== undefined ? values.imageUrl : userInfo.imageUrl, // Preserve if not provided
+        roleId: values.roleId !== undefined ? values.roleId : userInfo.roleId, // Preserve if not provided
+      };
+  
+      // Make the update request
+      const response = await api.put(`/accounts/${userInfo.id}`, updateData, {
         headers: { Authorization: `Bearer ${userInfo.token}` },
       });
-
-      console.log("Response data:", response.data); // Kiểm tra giá trị của response.data
-
-      // Lưu lại thông tin mới bao gồm token và ID cũ
+  
+      console.log("Response data:", response.data);
+  
+      // Update localStorage
       const updatedUserInfo = {
-        ...userInfo, // Giữ lại ID cũ
-        ...response.data, // Cập nhật thông tin mới
+        ...userInfo,
+        ...updateData, // Update relevant fields
       };
-      localStorage.setItem("userInfo", JSON.stringify(updatedUserInfo)); // Đảm bảo response.data chứa thông tin đầy đủ
+  
+      localStorage.setItem("userInfo", JSON.stringify(updatedUserInfo));
       message.success("Information updated successfully");
-      navigate("/profile", { replace: true }); // Sử dụng replace để ngăn quay lại trang edit
+      navigate("/profile", { replace: true });
     } catch (error) {
       console.error(error);
       message.error("Update information failed");
     }
   };
+  
 
   return (
     <div className="edit-profile-page">
@@ -54,9 +79,16 @@ function EditProfile() {
             <Input />
           </Form.Item>
           <Form.Item
+            name="password"
+            label="Password"
+            rules={[{ required: true, message: "Please enter Password" }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
             name="fullName"
-            label="Fullname"
-            rules={[{ required: true, message: "Please enter your full name" }]}
+            label="Full Name"
+            // rules={[{ required: false, message: "Please enter your full name" }]}
           >
             <Input />
           </Form.Item>
@@ -64,7 +96,7 @@ function EditProfile() {
             name="email"
             label="Email"
             rules={[
-              { required: true, message: "Please enter email" },
+              // { required: false, message: "Please enter email" },
               { type: "email", message: "Invalid email" },
             ]}
           >
@@ -73,7 +105,10 @@ function EditProfile() {
           <Form.Item
             name="phone"
             label="Phone"
-            rules={[{ required: true, message: "Please enter phone number" }]}
+            rules={[
+              // { required: true, message: "Please enter phone number" },
+              { type: "phone", message: "Invalid phone number" },
+            ]}
           >
             <Input />
           </Form.Item>

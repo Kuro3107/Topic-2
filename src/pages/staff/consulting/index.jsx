@@ -58,9 +58,9 @@ function Consulting() {
       const response = await api.get("/bookings");
       const filteredBookings = response.data.filter(
         (booking) =>
-          booking.status === "purchased" ||
-          booking.status === "checkin" ||
-          booking.status === "checkout"
+          booking.status === "Purchased" ||
+          booking.status === "Checkin" ||
+          booking.status === "Checkout"
       );
       setBookings(filteredBookings);
     } catch (error) {
@@ -340,18 +340,18 @@ function Consulting() {
             View Details
           </Button>
 
-          {record.status === "purchased" && (
+          {record.status === "Purchased" && (
             <Button
-              onClick={() => handleStatusChange(record.bookingId, "checkin")}
+              onClick={() => handleStatusChange(record.bookingId, "Checkin")}
             >
               Check In
             </Button>
           )}
 
-          {record.status === "checkin" && (
+          {record.status === "Checkin" && (
             <>
               <Button
-                onClick={() => handleStatusChange(record.bookingId, "checkout")}
+                onClick={() => handleStatusChange(record.bookingId, "Checkout")}
               >
                 Check Out
               </Button>
@@ -363,9 +363,9 @@ function Consulting() {
             </>
           )}
 
-          {record.status === "checkout" && (
+          {record.status === "Checkout" && (
             <Button
-              onClick={() => handleStatusChange(record.bookingId, "checkin")}
+              onClick={() => handleStatusChange(record.bookingId, "Checkin")}
             >
               Check In
             </Button>

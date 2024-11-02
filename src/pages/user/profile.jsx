@@ -125,6 +125,17 @@ function Profile() {
     console.log("Updated orders:", orders);
   }, [orders]);
 
+  useEffect(() => {
+    const query = new URLSearchParams(window.location.search);
+    const Message = query.get('message');
+    if (Message === 'success') {
+        message.success('Payment successful!');
+    } else if (Message === 'failure' || Message === "retry") {
+        message.error('Payment failed. Please try again.');
+    }
+
+}, []);
+
   const handleEdit = () => {
     navigate("/edit-profile");
   };
@@ -748,7 +759,7 @@ function Profile() {
         </Modal>
 
         <Modal
-          title={isEditMode ? "Edit Feedback" : "View Feedback"}
+          title={isEditMode ? "Feedback" : "View Feedback"}
           visible={isFeedbackModalVisible}
           onCancel={handleCloseFeedbackModal}
           footer={[
