@@ -234,5 +234,26 @@
     .system-introduction h3 {
       font-size: 1.8em;
     }
+
+    .partners-section {
+      padding: 20px;
+      text-align: center;
+    }
+    
+    .partner-image-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px;
+      border: 1px solid #f0f0f0;
+      border-radius: 8px;
+    }
+    
+    .partner-image {
+      width: 100px; /* Set a fixed width */
+      height: 100px; /* Set a fixed height */
+      object-fit: contain; /* Maintain aspect ratio without cropping */
+    }
+    
   }
   

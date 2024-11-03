@@ -46,7 +46,7 @@ const Header = () => {
           </li>
           <li>
             <Link to="/introduce" className="header-link">
-              Introduce
+              Farms & Koi
             </Link>
           </li>
           <li>

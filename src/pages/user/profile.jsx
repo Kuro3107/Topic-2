@@ -86,8 +86,8 @@ function Profile() {
             setUser({
               fullName: response.data.fullName || "Not Updated!",
               username: response.data.username || "N/A",
-              email: response.data.email || "N/A",
-              phone: response.data.phone || "N/A",
+              email: response.data.email || "Not Updated!",
+              phone: response.data.phone || "Not Updated!",
               status: response.data.status || "N/A",
               roleId: response.data.roleId || "N/A",
               imageUrl: response.data.imageUrl || defaultImageUrl, // Dùng hình ảnh mặc định nếu không có

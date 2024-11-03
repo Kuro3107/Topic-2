@@ -27,6 +27,22 @@ function HomePage() {
     }
   };
 
+  const partnerImages = [
+    { src: '/logo-vietnam-airlines-2.png', alt: 'Partner 1' },
+    { src: '/Logo-VietjetAir.jpg', alt: 'Partner 2' },
+    { src: '/japan-airlines5379.jpg', alt: 'Partner 3' },
+    { src: '/All-Nippon-Airways-logo.jpg', alt: 'Partner 4' },
+    { src: '/JW-Marriottpng.png', alt: 'Partner 5' },
+    { src: '/property_logo_99037720_1614133500.jpg', alt: 'Partner 6' },
+    { src: '/1500x2250+Artboard+Shinrin+Hotel+3_4-01.png', alt: 'Partner 7' },
+    { src: '/93d92dbf1c42071888488f759314d2c5.jpg', alt: 'Partner 8' },
+    { src: '/japanexpress.png', alt: 'Partner 9' },
+    { src: '/spx.jpg', alt: 'Partner 10' },
+    { src: '/ghtk.jpg', alt: 'Partner 11' },
+    { src: '/607cdb2f875a62174a2ac9e3_After_GHN.png', alt: 'Partner 12' }
+    // Add more images as needed
+  ];
+
   return (
     <div className="introduce-page">
       <Header />
@@ -216,6 +232,35 @@ function HomePage() {
             perfect Koi from Japan's finest farms.
           </Paragraph>
         </div>
+        <div className="system-introduction">
+        <Title level={2}>Our Partners</Title>
+      <Row gutter={[16, 16]} justify="center">
+        {partnerImages.map((partner, index) => (
+          <Col xs={24} sm={12} md={8} lg={6} key={index}>
+            <div
+              style={{
+                padding: '1px',
+                border: '1px solid #f0f0f0',
+                borderRadius: '1px',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              <img
+                src={partner.src}
+                alt={partner.alt}
+                style={{
+                  width: '150px', // Set fixed width
+                  height: '150px', // Set fixed height
+                  objectFit: 'contain', // Keep aspect ratio
+                }}
+              />
+            </div>
+          </Col>
+        ))}
+      </Row>
+    </div>
       </div>
       <Footer />
     </div>

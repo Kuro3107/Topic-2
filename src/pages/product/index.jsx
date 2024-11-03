@@ -354,7 +354,7 @@ const Product = () => {
                       <div className="card-content">
                         <Meta title={tour.tripName} />
                         <div className="tour-price">
-                          Price: {tour.priceTotal?.toLocaleString()} $
+                          Price: {tour.priceTotal?.toLocaleString()} VNĐ
                         </div>
                         
                         <div className="button-group">

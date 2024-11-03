@@ -37,7 +37,7 @@ function EditProfile() {
         password: values.password || userInfo.password,
         fullName: values.fullName,
         email: values.email,
-        phone: values.phone || userInfo.phone,
+        phone: values.phone,
         imageUrl: values.imageUrl !== undefined ? values.imageUrl : userInfo.imageUrl, // Preserve if not provided
         roleId: values.roleId !== undefined ? values.roleId : userInfo.roleId, // Preserve if not provided
       };
@@ -63,6 +63,10 @@ function EditProfile() {
       message.error("Update information failed");
     }
   };
+
+  const handleCancel = () => {
+    navigate("/profile"); // Adjust this path to your profile page route
+  };
   
 
   return (
@@ -81,7 +85,7 @@ function EditProfile() {
           <Form.Item
             name="password"
             label="Password"
-            rules={[{ required: true, message: "Please enter Password" }]}
+            
           >
             <Input />
           </Form.Item>
@@ -115,6 +119,9 @@ function EditProfile() {
           <Form.Item>
             <Button type="primary" htmlType="submit">
               Save changes
+            </Button>
+            <Button type="default" onClick={handleCancel}>
+              Cancel
             </Button>
           </Form.Item>
         </Form>
