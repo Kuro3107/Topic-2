@@ -25,6 +25,10 @@ public class AccountService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    public boolean usernameExists(String username) {
+        return accountRepository.findByUsername(username).isPresent();
+    }
+
     public String registerUser(Account account, String rePassword) {
         System.out.println("Full Name in Account: " + account.getFullName()); // Log giá trị fullName
         if (accountRepository.findByUsername(account.getUsername()).isPresent()) {
@@ -105,6 +109,10 @@ public class AccountService {
             if (accountDetails.getUsername() != null) {
                 existingAccount.setUsername(accountDetails.getUsername());
             }
+
+            if(accountDetails.getPassword() != null) {
+                existingAccount.setPassword(passwordEncoder.encode(accountDetails.getPassword()));
+            }
             if (accountDetails.getPhone() != null) {
                 existingAccount.setPhone(accountDetails.getPhone());
             }
@@ -128,6 +136,29 @@ public class AccountService {
         }
         return null;
     }
+
+    public Account updatePassword(Integer id, Account accountDetails) {
+        Optional<Account> account = accountRepository.findById(id);
+        if (account.isPresent()) {
+            Account existingAccount = account.get();
+            if(accountDetails.getPassword() != null) {
+                existingAccount.setPassword(passwordEncoder.encode(accountDetails.getPassword()));
+            }
+            return accountRepository.save(existingAccount);
+        }
+        return null;
+    }
+
+    public Account resetPasswordByUsername(String username, String newPassword) {
+        Optional<Account> account = accountRepository.findByUsername(username);
+        if (account.isPresent()) {
+            Account existingAccount = account.get();
+            existingAccount.setPassword(passwordEncoder.encode(newPassword));
+            return accountRepository.save(existingAccount);
+        }
+        return null;
+    }
+
 
 
     public Account updateAccountByManager(Integer id, Account accountDetails) {

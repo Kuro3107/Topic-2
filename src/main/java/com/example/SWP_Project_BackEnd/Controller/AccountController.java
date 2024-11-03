@@ -23,6 +23,13 @@ public class AccountController {
         return accountService.getAllAccounts();
     }
 
+    @GetMapping("/check-username")
+    public ResponseEntity<Boolean> checkUsernameExists(@RequestParam String username) {
+        boolean exists = accountService.usernameExists(username);
+        return ResponseEntity.ok(exists);
+    }
+
+
     @GetMapping("/{id}")
     public ResponseEntity<Account> getAccountById(@PathVariable Integer id) {
         Optional<Account> account = accountService.getAccountById(id);
@@ -47,6 +54,30 @@ public class AccountController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @PutMapping("/{id}/password")
+    public ResponseEntity<Account> updatePassword(@PathVariable Integer id, @RequestBody Account accountDetails) {
+        Account updatedAccount = accountService.updatePassword(id, accountDetails);
+        if (updatedAccount != null) {
+            return ResponseEntity.ok(updatedAccount);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PutMapping("/reset-password")
+    public ResponseEntity<Account> resetPassword(@RequestBody Map<String, String> request) {
+        String username = request.get("username");
+        String newPassword = request.get("newPassword");
+
+        Account updatedAccount = accountService.resetPasswordByUsername(username, newPassword);
+        if (updatedAccount != null) {
+            return ResponseEntity.ok(updatedAccount);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAccount(@PathVariable Integer id) {
