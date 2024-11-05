@@ -97,7 +97,7 @@ public class BookingService {
     public void updateConsultant(Integer bookingId, String consultant) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new EntityNotFoundException("Booking not found"));
-        booking.setStatus(consultant);
+        booking.setConsultant(consultant);
         bookingRepository.save(booking);
     }
 

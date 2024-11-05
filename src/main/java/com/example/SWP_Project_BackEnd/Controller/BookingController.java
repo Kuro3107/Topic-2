@@ -64,7 +64,7 @@ public class BookingController {
 
         Booking booking = optionalBooking.get();
 
-        // Kiểm tra và chỉ cập nhật feedbackId
+        // Cập nhật feedbackId, status, xóa consultant
         if (updates.containsKey("feedbackId")) {
             Long newFeedbackId = ((Number) updates.get("feedbackId")).longValue();
             booking.setFeedbackId(newFeedbackId);
@@ -72,6 +72,10 @@ public class BookingController {
         if (updates.containsKey("status")){
             String newStatus = ((String) updates.get("status") );
             booking.setStatus(newStatus);
+        }
+        if (updates.containsKey("consultant")){
+            String newConsultant = ((String) updates.get("consultant") );
+            booking.setStatus(newConsultant);
         }
 
         // Lưu lại booking với feedbackId mới
