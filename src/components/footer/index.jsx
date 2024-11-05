@@ -9,7 +9,7 @@ const Footer = () => {
         <div className="footer-section">
           <h3>About Us</h3>
           <p>
-            We are a company specializing in providing high-quality products and services.
+          We are a company specializing in providing trips to Japan, consulting and supporting customers in purchasing koi fish, as well as taking care of transporting koi fish for customers.
           </p>
         </div>
         <div className="footer-section">

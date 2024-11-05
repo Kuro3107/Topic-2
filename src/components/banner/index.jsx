@@ -17,6 +17,10 @@ const Banner = () => {
     }
   };
 
+  const handleBookTripClick2 = () => {
+    navigate("/product");
+};
+
   return (
     <div className="banner">
       <div className="banner-content">
@@ -27,6 +31,12 @@ const Banner = () => {
           onClick={handleBookTripClick}
         >
           Create Your Tour Now
+        </Button>
+        <Button 
+          className="banner-button" 
+          onClick={handleBookTripClick2}
+        >
+          Discover Our Tours
         </Button>
       </div>
     </div>

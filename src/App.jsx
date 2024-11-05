@@ -55,6 +55,14 @@ function App() {
       ),
     },
     {
+      path: "/product/handleBooking",
+      element: (
+        <ProtectedRoute allowedRoles={["customer"]}>
+          <Product />
+        </ProtectedRoute>
+      ),
+    },
+    {
       path: "/dashboard",
       element: (
         <ProtectedRoute allowedRoles={["admin"]}>

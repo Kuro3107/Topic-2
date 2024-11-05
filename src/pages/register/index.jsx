@@ -11,10 +11,20 @@ function RegisterPage() {
 
   const handleRegister = async (values) => {
     try {
+      const checkUsername = await api.get("http://localhost:8080/api/accounts");
+      const usernameExists = checkUsername.data.some(
+        (account) => account.username === values.username
+      );
+      
+      if (usernameExists) {
+        toast.error("Tên đăng nhập đã tồn tại. Vui lòng chọn tên khác.");
+        return;
+      }
+
       const requestBody = {
         username: values.username,
         password: values.password,
-        phone: values.phone,
+        phone: values.phone || null,
         rePassword: values['re-password'],
         fullName: values.fullName || null,
         email: values.email || null,
@@ -27,15 +37,15 @@ function RegisterPage() {
 
       if (response.data && response.data.token) {
         localStorage.setItem('userInfo', JSON.stringify(response.data));
-        toast.success("Registered successfully and logged in");
+        toast.success("Đăng ký thành công và đã đăng nhập");
         navigate("/profile");
       } else {
-        toast.success("Registration successful");
+        toast.success("Đăng ký thành công");
         navigate("/login");
       }
     } catch (error) {
       console.error("Error details:", error.response || error);
-      toast.error(error.response?.data?.message || "Registration failed. Please try again.");
+      toast.error(error.response?.data?.message || "Đăng ký thất bại. Vui lòng thử lại.");
     }
   };
 
@@ -85,6 +95,9 @@ function RegisterPage() {
           </Button>
           <div>
             <Link to="/login">Already have an account?</Link>
+          </div>
+          <div>
+            <Link to="/">Back to Home</Link>
           </div>
         </Form>
       </AuthenTemplate>

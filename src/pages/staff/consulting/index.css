@@ -100,3 +100,14 @@
     max-height: 80vh;
     overflow-y: auto;
   }
+  
+  .deli-header {
+    padding: 0 20px;
+    background: #fff;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  
+  .deli-header button {
+    margin-top: 16px;
+    margin-bottom: 16px;
+  }

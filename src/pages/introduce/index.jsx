@@ -57,7 +57,7 @@ function Introduce() {
                 />
                 <div className="koi-info">
                   <p>Type: {koi.varietyName}</p>
-                  <p>Price: {koi.koiPrice.toLocaleString()} VNĐ</p>
+                  <p>Average Price: {koi.koiPrice.toLocaleString()} VNĐ</p>
                   <p>Describe: {koi.description}</p>
                 </div>
               </div>
