@@ -79,6 +79,7 @@ public class BookingService {
             booking.setStatus(bookingDTO.getStatus());
             booking.setStartDate(bookingDTO.getStartDate());
             booking.setEndDate(bookingDTO.getEndDate());
+            booking.setConsultant(bookingDTO.getConsultant());
 
             return bookingRepository.save(booking);
         } else {
@@ -90,6 +91,13 @@ public class BookingService {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new EntityNotFoundException("Booking not found"));
         booking.setStatus(status);
+        bookingRepository.save(booking);
+    }
+
+    public void updateConsultant(Integer bookingId, String consultant) {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new EntityNotFoundException("Booking not found"));
+        booking.setStatus(consultant);
         bookingRepository.save(booking);
     }
 

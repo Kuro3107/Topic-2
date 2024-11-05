@@ -107,6 +107,18 @@ public class BookingController {
         }
     }
 
+    @PutMapping("{id}/consultant")
+    public ResponseEntity<?> updateBookingConsultant(@PathVariable Integer bookingId, @RequestBody Map<String, String> request) {
+        String consultant = request.get("consultant");
+        try {
+            bookingService.updateConsultant(bookingId, consultant); // Gọi service để cập nhật thông tin
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update Consultant.");
+        }
+    }
+
+
 
 }
 

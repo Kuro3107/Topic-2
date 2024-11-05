@@ -29,6 +29,13 @@ public class AccountService {
         return accountRepository.findByUsername(username).isPresent();
     }
 
+    public boolean verifyEmailAndPhone(String username, String email, String phone) {
+        return accountRepository.findByUsername(username)
+                .map(account -> account.getEmail().equals(email) && account.getPhone().equals(phone))
+                .orElse(false);
+    }
+
+
     public String registerUser(Account account, String rePassword) {
         System.out.println("Full Name in Account: " + account.getFullName()); // Log giá trị fullName
         if (accountRepository.findByUsername(account.getUsername()).isPresent()) {

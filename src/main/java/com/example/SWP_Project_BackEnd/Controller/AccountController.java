@@ -29,6 +29,19 @@ public class AccountController {
         return ResponseEntity.ok(exists);
     }
 
+    @PostMapping("/verify-email-phone")
+    public ResponseEntity<Boolean> verifyEmailAndPhone(
+            @RequestBody Map<String, String> payload) {
+
+        String username = payload.get("username");
+        String email = payload.get("email");
+        String phone = payload.get("phone");
+
+        boolean verified = accountService.verifyEmailAndPhone(username, email, phone);
+        return ResponseEntity.ok(verified);
+    }
+
+
 
     @GetMapping("/{id}")
     public ResponseEntity<Account> getAccountById(@PathVariable Integer id) {

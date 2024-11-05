@@ -29,6 +29,7 @@ public class BookingDTO {
     private Date startDate;
     private Date endDate;
     private LocalDate bookingDate;
+    private String consultant;
 
     // Constructor
     public BookingDTO() {

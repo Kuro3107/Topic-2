@@ -61,6 +61,8 @@ public class Booking {
     private String note;
     @Column(name = "is_active")
     private Boolean isActive;
+    @Column(name = "consultant")
+    private String consultant;
     // Liên kết ManyToOne với Customer
     @ManyToOne
     @JsonIgnore
