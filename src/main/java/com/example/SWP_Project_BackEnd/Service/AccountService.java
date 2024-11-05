@@ -42,21 +42,13 @@ public class AccountService {
             return "Username already exists";
         }
 
-        if (accountRepository.findByPhone(account.getPhone()).isPresent()) {
-            return "Phone number already exists";
-        }
+        account.setPhone(account.getPhone());
 
-        if (account.getEmail() != null && accountRepository.findByEmail(account.getEmail()).isPresent()) {
-            return "Email already exists";
-        }
+        account.setEmail(account.getEmail());
 
 
         if (!account.getPassword().equals(rePassword)) {
             return "Passwords do not match";
-        }
-
-        if (!isValidPhone(account.getPhone())) {
-            return "Phone not valid";
         }
 
 //        if (!isValidEmail(account.getEmail())) {

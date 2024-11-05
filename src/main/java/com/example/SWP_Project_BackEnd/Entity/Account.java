@@ -24,16 +24,16 @@ public class Account {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer accountId;
 
-    @Column(unique = true, nullable = false)
+    @Column(name = "username", unique = true, nullable = false)
     private String username;
 
-    @Column(nullable = false)
+    @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(unique = true, nullable = false)
+    @Column(name = "phone", unique = true, nullable = true)
     private String phone;
 
-    @Column(unique = true)
+    @Column(name = "email", unique = true)
     private String email;
 
     @Column(name = "image_url")
@@ -49,7 +49,7 @@ public class Account {
     private String status;
 
     // Liên kết OneToOne với Customer
-    @OneToOne(mappedBy = "account")
+    @OneToOne(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
 //    @JsonManagedReference
     private Customer customer;
     // Constructors, getters, and setters

@@ -27,7 +27,11 @@ public class RegisterController {
         } else {
             account.setFullName(null); // hoặc chuỗi rỗng
         }
-        account.setPhone(registerRequest.getPhone());
+        if(registerRequest.getPhone() != null) {
+            account.setPhone(registerRequest.getPhone());
+        } else {
+            account.setPhone(null);
+        }
 
         // Bỏ qua việc lấy roleId từ request, luôn gán roleId là 5 cho khách hàng
         account.setRoleId(5);  // Set role_id là 5 mặc định cho khách hàng
