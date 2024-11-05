@@ -9,12 +9,15 @@ import {
   Modal,
   Select,
   DatePicker,
+  Tabs,
 } from "antd";
 import {
   LogoutOutlined,
 } from "@ant-design/icons";
 import moment from "moment"; // Import moment
 import "./index.css"; // Import file CSS
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const { Header, Content, Footer, Sider } = Layout;
 const { Option } = Select;
@@ -31,6 +34,8 @@ const Delivery = () => {
   const [status, setStatus] = useState("");
   const [farms, setFarms] = useState([]);
   const [varieties, setVarieties] = useState([]);
+  const navigate = useNavigate();
+  const isLoggedIn = localStorage.getItem("userInfo") !== null;
 
   // Hàm fetch dữ liệu Farms và Varieties
   const fetchFarmsAndVarieties = async () => {
@@ -59,7 +64,7 @@ const Delivery = () => {
 
       if (poResponse.ok && bookingResponse.ok) {
         const deliveringPOs = poData.filter(
-          (po) => po.status === "delivering" || po.status === "delivered"
+          (po) => po.status === "delivering" || po.status === "delivered" || po.status === "deny"
         );
         setPoData(deliveringPOs);
         setBookings(bookingData);
@@ -89,6 +94,11 @@ const Delivery = () => {
       email: booking ? booking.email : "Unknown",
     };
   });
+
+  // Tách poData thành 2 danh sách riêng biệt
+  const deliveringPOs = combinedData.filter(po => po.status === "delivering");
+  const deliveredPOs = combinedData.filter(po => po.status === "delivered");
+  const denyPOs = combinedData.filter(po => po.status === "deny");
 
   // Hàm xử lý khi xem PODetails
   const handleViewPODetails = async (poId) => {
@@ -166,9 +176,16 @@ const Delivery = () => {
 
   // Hàm để xử lý đăng xuất
   const handleLogout = () => {
-    localStorage.removeItem("authToken"); // Assuming you store your token here
-    // Redirect to the login page
-    window.location.href = "/login"; // Navigate to the login page
+    try {
+      localStorage.removeItem("token");
+      localStorage.removeItem("userInfo");
+      navigate("/");
+      toast.success("Log out successfully!");
+      window.location.reload();
+    } catch (error) {
+      console.error("Error when logging out:", error);
+      toast.error("An error occurred while logging out. Please try again.");
+    }
   };
 
   // Hiển thị loading nếu dữ liệu chưa được tải
@@ -211,27 +228,75 @@ const Delivery = () => {
           <h5>Order details</h5>
           <Button
             type="primary"
-            icon={<LogoutOutlined />} // Icon logout
+            icon={<LogoutOutlined />}
             onClick={handleLogout}
-            style={{ float: "right" }} // Căn phải
+            style={{ float: "right" }}
           >
             Logout
           </Button>
         </Header>
         <Content className="deli-content">
           <div className="site-layout-background">
-            <Row gutter={[16, 16]}>
-              <Col span={24}>
-                <Card title="List of Orders in Delivery">
-                  <Table
-                    dataSource={combinedData}
-                    columns={columns}
-                    rowKey="poId"
-                    pagination={false}
-                  />
-                </Card>
-              </Col>
-            </Row>
+            <Tabs
+              defaultActiveKey="delivering"
+              type="card"
+              items={[
+                {
+                  key: 'delivering',
+                  label: (
+                    <span style={{ color: '#1890ff', fontWeight: 'bold' }}>
+                      Đơn đang vận chuyển
+                    </span>
+                  ),
+                  children: (
+                    <Card>
+                      <Table
+                        dataSource={deliveringPOs}
+                        columns={columns}
+                        rowKey="poId"
+                        pagination={false}
+                      />
+                    </Card>
+                  ),
+                },
+                {
+                  key: 'delivered',
+                  label: (
+                    <span style={{ color: '#52c41a', fontWeight: 'bold' }}>
+                      Đã vận chuyển
+                    </span>
+                  ),
+                  children: (
+                    <Card>
+                      <Table
+                        dataSource={deliveredPOs}
+                        columns={columns}
+                        rowKey="poId"
+                        pagination={false}
+                      />
+                    </Card>
+                  ),
+                },
+                {
+                  key: 'deny',
+                  label: (
+                    <span style={{ color: 'red', fontWeight: 'bold' }}>
+                      Đơn bị từ chối
+                    </span>
+                  ),
+                  children: (
+                    <Card>
+                      <Table
+                        dataSource={denyPOs}
+                        columns={columns}
+                        rowKey="poId"
+                        pagination={false}
+                      />
+                    </Card>
+                  ),
+                },
+              ]}
+            />
           </div>
         </Content>
         <Footer style={{ textAlign: "center" }}>

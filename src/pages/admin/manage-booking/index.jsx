@@ -15,99 +15,115 @@ import axios from "axios";
 
 function ManageBooking() {
   const [bookings, setBookings] = useState([]);
+  const [consultants, setConsultants] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
   const [editingBooking, setEditingBooking] = useState(null);
 
-  const api = "http://localhost:8080/api/bookings"; // Cập nhật URL API
+  const api = "http://localhost:8080/api/bookings"; // Update API URL
 
   useEffect(() => {
     fetchBookings();
+    fetchConsultants();
   }, []);
 
   const fetchBookings = async () => {
     try {
-      const response = await axios.get(api); // Lấy dữ liệu từ API
-      const updatedBookings = response.data.map((booking) => ({
-        ...booking,
-        isActive: booking.status !== "delivered",
-      }));
-      setBookings(updatedBookings);
+      const response = await axios.get(api); // Fetch booking data from API
+      setBookings(response.data); // Set bookings without the isActive logic
     } catch (error) {
-      console.error("Lỗi khi lấy danh sách đặt chỗ:", error);
-      message.error("Không thể lấy danh sách đặt chỗ");
+      console.error("Error fetching bookings:", error);
+      message.error("Unable to fetch booking list");
     }
   };
 
-  const showModal = (booking = null) => {
-    if (booking && !booking.isActive) {
+  const fetchConsultants = async () => {
+    try {
+      const response = await axios.get('http://localhost:8080/api/accounts');
+      const consultants = response.data.filter(account => account.roleId === 3);
+      setConsultants(consultants); // Store consultants for use in the dropdown
+    } catch (error) {
+      console.error("Error fetching consultants:", error);
+      message.error("Unable to fetch consultant list");
+    }
+  };
+
+  // Cập nhật giá trị cho modal
+const showModal = (booking = null) => {
+  if (booking.status === "Finished") {
       message.warning("Không thể chỉnh sửa booking đã không còn hoạt động");
       return;
-    }
-    setEditingBooking(booking);
-    if (booking) {
+  }
+  setEditingBooking(booking);
+  if (booking) {
       form.setFieldsValue({
-        ...booking,
-        startDate: dayjs(booking.startDate),
-        endDate: dayjs(booking.endDate),
+          ...booking,
+          startDate: dayjs(booking.startDate),
+          endDate: dayjs(booking.endDate),
+          consultant: booking.consultant || null, // Cập nhật giá trị consultant
       });
-    } else {
+  } else {
       form.resetFields();
-    }
-    setIsModalVisible(true);
-  };
+  }
+  setIsModalVisible(true);
+};
 
-  const handleOk = () => {
-    form.validateFields().then((values) => {
+const handleOk = () => {
+  form.validateFields().then((values) => {
       const bookingData = {
-        status: values.status, // Chỉ gửi trạng thái
+          status: values.status,
+          consultant: values.consultant || null,
       };
-      if (editingBooking && editingBooking.bookingId) { // Kiểm tra BookingID
-        const updatedData = { ...editingBooking, ...bookingData }; // Giữ nguyên các trường khác
-        updateBooking(editingBooking.bookingId, updatedData); // Cập nhật chỉ trạng thái
+
+      if (editingBooking && editingBooking.bookingId) {
+          const updatedData = { 
+              ...editingBooking, 
+              ...bookingData,
+              consultant: values.consultant === undefined ? null : values.consultant
+          };
+          updateBooking(editingBooking.bookingId, updatedData);
       } else {
-        message.error("Không có ID đặt chỗ để cập nhật."); // Thông báo lỗi nếu không có ID
+          message.error("Không có ID đặt chỗ để cập nhật.");
       }
       setIsModalVisible(false);
-    });
-  };
-
-   const createBooking = async (bookingData) => {
-    try {
-      await axios.post(api, bookingData);
-      message.success("Đã tạo đặt chỗ mới");
-      fetchBookings();
-    } catch (error) {
-      console.error("Lỗi khi tạo đặt chỗ:", error);
-      message.error("Không th��� tạo đặt chỗ mới");
-    }
-  };
+  }).catch((error) => {
+      console.error("Validation failed:", error);
+  });
+};
 
   const updateBooking = async (BookingID, bookingData) => {
     try {
       await axios.put(`${api}/${BookingID}`, bookingData);
-      message.success("Đã cập nhật đặt chỗ");
+      message.success("Booking updated successfully");
       fetchBookings();
     } catch (error) {
-      console.error("Lỗi khi cập nhật đặt chỗ:", error);
-      message.error("Không thể cập nhật đặt chỗ");
+      console.error("Error updating booking:", error);
+      message.error("Unable to update booking");
     }
   };
 
   const deleteBooking = async (BookingID) => {
     try {
       await axios.delete(`${api}/${BookingID}`);
-      message.success("Đã xóa đặt chỗ");
+      message.success("Booking deleted successfully");
       fetchBookings();
     } catch (error) {
-      console.error("Lỗi khi xóa đặt chỗ:", error);
-      message.error("Không thể xóa đặt chỗ");
+      console.error("Error deleting booking:", error);
+      message.error("Unable to delete booking");
     }
   };
 
+  const getAvailableConsultants = () => {
+    const assignedConsultants = bookings
+      .filter(booking => booking.consultant && booking.bookingId !== (editingBooking ? editingBooking.bookingId : null))
+      .map(booking => booking.consultant);
+
+    return consultants.filter(consultant => !assignedConsultants.includes(consultant.username));
+  };
+
   const columns = [
-    { title: "ID", dataIndex: "bookingId", key: "bookingId" }, // Cập nhật dataIndex cho bookingId
-    { title: "Tên", dataIndex: "fullname", key: "fullname" },
+    { title: "ID", dataIndex: "bookingId", key: "bookingId" },
+    { title: "Tên khách hàng", dataIndex: "fullname", key: "fullname" },
     {
       title: "Ngày đặt",
       dataIndex: "bookingDate",
@@ -124,7 +140,7 @@ function ManageBooking() {
       title: "Ngày kết thúc",
       dataIndex: "endDate",
       key: "endDate",
-      render: (date) => date ? dayjs(date).format("DD/MM/YYYY") : null, // Chấp nhận null và không hiển thị nếu không có dữ liệu
+      render: (date) => date ? dayjs(date).format("DD/MM/YYYY") : null,
     },
     { title: "Koi yêu thích", dataIndex: "favoriteKoi", key: "favoriteKoi" },
     {
@@ -132,25 +148,24 @@ function ManageBooking() {
       dataIndex: "favoriteFarm",
       key: "favoriteFarm",
     },
-    // {
-    //   title: "Hoạt động",
-    //   dataIndex: "isActive",
-    //   key: "isActive",
-    //   render: (isActive) => (isActive ? "Có" : "Không"),
-    // },
+    {
+      title: "Consultant Staff",
+      dataIndex: "consultant",
+      key: "consultant",
+      render: (consultant) => consultant || 'Chưa chỉ định', // Display if no consultant assigned
+    },
     { title: "Trạng thái", dataIndex: "status", key: "status" },
     {
       title: "Hành động",
       key: "action",
       render: (_, record) => (
         <>
-          <Button onClick={() => showModal(record)} disabled={!record.isActive}>
+          <Button onClick={() => showModal(record)}>
             Sửa
           </Button>
           <Button
-            onClick={() => deleteBooking(record.bookingId)} // Sửa lại để sử dụng bookingId
+            onClick={() => deleteBooking(record.bookingId)}
             danger
-            disabled={!record.isActive}
           >
             Xóa
           </Button>
@@ -203,6 +218,7 @@ function ManageBooking() {
                                 <h4>Trang trại Koi:</h4>
                                 {trip.koiFarms.map(farm => (
                                     <div key={farm.farmId}>
+                                      <img src={farm.imageUrl} alt="Hình ảnh trang trại" width="200" height="150" />
                                         <p>Tên trang trại: {farm.farmName}</p>
                                         <p>Địa điểm: {farm.location}</p>
                                         <p>Thông tin liên hệ: {farm.contactInfo}</p>
@@ -223,13 +239,12 @@ function ManageBooking() {
     }
 };
 
-
   return (
     <div>
       <h1>Manage Booking</h1>
-      <Table columns={columns} dataSource={bookings} rowKey="BookingID" />
+      <Table columns={columns} dataSource={bookings} rowKey="bookingId" />
       <Modal
-        title={editingBooking ? "Edit booking" : "Add new booking"}
+        title={editingBooking ? "Edit Booking" : "Add New Booking"}
         visible={isModalVisible}
         onOk={handleOk}
         onCancel={() => setIsModalVisible(false)}
@@ -237,64 +252,74 @@ function ManageBooking() {
         <Form form={form} layout="vertical">
           <Form.Item
             name="fullname"
-            label="fullname"
+            label="Tên"
             rules={[{ required: true }]}
           >
-            <Input />
+            <Input disabled={editingBooking !== null} />
           </Form.Item>
           <Form.Item
             name="status"
-            label="status"
+            label="Trạng thái"
             rules={[{ required: true }]}
           >
             <Select>
-              {/* <Select.Option value="pending">Pending</Select.Option> */}
+              <Select.Option value="pending">Pending</Select.Option>
               <Select.Option value="detailed">Detailed</Select.Option>
-              <Select.Option value="Approved">Approved</Select.Option>
+              <Select.Option value="approved">Approved</Select.Option>
               <Select.Option value="rejected">Rejected</Select.Option>
-              {/* <Select.Option value="delivered">Delivered</Select.Option> */}
             </Select>
           </Form.Item>
           <Form.Item
             name="startDate"
-            label="startDate"
+            label="Ngày bắt đầu"
             rules={[{ required: true }]}
           >
-            <DatePicker />
+            <DatePicker disabled={editingBooking !== null} />
           </Form.Item>
           <Form.Item
             name="endDate"
-            label="endDate"
+            label="Ngày kết thúc"
             rules={[{ required: true }]}
           >
-            <DatePicker />
+            <DatePicker disabled={editingBooking !== null} />
           </Form.Item>
           <Form.Item
             name="phone"
-            label="phone"
+            label="Số điện thoại"
             rules={[{ required: true }]}
           >
-            <Input />
+            <Input disabled={editingBooking !== null} />
           </Form.Item>
           <Form.Item
             name="email"
             label="Email"
             rules={[{ required: true, type: "email" }]}
           >
-            <Input />
+            <Input disabled={editingBooking !== null} />
           </Form.Item>
-          <Form.Item name="favoriteKoi" label="favoriteKoi">
-            <Input />
+          <Form.Item name="favoriteKoi" label="Koi yêu thích">
+            <Input disabled={editingBooking !== null} />
           </Form.Item>
-          <Form.Item name="favoriteFarm" label="favoriteFarm">
-            <Input />
+          <Form.Item name="favoriteFarm" label="Trang trại yêu thích">
+            <Input disabled={editingBooking !== null} />
           </Form.Item>
-          <Form.Item name="note" label="note">
-            <Input.TextArea />
+          <Form.Item
+            name="consultant"
+            label="Consultant Staff"
+          >
+            <Select 
+              allowClear
+              disabled={editingBooking === null || (editingBooking && editingBooking.status !== "Purchased")}
+            >
+              {getAvailableConsultants().map(consultant => (
+                <Select.Option key={consultant.accountId} value={consultant.username}>
+                  {consultant.username}
+                </Select.Option>
+              ))}
+            </Select>
           </Form.Item>
-        
-          <Form.Item name="isActive" label="Active" valuePropName="checked">
-            <Switch disabled />
+          <Form.Item name="note" label="Ghi chú">
+            <Input disabled={editingBooking !== null} />
           </Form.Item>
         </Form>
       </Modal>

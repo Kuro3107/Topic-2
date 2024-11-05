@@ -4,19 +4,63 @@ import {
   GlobalOutlined,
   HeartOutlined,
   EnvironmentOutlined,
+  StarFilled,
 } from "@ant-design/icons";
 import Header from "../../components/header/index";
 import Footer from "../../components/footer/index";
 import "./index.css";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { Rate } from "antd";
 
 const { Title, Paragraph } = Typography;
+
+const censorName = (fullName) => {
+  if (!fullName) return '';
+  const names = fullName.split(' ');
+  const lastName = names[names.length - 1];
+  const censoredPart = '*'.repeat(fullName.length - lastName.length);
+  return censoredPart + lastName;
+};
 
 function HomePage() {
 
   const navigate = useNavigate();
   const isLoggedIn = localStorage.getItem("userInfo") !== null;
+  const [feedbacks, setFeedbacks] = useState([]);
+
+  useEffect(() => {
+    const fetchFeedbacks = async () => {
+      try {
+        const feedbackResponse = await axios.get('http://localhost:8080/api/feedbacks');
+        const bookingResponse = await axios.get('http://localhost:8080/api/bookings');
+        
+        // Kết hợp dữ liệu booking và feedback
+        const combinedData = bookingResponse.data.map(booking => {
+          const feedback = feedbackResponse.data.find(f => f.feedbackId === booking.feedbackId);
+          if (feedback && feedback.rating >= 5) {
+            return {
+              bookingId: booking.bookingId,
+              fullName: booking.fullname,
+              rating: feedback.rating,
+              comment: feedback.comments || 'No comment provided'
+            };
+          }
+          return null;
+        }).filter(item => item !== null);
+        
+        // Lấy ngẫu nhiên 5 feedback
+        const shuffled = combinedData.sort(() => 0.5 - Math.random());
+        setFeedbacks(shuffled.slice(0, 5));
+      } catch (error) {
+        console.error('Error fetching feedbacks:', error);
+      }
+    };
+
+    fetchFeedbacks();
+  }, []);
 
   const handleBookTripClick = () => {
     if (!isLoggedIn) {
@@ -232,35 +276,57 @@ function HomePage() {
             perfect Koi from Japan's finest farms.
           </Paragraph>
         </div>
+
         <div className="system-introduction">
-        <Title level={2}>Our Partners</Title>
-      <Row gutter={[16, 16]} justify="center">
-        {partnerImages.map((partner, index) => (
-          <Col xs={24} sm={12} md={8} lg={6} key={index}>
-            <div
-              style={{
-                padding: '1px',
-                border: '1px solid #f0f0f0',
-                borderRadius: '1px',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-            >
-              <img
-                src={partner.src}
-                alt={partner.alt}
-                style={{
-                  width: '150px', // Set fixed width
-                  height: '150px', // Set fixed height
-                  objectFit: 'contain', // Keep aspect ratio
-                }}
-              />
-            </div>
-          </Col>
-        ))}
-      </Row>
-    </div>
+          <Title level={2}>Our Customers&apos; Feedback</Title>
+          <Row gutter={[24, 24]} justify="center">
+            {feedbacks.map((feedback, index) => (
+              <Col xs={24} sm={12} md={8} key={index}>
+                <div className="feedback-item">
+                  <Title level={4}>{censorName(feedback.fullName || '')}</Title>
+                  <Rate 
+                    disabled 
+                    value={feedback.rating} 
+                    style={{ fontSize: 20 }}
+                  />
+                  <Paragraph className="feedback-text">
+                    {feedback.comment}
+                  </Paragraph>
+                </div>
+              </Col>
+            ))}
+          </Row>
+        </div>
+
+        <div className="system-introduction">
+          <Title level={2}>Our Partners</Title>
+          <Row gutter={[16, 16]} justify="center">
+            {partnerImages.map((partner, index) => (
+              <Col xs={24} sm={12} md={8} lg={6} key={index}>
+                <div
+                  style={{
+                    padding: '1px',
+                    border: '1px solid #f0f0f0',
+                    borderRadius: '1px',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}
+                >
+                  <img
+                    src={partner.src}
+                    alt={partner.alt}
+                    style={{
+                      width: '150px', // Set fixed width
+                      height: '150px', // Set fixed height
+                      objectFit: 'contain', // Keep aspect ratio
+                    }}
+                  />
+                </div>
+              </Col>
+            ))}
+          </Row>
+        </div>
       </div>
       <Footer />
     </div>

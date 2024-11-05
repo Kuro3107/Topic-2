@@ -25,6 +25,7 @@ import {
   UploadOutlined,
   CameraOutlined,
   PictureOutlined,
+  DeleteOutlined,
 } from "@ant-design/icons";
 import "./profile.css";
 import api from "../../config/axios";
@@ -57,6 +58,9 @@ function Profile() {
   const [feedbackId, setFeedbackId] = useState(null); // Thêm state để lưu feedbackId
   const [isEditMode, setIsEditMode] = useState(false); // Thêm state để quản lý chế độ chỉnh sửa
   const [backgroundImage, setBackgroundImage] = useState(defaultBackgrounds[0]);
+  const [isRefundModalVisible, setIsRefundModalVisible] = useState(false);
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const [bookingToDelete, setBookingToDelete] = useState(null);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -308,10 +312,11 @@ function Profile() {
       }
       const newFeedbackId = response.data.feedbackId;
 
-      // Gửi yêu cầu chỉ cập nhật feedbackId và status cho booking hiện tại
+      // Gửi yêu cầu cập nhật feedbackId, status và xóa consultant cho booking hiện tại
       await api.patch(`/bookings/${selectedBooking.bookingId}`, {
         feedbackId: newFeedbackId,
-        status: "Finished", // Cập nhật status thành "kết thúc"
+        status: "Finished",
+        consultant: null // Đặt consultant thành null để xóa trong database
       });
 
       // Cập nhật lại state để hiển thị feedback đã được gửi
@@ -324,6 +329,7 @@ function Profile() {
                 rating,
                 comments,
                 status: "Finished",
+                consultant: null // Cập nhật consultant trong state local thành null
               }
             : order
         )
@@ -363,6 +369,25 @@ function Profile() {
     // Ở đây bạn có thể thêm logic để lưu lựa chọn của người dùng vào local storage hoặc database nếu cần
   };
 
+  // Di chuyển handleDeleteAvatar lên trước avatarPopoverContent
+  const handleDeleteAvatar = async () => {
+    try {
+      // Gọi API để cập nhật imageUrl thành null hoặc defaultImageUrl
+      await api.put(
+        `/accounts/${parsedUser.id}/image`,
+        { imageUrl: defaultImageUrl },
+        { headers: { Authorization: `Bearer ${parsedUser.token}` } }
+      );
+
+      // Cập nhật state local
+      setUser(prevUser => ({ ...prevUser, imageUrl: defaultImageUrl }));
+      message.success('Avatar đã được xóa thành công!');
+    } catch (error) {
+      console.error("Error deleting avatar:", error);
+      message.error('Đã xảy ra lỗi khi xóa avatar.');
+    }
+  };
+
   const backgroundPopoverContent = (
     <div className="background-options">
       {defaultBackgrounds.map((bg, index) => (
@@ -378,7 +403,7 @@ function Profile() {
   );
 
   const avatarPopoverContent = (
-    <div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
       <Upload
         name="avatar"
         showUploadList={false}
@@ -387,10 +412,52 @@ function Profile() {
           return false;
         }}
       >
-        <Button icon={<CameraOutlined />}>Change Avatar</Button>
+        <Button icon={<CameraOutlined />} style={{ width: '100%' }}>
+          Change Avatar
+        </Button>
       </Upload>
+      <Button 
+        icon={<DeleteOutlined />} 
+        danger
+        onClick={handleDeleteAvatar}
+        style={{ width: '100%' }}
+      >
+        Delete Avatar
+      </Button>
     </div>
   );
+
+  const showRefundModal = () => {
+    setIsRefundModalVisible(true);
+  };
+
+  const handleCloseRefundModal = () => {
+    setIsRefundModalVisible(false);
+  };
+
+  const showDeleteConfirm = (bookingId) => {
+    setBookingToDelete(bookingId);
+    setIsDeleteModalVisible(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      await api.delete(`/bookings/${bookingToDelete}`, {
+        headers: { Authorization: `Bearer ${parsedUser.token}` },
+      });
+      toast.success("Order was canceled successfully.");
+      setOrders(orders.filter((order) => order.bookingId !== bookingToDelete));
+      setIsDeleteModalVisible(false);
+    } catch (error) {
+      console.error("Error canceling order:", error);
+      toast.error("An error occurred while canceling the order.");
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setIsDeleteModalVisible(false);
+    setBookingToDelete(null);
+  };
 
   if (loading) {
     return (
@@ -486,9 +553,17 @@ function Profile() {
               >
                 Finish Tour & Send Feedback
               </Button>
+            ) : record.status && record.status.toLowerCase() === "purchased" ? (
+              <Button
+                onClick={showRefundModal}
+                type="primary"
+                danger
+              >
+                Cancel & Refund
+              </Button>
             ) : (
               <Button
-                onClick={() => handleCancelOrder(record.bookingId)}
+                onClick={() => showDeleteConfirm(record.bookingId)}
                 danger
               >
                 Cancel
@@ -809,6 +884,39 @@ function Profile() {
               />
             </label>
           </div>
+        </Modal>
+
+        <Modal
+          title="Hủy chuyến"
+          visible={isRefundModalVisible}
+          onCancel={handleCloseRefundModal}
+          footer={[
+            <Button key="close" onClick={handleCloseRefundModal}>
+              Close
+            </Button>
+          ]}
+        >
+          <p style={{ fontSize: '16px', marginBottom: '20px' }}>
+            Để hủy chuyến đi đã thanh toán, vui lòng liên hệ chúng tôi để được hỗ trợ và hướng dẫn hoàn tiền.
+          </p>
+          <p style={{ fontSize: '16px', marginBottom: '10px' }}>
+            <strong>Phone:</strong> 0387729579
+          </p>
+          <p style={{ fontSize: '16px' }}>
+            <strong>Email:</strong> quankun2303@gmail.com
+          </p>
+        </Modal>
+
+        <Modal
+          title="Xác nhận hủy đặt tour"
+          visible={isDeleteModalVisible}
+          onOk={handleConfirmDelete}
+          onCancel={handleCancelDelete}
+          okText="Xác nhận"
+          cancelText="Hủy"
+        >
+          <p>Bạn có chắc chắn muốn hủy đặt tour này không?</p>
+          <p>Hành động này không thể hoàn tác.</p>
         </Modal>
       </main>
       <Footer />

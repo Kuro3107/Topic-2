@@ -26,6 +26,8 @@ import dayjs from "dayjs";
 import axios from "axios";
 import { Space } from "antd";
 import { Footer, Header } from "antd/es/layout/layout";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 function SalesDashboard() {
   const [bookings, setBookings] = useState([]);
@@ -39,6 +41,8 @@ function SalesDashboard() {
 
   const bookingApi = "http://localhost:8080/api/bookings";
   const farmApi = "http://localhost:8080/api/farms"; // API cho Koi Farms
+  const navigate = useNavigate();
+  const isLoggedIn = localStorage.getItem("userInfo") !== null;
 
   useEffect(() => {
     fetchBookings();
@@ -577,10 +581,18 @@ function SalesDashboard() {
     },
   ];
 
+  // Hàm để xử lý đăng xuất
   const handleLogout = () => {
-    localStorage.removeItem("authToken"); // Assuming you store your token here
-    // Redirect to the login page
-    window.location.href = "/login"; // Navigate to the login page
+    try {
+      localStorage.removeItem("token");
+      localStorage.removeItem("userInfo");
+      navigate("/");
+      toast.success("Log out successfully!");
+      window.location.reload();
+    } catch (error) {
+      console.error("Error when logging out:", error);
+      toast.error("An error occurred while logging out. Please try again.");
+    }
   };
 
   const showBookingDetails = (booking) => {

@@ -14,8 +14,33 @@ function Payment() {
   const [loading, setLoading] = useState(true);
   const [priceTotal, setPriceTotal] = useState(null);
   const [paymentProcessed, setPaymentProcessed] = useState(false); // Trạng thái ngăn lặp lại
+  const [paymentMessage, setPaymentMessage] = useState(null);
   
   const bookingId = location.state?.order?.bookingId; // Lấy bookingId từ location
+
+  useEffect(() => {
+    const message = localStorage.getItem('retry');
+    if (message) {
+        alert(`Payment status: ${message}`);
+        localStorage.removeItem('retry'); // Xóa thông báo sau khi hiển thị
+    }
+}, []);
+
+useEffect(() => {
+  const message = localStorage.getItem('success');
+  if (message) {
+      alert(`Payment status: ${message}`);
+      localStorage.removeItem('success'); // Xóa thông báo sau khi hiển thị
+  }
+}, []);
+
+useEffect(() => {
+  const message = localStorage.getItem('failure');
+  if (message) {
+      alert(`Payment status: ${message}`);
+      localStorage.removeItem('failure'); // Xóa thông báo sau khi hiển thị
+  }
+}, []);
 
   useEffect(() => {
     const fetchBooking = async () => {
@@ -85,20 +110,42 @@ function Payment() {
     }
   }, [booking, navigate, paymentProcessed]);
 
+
   useEffect(() => {
+    // Đọc query parameter
     const query = new URLSearchParams(window.location.search);
-    const message = query.get('message');
-    if (message === 'success') {
-        alert('Payment successful!');
-    } else if (message === 'failure') {
-        alert('Payment failed. Please try again.');
-    } else if(message === 'retry'){
-      alert('Please purchase again')
+    const messageParam = query.get('message');
+
+    // Kiểm tra message và cập nhật trạng thái thông báo
+    if (messageParam) {
+      if (messageParam === 'success') {
+        setPaymentMessage('Payment successful!');
+      } else if (messageParam === 'failure') {
+        setPaymentMessage('Payment failed. Please try again.');
+      } else if (messageParam === 'retry') {
+        setPaymentMessage('Please purchase again');
+      }
+
+      // Xóa query parameter khỏi URL mà không tải lại trang
+      window.history.replaceState(null, '', window.location.pathname);
     }
+  }, []);
 
-}, []);
+  useEffect(() => {
+    if (paymentMessage) {
+      // Hiển thị thông báo dựa trên kết quả thanh toán
+      if (paymentMessage === 'Payment successful!') {
+        message.success(paymentMessage);
+      } else if (paymentMessage === 'Payment failed. Please try again.') {
+        message.error(paymentMessage);
+      } else {
+        message.info(paymentMessage);
+      }
+      setPaymentMessage(null); // Xóa trạng thái sau khi hiển thị
+    }
+  }, [paymentMessage]);
 
-
+  
   useEffect(() => {
     console.log("useEffect triggered");
     const searchParams = new URLSearchParams(window.location.search);

@@ -23,7 +23,7 @@ import ManageAccounts from "./pages/admin/manage-accounts";
 import ManageFeedback from "./pages/admin/manage-feedback";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Diagram from "./pages/admin/Diagram";
-
+import ManagePO from "./pages/admin/manage-po";
 function App() {
   const router = createBrowserRouter([
     {
@@ -66,6 +66,7 @@ function App() {
         { path: "farm", element: <ManageFarm /> },
         { path: "trip", element: <ManageTrip /> },
         { path: "booking", element: <ManageBooking /> },
+        { path: "PO", element: <ManagePO /> },
         { path: "account", element: <ManageAccounts /> },
         { path: "feedback", element: <ManageFeedback /> },
       ],
