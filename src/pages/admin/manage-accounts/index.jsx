@@ -178,14 +178,13 @@ const ManageAccounts = () => {
           >
             <Input />
           </Form.Item>
-          {/* Bỏ trường Password */}
-          {/* <Form.Item
+          <Form.Item
               name="password"
               label="Password"
               rules={[{ required: false }]} // Không bắt buộc
             >
               <Input.Password />
-            </Form.Item> */}
+            </Form.Item>
           <Form.Item
             name="phone"
             label="Phone"

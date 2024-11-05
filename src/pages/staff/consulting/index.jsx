@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import {
   Table,
   Button,
@@ -8,6 +10,7 @@ import {
   Select,
   Layout,
   Menu,
+  Input,
 } from "antd";
 import api from "../../../config/axios";
 import Sider from "antd/es/layout/Sider";
@@ -45,23 +48,74 @@ function Consulting() {
   const [podetails, setPODetails] = useState([]); // State cho danh sách PODetails
   const [isEditPODetailVisible, setIsEditPODetailVisible] = useState(false); // State cho modal chỉnh sửa PODetail
   const [editingPODetail, setEditingPODetail] = useState(null); // State cho PODetail đang chỉnh sửa
+  const navigate = useNavigate();
+  const isLoggedIn = localStorage.getItem("userInfo") !== null;
 
+  // Thêm state để lưu thông tin người dùng
+  const [username, setUsername] = useState(null);
+
+  // Kiểm tra localStorage
   useEffect(() => {
+    console.log("All localStorage data:", localStorage);
+    console.log("UserInfo raw data:", localStorage.getItem("userInfo"));
+    
+    // Thử lấy thông tin user từ localStorage theo cách khác
+    const allKeys = Object.keys(localStorage);
+    console.log("All localStorage keys:", allKeys);
+    
+    allKeys.forEach(key => {
+      console.log(`${key}:`, localStorage.getItem(key));
+    });
+
+    // Lấy thông tin user từ localStorage với key đúng (userInfo)
+    const userInfoStr = localStorage.getItem("userInfo");
+    console.log("UserInfo raw data:", userInfoStr);
+    
+    if (userInfoStr) {
+      const userInfo = JSON.parse(userInfoStr);
+      setUsername(userInfo.username);
+      console.log("Parsed UserInfo:", userInfo);
+      console.log("Logged in as:", userInfo.username);
+    }
+
     fetchBookings();
-    fetchFarms(); // Tải danh sách farms
-    fetchKoiVarieties(); // Tải danh sách koi varieties
+    fetchFarms();
+    fetchKoiVarieties();
   }, []);
+
+  // Effect để lấy thông tin user
+  useEffect(() => {
+    const userInfoStr = localStorage.getItem("userInfo");
+    if (userInfoStr) {
+      const userInfo = JSON.parse(userInfoStr);
+      setUsername(userInfo.username);
+    }
+  }, []); // Chỉ chạy một lần khi component mount
+
+  // Effect riêng để fetch bookings khi username thay đổi
+  useEffect(() => {
+    if (username) { // Chỉ fetch khi có username
+      console.log("Fetching bookings for user:", username);
+      fetchBookings();
+    }
+  }, [username]); // Dependency là username
+
+  // Effect để fetch farms và koi varieties
+  useEffect(() => {
+    fetchFarms();
+    fetchKoiVarieties();
+  }, []); // Chỉ chạy một lần
 
   const fetchBookings = async () => {
     try {
       setLoading(true);
-      const response = await api.get("/bookings");
+      const response = await api.get("http://localhost:8080/api/bookings");
+      console.log("Bookings fetched:", response.data);
       const filteredBookings = response.data.filter(
         (booking) =>
-          booking.status === "purchased" ||
-          booking.status === "checkin" ||
-          booking.status === "checkout"
+          booking.status === "Purchased" && booking.consultant === username || booking.status === "Checkin" && booking.consultant === username || booking.status === "Checkout" && booking.consultant === username
       );
+      console.log("Filtered bookings:", filteredBookings);
       setBookings(filteredBookings);
     } catch (error) {
       console.error("Error fetching bookings:", error);
@@ -211,6 +265,12 @@ function Consulting() {
     }
   };
 
+  // Thêm hàm tính tổng Remaining Price
+  const calculateTotalAmount = (podetailsList) => {
+    return podetailsList.reduce((total, detail) => total + detail.remainingPrice, 0);
+  };
+
+  // Cập nhật hàm fetchPODetails để tự động cập nhật Total Amount
   const fetchPODetails = async (poId) => {
     try {
       const response = await api.get(
@@ -228,6 +288,20 @@ function Consulting() {
         };
       });
       setPODetails(podetailsWithNames);
+      
+      // Tự động cập nhật Total Amount
+      const newTotalAmount = calculateTotalAmount(podetailsWithNames);
+      setTotalAmount(newTotalAmount);
+      
+      // Cập nhật PO với Total Amount mới
+      if (selectedBooking && selectedBooking.poId) {
+        await api.put(`http://localhost:8080/api/pos/${selectedBooking.poId}`, {
+          totalAmount: newTotalAmount,
+          koiDeliveryDate: deliveryDate,
+          status: status,
+          address: poAddress,
+        });
+      }
     } catch (error) {
       console.error("Error fetching PODetails:", error);
       message.error("Failed to fetch PODetails");
@@ -308,6 +382,11 @@ function Consulting() {
     }
   };
 
+  // Thêm hàm tính toán remainingPrice
+  const calculateRemainingPrice = (total, depositAmount) => {
+    return total - depositAmount;
+  };
+
   const columns = [
     { title: "Booking ID", dataIndex: "bookingId", key: "bookingId" },
     { title: "Full Name", dataIndex: "fullname", key: "fullname" },
@@ -340,18 +419,18 @@ function Consulting() {
             View Details
           </Button>
 
-          {record.status === "purchased" && (
+          {record.status === "Purchased" && (
             <Button
-              onClick={() => handleStatusChange(record.bookingId, "checkin")}
+              onClick={() => handleStatusChange(record.bookingId, "Checkin")}
             >
               Check In
             </Button>
           )}
 
-          {record.status === "checkin" && (
+          {record.status === "Checkin" && (
             <>
               <Button
-                onClick={() => handleStatusChange(record.bookingId, "checkout")}
+                onClick={() => handleStatusChange(record.bookingId, "Checkout")}
               >
                 Check Out
               </Button>
@@ -363,9 +442,9 @@ function Consulting() {
             </>
           )}
 
-          {record.status === "checkout" && (
+          {record.status === "Checkout" && (
             <Button
-              onClick={() => handleStatusChange(record.bookingId, "checkin")}
+              onClick={() => handleStatusChange(record.bookingId, "Checkin")}
             >
               Check In
             </Button>
@@ -382,24 +461,20 @@ function Consulting() {
   ];
 
   const handleLogout = () => {
-    localStorage.removeItem("authToken"); // Assuming you store your token here
-    // Redirect to the login page
-    window.location.href = "/login"; // Navigate to the login page
+    try {
+      localStorage.removeItem("token");
+      localStorage.removeItem("userInfo");
+      navigate("/");
+      toast.success("Log out successfully!");
+      window.location.reload();
+    } catch (error) {
+      console.error("Error when logging out:", error);
+      toast.error("An error occurred while logging out. Please try again.");
+    }
   };
 
   return (
     <Layout>
-      <Sider breakpoint="lg" collapsedWidth="0">
-        <div className="demo-logo" />
-        <Menu theme="dark" mode="inline" defaultSelectedKeys={["1"]}>
-          <Menu.Item key="1" icon={<UserOutlined />}>
-            nav 1
-          </Menu.Item>
-          <Menu.Item key="2" icon={<VideoCameraOutlined />}>
-            nav 2
-          </Menu.Item>
-        </Menu>
-      </Sider>
       <Layout>
         <Header className="deli-header">
           <Button
@@ -490,11 +565,13 @@ function Consulting() {
                         <strong>Total Price:</strong> ${tripDetails.priceTotal}
                       </p>
                     </div>
-                    <img
-                      src={tripDetails.imageUrl}
-                      alt="Trip"
-                      className="trip-main-image"
-                    />
+                    {tripDetails.imageUrl && ( // Kiểm tra nếu có imageUrl
+                      <img
+                        src={tripDetails.imageUrl}
+                        alt="Trip"
+                        className="trip-main-image"
+                      />
+                    )}
                   </div>
 
                   <div className="itinerary-section">
@@ -574,8 +651,8 @@ function Consulting() {
                 <input
                   type="number"
                   value={totalAmount}
-                  onChange={(e) => setTotalAmount(e.target.value)}
-                  style={{ width: "100%", marginTop: "5px" }}
+                  disabled // Disable input vì giá trị được tính tự động
+                  style={{ width: "100%", marginTop: "5px", backgroundColor: "#f5f5f5" }}
                 />
               </p>
               <p>
@@ -700,7 +777,9 @@ function Consulting() {
               onChange={setSelectedFarmId}
               placeholder="Select a farm"
             >
-              {farms.map((farm) => (
+              {tripDetails && tripDetails.koiFarms.map(tripFarm => (
+                farms.find(farm => farm.farmId === tripFarm.farmId) // Lọc farms theo trip
+              )).filter(farm => farm).map(farm => (
                 <Select.Option key={farm.farmId} value={farm.farmId}>
                   {farm.farmName}
                 </Select.Option>
@@ -714,11 +793,8 @@ function Consulting() {
               onChange={setSelectedVarietyId}
               placeholder="Select a koi variety"
             >
-              {koiVarieties.map((variety) => (
-                <Select.Option
-                  key={variety.varietyId}
-                  value={variety.varietyId}
-                >
+              {selectedFarmId && farms.find(farm => farm.farmId === selectedFarmId)?.koiVarieties.map(variety => (
+                <Select.Option key={variety.varietyId} value={variety.varietyId}>
                   {variety.varietyName}
                 </Select.Option>
               ))}
@@ -726,28 +802,41 @@ function Consulting() {
           </p>
           <p>
             <strong>Quantity:</strong>
-            <input
-              type="number"
+            <Input
+              type="text"
               value={quantity}
-              onChange={(e) => setQuantity(e.target.value)}
-              style={{ width: "100%", marginTop: "5px" }}
-            />
-          </p>
-          <p>
-            <strong>Deposit:</strong>
-            <input
-              type="number"
-              value={deposit}
-              onChange={(e) => setDeposit(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value.replace(/[^0-9]/g, '');
+                setQuantity(value ? parseInt(value) : 0);
+              }}
               style={{ width: "100%", marginTop: "5px" }}
             />
           </p>
           <p>
             <strong>Total Koi Price:</strong>
-            <input
-              type="number"
+            <Input
+              type="text"
               value={totalKoiPrice}
-              onChange={(e) => setTotalKoiPrice(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value.replace(/[^0-9]/g, '');
+                const newTotal = value ? parseInt(value) : 0;
+                setTotalKoiPrice(newTotal);
+                setRemainingPrice(calculateRemainingPrice(newTotal, deposit));
+              }}
+              style={{ width: "100%", marginTop: "5px" }}
+            />
+          </p>
+          <p>
+            <strong>Deposit:</strong>
+            <Input
+              type="text"
+              value={deposit}
+              onChange={(e) => {
+                const value = e.target.value.replace(/[^0-9]/g, '');
+                const newDeposit = value ? parseInt(value) : 0;
+                setDeposit(newDeposit);
+                setRemainingPrice(calculateRemainingPrice(totalKoiPrice, newDeposit));
+              }}
               style={{ width: "100%", marginTop: "5px" }}
             />
           </p>
@@ -756,8 +845,8 @@ function Consulting() {
             <input
               type="number"
               value={remainingPrice}
-              onChange={(e) => setRemainingPrice(e.target.value)}
-              style={{ width: "100%", marginTop: "5px" }}
+              disabled // Không cho phép chỉnh sửa trực tiếp
+              style={{ width: "100%", marginTop: "5px", backgroundColor: "#f5f5f5" }}
             />
           </p>
           <p>
@@ -780,10 +869,7 @@ function Consulting() {
             <Button key="submit" type="primary" onClick={updatePODetail}>
               OK
             </Button>,
-            <Button
-              key="cancel"
-              onClick={() => setIsEditPODetailVisible(false)}
-            >
+            <Button key="cancel" onClick={() => setIsEditPODetailVisible(false)}>
               Cancel
             </Button>,
           ]}
@@ -823,28 +909,41 @@ function Consulting() {
           </p>
           <p>
             <strong>Quantity:</strong>
-            <input
-              type="number"
+            <Input
+              type="text"
               value={quantity}
-              onChange={(e) => setQuantity(e.target.value)}
-              style={{ width: "100%", marginTop: "5px" }}
-            />
-          </p>
-          <p>
-            <strong>Deposit:</strong>
-            <input
-              type="number"
-              value={deposit}
-              onChange={(e) => setDeposit(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value.replace(/[^0-9]/g, '');
+                setQuantity(value ? parseInt(value) : 0);
+              }}
               style={{ width: "100%", marginTop: "5px" }}
             />
           </p>
           <p>
             <strong>Total Koi Price:</strong>
-            <input
-              type="number"
+            <Input
+              type="text"
               value={totalKoiPrice}
-              onChange={(e) => setTotalKoiPrice(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value.replace(/[^0-9]/g, '');
+                const newTotal = value ? parseInt(value) : 0;
+                setTotalKoiPrice(newTotal);
+                setRemainingPrice(calculateRemainingPrice(newTotal, deposit));
+              }}
+              style={{ width: "100%", marginTop: "5px" }}
+            />
+          </p>
+          <p>
+            <strong>Deposit:</strong>
+            <Input
+              type="text"
+              value={deposit}
+              onChange={(e) => {
+                const value = e.target.value.replace(/[^0-9]/g, '');
+                const newDeposit = value ? parseInt(value) : 0;
+                setDeposit(newDeposit);
+                setRemainingPrice(calculateRemainingPrice(totalKoiPrice, newDeposit));
+              }}
               style={{ width: "100%", marginTop: "5px" }}
             />
           </p>
@@ -853,8 +952,8 @@ function Consulting() {
             <input
               type="number"
               value={remainingPrice}
-              onChange={(e) => setRemainingPrice(e.target.value)}
-              style={{ width: "100%", marginTop: "5px" }}
+              disabled
+              style={{ width: "100%", marginTop: "5px", backgroundColor: "#f5f5f5" }}
             />
           </p>
           <p>

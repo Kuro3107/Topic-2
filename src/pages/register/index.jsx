@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React from "react";
 import AuthenTemplate from "../../components/authen-template";
 import { Button, Form, Input } from "antd";
@@ -67,10 +68,10 @@ function RegisterPage() {
             <Input />
           </Form.Item>
           <Form.Item
-            label="Phone"
+            label="Phone (Optional)"
             name="phone"
             rules={[
-              { required: true, message: "Please enter phone number!" },
+              // { required: true, message: "Please enter phone number!" },
               { pattern: /^0\d{9}$/, message: "Phone number must be 10 digits and start with 0" },
             ]}
           >

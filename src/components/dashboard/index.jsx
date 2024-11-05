@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { DesktopOutlined, FileOutlined, LogoutOutlined } from "@ant-design/icons";
+import { BarChartOutlined, CommentOutlined, ContainerOutlined, DatabaseOutlined, LogoutOutlined, ScheduleOutlined, ShoppingOutlined, UserOutlined } from "@ant-design/icons";
 import { Button, Layout, Menu, theme } from "antd";
 import ManageFarm from "../../pages/admin/manage-farm";
 import ManageTrip from "../../pages/admin/manage-trip";
@@ -7,10 +7,14 @@ import ManageBooking from "../../pages/admin/manage-booking";
 import ManageAccounts from "../../pages/admin/manage-accounts";
 import ManageFeedback from "../../pages/admin/manage-feedback";
 import ManageKoi from "../../pages/admin/manage-koi";
+import ManagePO from "../../pages/admin/manage-po";
 import "../dashboard/index.css"
 import Diagram from "../../pages/admin/Diagram";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const { Header, Content, Footer, Sider } = Layout;
+
 
 function getItem(label, key, icon, children) {
   return {
@@ -22,18 +26,21 @@ function getItem(label, key, icon, children) {
 }
 
 const items = [
-  getItem("Diagram", "Diagram", <DesktopOutlined />),
-  getItem("Manage Booking", "Booking", <DesktopOutlined />),
-  getItem("Manage Trip", "Trip", <FileOutlined />),
-  getItem("Manage Farm", "Farm", <DesktopOutlined />),
-  getItem("Manage Accounts", "Accounts", <DesktopOutlined />),
-  getItem("Manage Feedback", "Feedback", <DesktopOutlined />),
-  getItem("Manage Koi", "Koi", <DesktopOutlined />),
+  getItem("Diagram", "Diagram", <BarChartOutlined />),
+  getItem("Manage Booking", "Booking", <ContainerOutlined />),
+  getItem("Manage Trip", "Trip", <ScheduleOutlined />),
+  getItem("Manage PO", "PO", <ShoppingOutlined />),
+  getItem("Manage Farm", "Farm", <DatabaseOutlined />),
+  getItem("Manage Koi", "Koi", <DatabaseOutlined />),
+  getItem("Manage Accounts", "Accounts", <UserOutlined />),
+  getItem("Manage Feedback", "Feedback", <CommentOutlined />),
 ];
 
 const Dashboard = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [selectedKey, setSelectedKey] = useState("1");
+  const navigate = useNavigate();
+  const isLoggedIn = localStorage.getItem("userInfo") !== null;
   const {
     token: { colorBgContainer },
   } = theme.useToken();
@@ -54,6 +61,8 @@ const Dashboard = () => {
         return <ManageFeedback />;
       case "Koi":
         return <ManageKoi />;
+      case "PO":
+        return <ManagePO />;
       default:
         return <div>Select a menu item</div>;
     }
@@ -61,9 +70,16 @@ const Dashboard = () => {
 
   // Hàm để xử lý đăng xuất
   const handleLogout = () => {
-    localStorage.removeItem("authToken"); // Assuming you store your token here
-    // Redirect to the login page
-    window.location.href = "/login"; // Navigate to the login page
+    try {
+      localStorage.removeItem("token");
+      localStorage.removeItem("userInfo");
+      navigate("/");
+      toast.success("Log out successfully!");
+      window.location.reload();
+    } catch (error) {
+      console.error("Error when logging out:", error);
+      toast.error("An error occurred while logging out. Please try again.");
+    }
   };
 
   return (

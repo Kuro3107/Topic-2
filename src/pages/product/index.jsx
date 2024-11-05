@@ -354,11 +354,9 @@ const Product = () => {
                       <div className="card-content">
                         <Meta title={tour.tripName} />
                         <div className="tour-price">
-                          Price: {tour.priceTotal?.toLocaleString()} $
+                          Price: {tour.priceTotal?.toLocaleString()} VNĐ
                         </div>
-                        <div className="tour-description">
-                          {tour.description?.slice(0, 100)}...
-                        </div>
+                        
                         <div className="button-group">
                           <Button
                             type="primary"
@@ -372,7 +370,7 @@ const Product = () => {
                             className="view-button"
                             onClick={() => handleViewTour(tour)}
                           >
-                            View
+                            View Details
                           </Button>
                         </div>
                       </div>
@@ -410,13 +408,6 @@ const Product = () => {
                 <span className="price-tag">
                   Price: ${selectedTour.priceTotal?.toLocaleString()}
                 </span>
-              </div>
-            </div>
-
-            <div className="tour-detail-section">
-              <h3>Description</h3>
-              <div className="tour-description">
-                {selectedTour.description || "No description available."}
               </div>
             </div>
 

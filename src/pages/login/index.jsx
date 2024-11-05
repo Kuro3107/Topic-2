@@ -1,17 +1,37 @@
 import AuthenTemplate from "../../components/authen-template";
-import { Button, Form, Input } from "antd";
+import { Button, Form, Input, message, Modal } from "antd";
 import { getAuth, signInWithPopup } from "firebase/auth";
 import { GoogleAuthProvider } from "firebase/auth/web-extension";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import api from "../../config/axios";
 import { googleProvider } from "../../config/firebase";
-import { LockOutlined, UserOutlined } from "@ant-design/icons";
+import { LockOutlined, UserOutlined, MailOutlined, PhoneOutlined } from "@ant-design/icons";
 import { setUserRole } from "../../utils/auth";
+import React, { useState } from 'react';
 
 function LoginPage() {
   const navigate = useNavigate();
   const [form] = Form.useForm();
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [usernameExists, setUsernameExists] = useState(false);
+  const [username, setUsername] = useState("");
+  const [step, setStep] = useState(1); // 1: Username, 2: Email & Phone, 3: Reset Password
+const [isVerified, setIsVerified] = useState(false);
+  // State cho form login
+const [loginForm] = Form.useForm();
+
+// State cho modal forget password
+const [forgotPasswordForm] = Form.useForm();
+// State cho form "Login"
+const [loginUsername, setLoginUsername] = useState("");
+
+// State cho form "Forgot Password"
+const [forgotPasswordUsername, setForgotPasswordUsername] = useState("");
+
+// State lưu trữ username đã xác thực
+const [validatedUsername, setValidatedUsername] = useState("");
+
 
   // Xử lý đăng nhập bằng Google
   const handleLoginWithGoogle = async () => {
@@ -79,11 +99,11 @@ function LoginPage() {
         }
       } else {
         console.error("Failed to login:", response);
-        toast.error("Sign in with Google failed. Please try again.");
+        toast.error("Sign in with Google failed. Email Not Found.");
       }
     } catch (error) {
       console.error("Error signing in with Google:", error);
-      toast.error("Sign in with Google failed. Please try again.");
+      toast.error("Sign in with Google failed. Email Not Found.");
     }
   };
 
@@ -159,19 +179,139 @@ function LoginPage() {
     }
   };
 
+  // Show the "Forgot Password" modal
+  const showForgotPasswordModal = () => {
+    setIsModalVisible(true);
+    setValidatedUsername(null); // Đặt lại username đã xác thực
+    setUsernameExists(false); // Đặt lại trạng thái xác thực username
+    setStep(1); // Bắt đầu lại từ bước 1
+  };
+
+  // Đóng modal và reset các trạng thái
+const handleCancel = () => {
+  setIsModalVisible(false);
+  setValidatedUsername(null); // Đặt lại username đã xác thực
+  setUsernameExists(false); // Đặt lại trạng thái xác thực username
+  setStep(1); // Bắt đầu lại từ bước 1
+};
+
+  // Check if username exists in the database
+  // Cập nhật state sau khi kiểm tra username thành công
+// Bước 1: Kiểm tra Username
+const checkUsername = async (username) => {
+  try {
+    const response = await fetch(`http://localhost:8080/api/accounts/check-username?username=${encodeURIComponent(username)}`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    });
+
+    if (response.ok) {
+      const exists = await response.json();
+      if (exists) {
+        message.success("Username exists");
+        setValidatedUsername(username); // Lưu username đã xác thực
+        setStep(2); // Chuyển sang bước kiểm tra email và phone
+      } else {
+        message.error("Username Not Found");
+      }
+    }
+  } catch (error) {
+    console.error("Error during fetch:", error);
+  }
+};
+
+// Bước 2: Kiểm tra Email và Phone
+const checkEmailAndPhone = async (email, phone) => {
+  try {
+    const response = await fetch("http://localhost:8080/api/accounts/verify-email-phone", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username: validatedUsername, email, phone }),
+    });
+
+    if (response.ok) {
+      const valid = await response.json();
+      if (valid) {
+        message.success("Email and phone number are correct");
+        setIsVerified(true);
+        setStep(3); // Chuyển sang bước reset mật khẩu
+      } else {
+        message.error("Incorrect email or phone number");
+      }
+    }
+  } catch (error) {
+    console.error("Error checking email and phone:", error);
+  }
+};
+  
+
+  const handleCheckUsername = async () => {
+    try {
+      await forgotPasswordForm.validateFields(['username']); // Kiểm tra form trước khi lấy giá trị
+      const formValues = forgotPasswordForm.getFieldsValue();
+      console.log("Current form values:", formValues);
+  
+      const username = formValues.username;
+      console.log("Username being checked:", username);
+  
+      if (username) {
+        await checkUsername(username);
+      } else {
+        console.warn("Username is empty");
+        message.error("Username Not Found")
+      }
+    } catch (error) {
+      console.error("Validation failed:", error);
+      message.error("Username Not Found")
+    }
+  };
+
+  // Handle password reset after username validation
+  // Sử dụng state validatedUsername khi gửi yêu cầu đặt lại mật khẩu
+const handlePasswordReset = async (values) => {
+  console.log("Password reset form submitted:", values);
+  try {
+    const response = await fetch(
+      "http://localhost:8080/api/accounts/reset-password",
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username: validatedUsername, newPassword: values.newPassword }),
+      }
+    );
+    if (response.ok) {
+      console.log("Password reset successful");
+      message.success("Password reset successful");
+      setIsModalVisible(false);
+    } else {
+      throw new Error("Password reset failed");
+    }
+  } catch (error) {
+    console.error("Error resetting password:", error);
+    message.error("Password reset failed")
+  }
+};
+
   return (
     <div className="wrapper">
       <AuthenTemplate>
         <h1 className="login-title">Login</h1>
-        <Form form={form} labelCol={{ span: 24 }} onFinish={handleLogin}>
+        <Form form={loginForm} labelCol={{ span: 24 }} onFinish={handleLogin}>
           <div className="login-form">
-            <Form.Item
-              label="Username"
-              name="username" // Sửa thành "username" nếu backend yêu cầu
-              rules={[{ required: true, message: "Please enter username!" }]}
-            >
-              <Input prefix={<UserOutlined />} placeholder="Username" />
-            </Form.Item>
+          <Form.Item
+    label="Username"
+    name="username"
+    rules={[{ required: true, message: "Please enter username!" }]}
+  >
+    <Input
+      prefix={<UserOutlined />}
+      placeholder="Username"
+      value={loginUsername}
+      onChange={(e) => setLoginUsername(e.target.value)}
+    />
+  </Form.Item>
             <Form.Item
               label="Password"
               name="password"
@@ -183,12 +323,17 @@ function LoginPage() {
                 placeholder="Password"
               />
             </Form.Item>
+
+            
           </div>
 
           <Button type="primary" htmlType="submit">
             Log In
           </Button>
           <Button onClick={handleLoginWithGoogle}>Sign in with Google</Button>
+          <div>
+            <a onClick={showForgotPasswordModal}>Forgot Password?</a>
+          </div>
           <div>
             <Link to="/register">Do not have an account?</Link>
           </div>
@@ -197,6 +342,43 @@ function LoginPage() {
           </div>
         </Form>
       </AuthenTemplate>
+
+      {/* Forgot Password Modal */}
+      <Modal
+    title="Forgot Password"
+    visible={isModalVisible}
+    onCancel={handleCancel}
+    footer={"Forgot Password and Reset Password function only works for users who have registered Email and Phone. If you have not registered, please contact us for support."}
+  >
+    {step === 1 && (
+      <Form form={forgotPasswordForm} onFinish={(values) => checkUsername(values.username)}>
+        <Form.Item name="username" rules={[{ required: true, message: "Please enter username!" }]}>
+          <Input prefix={<UserOutlined />} placeholder="Username" />
+        </Form.Item>
+        <Button type="primary" htmlType="submit">Check Username</Button>
+      </Form>
+    )}
+    {step === 2 && (
+      <Form form={forgotPasswordForm} onFinish={(values) => checkEmailAndPhone(values.email, values.phone)}>
+        <Form.Item name="email" rules={[{ required: true, message: "Please enter your email!" }]}>
+          <Input prefix={<MailOutlined />} placeholder="Email" />
+        </Form.Item>
+        <Form.Item name="phone" rules={[{ required: true, message: "Please enter your phone number!" }]}>
+          <Input prefix={<PhoneOutlined />} placeholder="Phone" />
+        </Form.Item>
+        <Button type="primary" htmlType="submit">Verify Email and Phone</Button>
+      </Form>
+    )}
+    {step === 3 && (
+      <Form form={forgotPasswordForm} onFinish={handlePasswordReset}>
+        <Form.Item name="newPassword" rules={[{ required: true, message: "Please enter your new password!" }]}>
+          <Input.Password placeholder="New Password" />
+        </Form.Item>
+        <Button type="primary" htmlType="submit">Save New Password</Button>
+      </Form>
+    )}
+  </Modal>
+
     </div>
   );
 }

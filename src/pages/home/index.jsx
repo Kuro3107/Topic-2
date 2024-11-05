@@ -4,19 +4,63 @@ import {
   GlobalOutlined,
   HeartOutlined,
   EnvironmentOutlined,
+  StarFilled,
 } from "@ant-design/icons";
 import Header from "../../components/header/index";
 import Footer from "../../components/footer/index";
 import "./index.css";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { Rate } from "antd";
 
 const { Title, Paragraph } = Typography;
+
+const censorName = (fullName) => {
+  if (!fullName) return '';
+  const names = fullName.split(' ');
+  const lastName = names[names.length - 1];
+  const censoredPart = '*'.repeat(fullName.length - lastName.length);
+  return censoredPart + lastName;
+};
 
 function HomePage() {
 
   const navigate = useNavigate();
   const isLoggedIn = localStorage.getItem("userInfo") !== null;
+  const [feedbacks, setFeedbacks] = useState([]);
+
+  useEffect(() => {
+    const fetchFeedbacks = async () => {
+      try {
+        const feedbackResponse = await axios.get('http://localhost:8080/api/feedbacks');
+        const bookingResponse = await axios.get('http://localhost:8080/api/bookings');
+        
+        // Kết hợp dữ liệu booking và feedback
+        const combinedData = bookingResponse.data.map(booking => {
+          const feedback = feedbackResponse.data.find(f => f.feedbackId === booking.feedbackId);
+          if (feedback && feedback.rating >= 5) {
+            return {
+              bookingId: booking.bookingId,
+              fullName: booking.fullname,
+              rating: feedback.rating,
+              comment: feedback.comments || 'No comment provided'
+            };
+          }
+          return null;
+        }).filter(item => item !== null);
+        
+        // Lấy ngẫu nhiên 5 feedback
+        const shuffled = combinedData.sort(() => 0.5 - Math.random());
+        setFeedbacks(shuffled.slice(0, 5));
+      } catch (error) {
+        console.error('Error fetching feedbacks:', error);
+      }
+    };
+
+    fetchFeedbacks();
+  }, []);
 
   const handleBookTripClick = () => {
     if (!isLoggedIn) {
@@ -26,6 +70,22 @@ function HomePage() {
       navigate("/bookingform");
     }
   };
+
+  const partnerImages = [
+    { src: '/logo-vietnam-airlines-2.png', alt: 'Partner 1' },
+    { src: '/Logo-VietjetAir.jpg', alt: 'Partner 2' },
+    { src: '/japan-airlines5379.jpg', alt: 'Partner 3' },
+    { src: '/All-Nippon-Airways-logo.jpg', alt: 'Partner 4' },
+    { src: '/JW-Marriottpng.png', alt: 'Partner 5' },
+    { src: '/property_logo_99037720_1614133500.jpg', alt: 'Partner 6' },
+    { src: '/1500x2250+Artboard+Shinrin+Hotel+3_4-01.png', alt: 'Partner 7' },
+    { src: '/93d92dbf1c42071888488f759314d2c5.jpg', alt: 'Partner 8' },
+    { src: '/japanexpress.png', alt: 'Partner 9' },
+    { src: '/spx.jpg', alt: 'Partner 10' },
+    { src: '/ghtk.jpg', alt: 'Partner 11' },
+    { src: '/607cdb2f875a62174a2ac9e3_After_GHN.png', alt: 'Partner 12' }
+    // Add more images as needed
+  ];
 
   return (
     <div className="introduce-page">
@@ -215,6 +275,57 @@ function HomePage() {
             clients have a delightful and memorable experience in selecting the
             perfect Koi from Japan's finest farms.
           </Paragraph>
+        </div>
+
+        <div className="system-introduction">
+          <Title level={2}>Our Customers&apos; Feedback</Title>
+          <Row gutter={[24, 24]} justify="center">
+            {feedbacks.map((feedback, index) => (
+              <Col xs={24} sm={12} md={8} key={index}>
+                <div className="feedback-item">
+                  <Title level={4}>{censorName(feedback.fullName || '')}</Title>
+                  <Rate 
+                    disabled 
+                    value={feedback.rating} 
+                    style={{ fontSize: 20 }}
+                  />
+                  <Paragraph className="feedback-text">
+                    {feedback.comment}
+                  </Paragraph>
+                </div>
+              </Col>
+            ))}
+          </Row>
+        </div>
+
+        <div className="system-introduction">
+          <Title level={2}>Our Partners</Title>
+          <Row gutter={[16, 16]} justify="center">
+            {partnerImages.map((partner, index) => (
+              <Col xs={24} sm={12} md={8} lg={6} key={index}>
+                <div
+                  style={{
+                    padding: '1px',
+                    border: '1px solid #f0f0f0',
+                    borderRadius: '1px',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}
+                >
+                  <img
+                    src={partner.src}
+                    alt={partner.alt}
+                    style={{
+                      width: '150px', // Set fixed width
+                      height: '150px', // Set fixed height
+                      objectFit: 'contain', // Keep aspect ratio
+                    }}
+                  />
+                </div>
+              </Col>
+            ))}
+          </Row>
         </div>
       </div>
       <Footer />

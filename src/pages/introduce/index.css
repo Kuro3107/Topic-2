@@ -79,7 +79,7 @@ main h1:hover {
 .koi-avatar {
   width: 100%;
   height: 150px; /* Đặt chiều cao cho hình ảnh */
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .koi-info {

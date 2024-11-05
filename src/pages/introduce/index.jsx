@@ -43,10 +43,10 @@ function Introduce() {
       <main>
         <Banner />
 
-        <h1>Farm List</h1>
+        <h1>Farms List</h1>
         <ProductList />
         <div>
-          <h1>Koi Breeds</h1>
+          <h1>Koi Varieties</h1>
           <div className="koi-grid">
             {currentKois.map((koi) => (
               <div key={koi.varietyId} className="koi-card">
