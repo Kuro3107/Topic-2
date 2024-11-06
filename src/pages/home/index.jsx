@@ -71,6 +71,10 @@ function HomePage() {
     }
   };
 
+  const handleBookTripClick2 = () => {
+      navigate("/product");
+  };
+
   const partnerImages = [
     { src: '/logo-vietnam-airlines-2.png', alt: 'Partner 1' },
     { src: '/Logo-VietjetAir.jpg', alt: 'Partner 2' },
@@ -95,6 +99,9 @@ function HomePage() {
           <Title level={1}>Discover the Beauty of Japanese Koi Farms</Title>
           <Button className="banner-button" onClick={handleBookTripClick}>
             Create Your Tour Now
+          </Button>
+          <Button className="banner-button" onClick={handleBookTripClick2}>
+            Discover Our Tours
           </Button>
         </div>
 

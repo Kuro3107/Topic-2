@@ -1,0 +1,43 @@
+/* Reset lại CSS cũ */
+input, 
+textarea, 
+select {
+    /* Xóa các styles này vì chúng có thể xung đột với Ant Design */
+}
+
+/* Thêm styles mới cho Ant Design components */
+.ant-input,
+.ant-input-outlined,
+.ant-select,
+.ant-select-selector,
+.ant-picker {
+    width: 100% !important;
+    min-width: 250px !important;
+}
+
+.ant-form-item {
+    width: 100% !important;
+    margin-bottom: 16px !important;
+}
+
+.ant-form-item-control-input-content {
+    width: 100% !important;
+}
+
+/* Nếu bạn sử dụng Form.Item của antd */
+.ant-form {
+    width: 100% !important;
+    max-width: 800px !important;
+    margin: 0 auto;
+}
+
+/* Đảm bảo responsive */
+@media screen and (max-width: 768px) {
+    .ant-input,
+    .ant-input-outlined,
+    .ant-select,
+    .ant-select-selector,
+    .ant-picker {
+        min-width: 200px !important;
+    }
+}

@@ -225,15 +225,25 @@ const Delivery = () => {
     <Layout>
       <Layout>
         <Header className="deli-header">
-          <h5>Order details</h5>
-          <Button
-            type="primary"
-            icon={<LogoutOutlined />}
-            onClick={handleLogout}
-            style={{ float: "right" }}
-          >
-            Logout
-          </Button>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+            <Link to="/">
+              <Button type="primary">
+                Home
+              </Button>
+            </Link>
+            <Link to="/profile">
+              <Button type="primary">
+                Profile
+              </Button>
+            </Link>
+            <Button
+              type="primary"
+              icon={<LogoutOutlined />}
+              onClick={handleLogout}
+            >
+              Log Out
+            </Button>
+          </div>
         </Header>
         <Content className="deli-content">
           <div className="site-layout-background">

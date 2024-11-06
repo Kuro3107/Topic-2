@@ -345,38 +345,97 @@ const handlePasswordReset = async (values) => {
 
       {/* Forgot Password Modal */}
       <Modal
-    title="Forgot Password"
+    title={<div style={{ textAlign: 'center', fontSize: '24px', fontWeight: 'bold' }}>Forgot Password</div>}
     visible={isModalVisible}
     onCancel={handleCancel}
-    footer={"Forgot Password and Reset Password function only works for users who have registered Email and Phone. If you have not registered, please contact us for support."}
+    width={400}
+    centered
+    footer={
+      <div style={{ textAlign: 'center', color: '#666', padding: '10px', fontSize: '13px' }}>
+        Forgot Password and Reset Password function only works for users who have registered Email and Phone. 
+        If you have not registered, please contact us for support.
+      </div>
+    }
   >
-    {step === 1 && (
-      <Form form={forgotPasswordForm} onFinish={(values) => checkUsername(values.username)}>
-        <Form.Item name="username" rules={[{ required: true, message: "Please enter username!" }]}>
-          <Input prefix={<UserOutlined />} placeholder="Username" />
-        </Form.Item>
-        <Button type="primary" htmlType="submit">Check Username</Button>
-      </Form>
-    )}
-    {step === 2 && (
-      <Form form={forgotPasswordForm} onFinish={(values) => checkEmailAndPhone(values.email, values.phone)}>
-        <Form.Item name="email" rules={[{ required: true, message: "Please enter your email!" }]}>
-          <Input prefix={<MailOutlined />} placeholder="Email" />
-        </Form.Item>
-        <Form.Item name="phone" rules={[{ required: true, message: "Please enter your phone number!" }]}>
-          <Input prefix={<PhoneOutlined />} placeholder="Phone" />
-        </Form.Item>
-        <Button type="primary" htmlType="submit">Verify Email and Phone</Button>
-      </Form>
-    )}
-    {step === 3 && (
-      <Form form={forgotPasswordForm} onFinish={handlePasswordReset}>
-        <Form.Item name="newPassword" rules={[{ required: true, message: "Please enter your new password!" }]}>
-          <Input.Password placeholder="New Password" />
-        </Form.Item>
-        <Button type="primary" htmlType="submit">Save New Password</Button>
-      </Form>
-    )}
+    <div style={{ padding: '20px 0' }}>
+      {step === 1 && (
+        <Form form={forgotPasswordForm} onFinish={(values) => checkUsername(values.username)}>
+          <Form.Item 
+            name="username" 
+            rules={[{ required: true, message: "Please enter username!" }]}
+          >
+            <Input 
+              prefix={<UserOutlined style={{ color: '#bfbfbf' }} />} 
+              placeholder="Username"
+              size="large"
+            />
+          </Form.Item>
+          <Form.Item style={{ textAlign: 'center', marginTop: '20px' }}>
+            <Button type="primary" htmlType="submit" size="large" block>
+              Check Username
+            </Button>
+          </Form.Item>
+        </Form>
+      )}
+
+      {step === 2 && (
+        <Form form={forgotPasswordForm} onFinish={(values) => checkEmailAndPhone(values.email, values.phone)}>
+          <Form.Item 
+            name="email" 
+            rules={[{ required: true, message: "Please enter your email!" }]}
+          >
+            <Input 
+              prefix={<MailOutlined style={{ color: '#bfbfbf' }} />} 
+              placeholder="Email"
+              size="large"
+            />
+          </Form.Item>
+          <Form.Item 
+            name="phone" 
+            rules={[{ required: true, message: "Please enter your phone number!" }]}
+          >
+            <Input 
+              prefix={<PhoneOutlined style={{ color: '#bfbfbf' }} />} 
+              placeholder="Phone"
+              size="large"
+            />
+          </Form.Item>
+          <Form.Item style={{ textAlign: 'center', marginTop: '20px' }}>
+            <Button type="primary" htmlType="submit" size="large" block>
+              Verify Email and Phone
+            </Button>
+          </Form.Item>
+        </Form>
+      )}
+
+      {step === 3 && (
+        <Form form={forgotPasswordForm} onFinish={handlePasswordReset}>
+          <Form.Item 
+            name="newPassword" 
+            rules={[
+              { required: true, message: "Please enter your new password!" },
+              { min: 6, message: "Password must be at least 6 characters!" }
+            ]}
+          >
+            <Input.Password 
+              placeholder="New Password"
+              size="large"
+            />
+          </Form.Item>
+          <Form.Item style={{ textAlign: 'center', marginTop: '20px' }}>
+            <Button type="primary" htmlType="submit" size="large" block>
+              Save New Password
+            </Button>
+          </Form.Item>
+        </Form>
+      )}
+
+      <div style={{ textAlign: 'center', marginTop: '15px' }}>
+        <div style={{ fontSize: '14px', color: '#666' }}>
+          Step {step} of 3
+        </div>
+      </div>
+    </div>
   </Modal>
 
     </div>

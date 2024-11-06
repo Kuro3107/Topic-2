@@ -263,10 +263,10 @@ const handleOk = () => {
             rules={[{ required: true }]}
           >
             <Select>
-              <Select.Option value="pending">Pending</Select.Option>
-              <Select.Option value="detailed">Detailed</Select.Option>
-              <Select.Option value="approved">Approved</Select.Option>
-              <Select.Option value="rejected">Rejected</Select.Option>
+              <Select.Option value="Pending">Pending</Select.Option>
+              <Select.Option value="Detailed">Detailed</Select.Option>
+              <Select.Option value="Approved">Approved</Select.Option>
+              <Select.Option value="Rejected">Rejected</Select.Option>
             </Select>
           </Form.Item>
           <Form.Item

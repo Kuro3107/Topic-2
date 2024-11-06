@@ -26,7 +26,7 @@ function getItem(label, key, icon, children) {
 }
 
 const items = [
-  getItem("Diagram", "Diagram", <BarChartOutlined />),
+  getItem("Statistics", "Diagram", <BarChartOutlined />),
   getItem("Manage Booking", "Booking", <ContainerOutlined />),
   getItem("Manage Trip", "Trip", <ScheduleOutlined />),
   getItem("Manage PO", "PO", <ShoppingOutlined />),
@@ -100,14 +100,25 @@ const Dashboard = () => {
       </Sider>
       <Layout>
         <Header>
-        <Button
-            type="primary"
-            icon={<LogoutOutlined />} // Icon logout
-            onClick={handleLogout}
-            style={{ float: "right" }} // Căn phải
-          >
-            Đăng xuất
-          </Button>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+            <Link to="/">
+              <Button type="primary">
+                Home
+              </Button>
+            </Link>
+            <Link to="/profile">
+              <Button type="primary">
+                Profile
+              </Button>
+            </Link>
+            <Button
+              type="primary"
+              icon={<LogoutOutlined />}
+              onClick={handleLogout}
+            >
+              Log Out
+            </Button>
+          </div>
         </Header>
         <Content>
           <div className="content-wrapper">

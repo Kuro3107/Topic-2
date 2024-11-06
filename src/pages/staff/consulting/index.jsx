@@ -477,14 +477,25 @@ function Consulting() {
     <Layout>
       <Layout>
         <Header className="deli-header">
-          <Button
-            type="primary"
-            icon={<LogoutOutlined />} // Icon logout
-            onClick={handleLogout}
-            style={{ float: "right" }} // Căn phải
-          >
-            Logout
-          </Button>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+            <Link to="/">
+              <Button type="primary">
+                Home
+              </Button>
+            </Link>
+            <Link to="/profile">
+              <Button type="primary">
+                Profile
+              </Button>
+            </Link>
+            <Button
+              type="primary"
+              icon={<LogoutOutlined />}
+              onClick={handleLogout}
+            >
+              Log Out
+            </Button>
+          </div>
         </Header>
         <h1>Consulting Staff Dashboard</h1>
         <Table

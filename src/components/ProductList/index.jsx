@@ -86,7 +86,7 @@ function ProductList() {
                     className="koi-avatar"
                   />
                   <p>Type: {koi.varietyName}</p>
-                  <p>Price: {koi.koiPrice} VNĐ</p>
+                  <p>Average Price: {koi.koiPrice} VNĐ</p>
                   <p>Describe: {koi.description}</p>
                 </div>
               ))

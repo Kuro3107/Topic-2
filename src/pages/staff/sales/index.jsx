@@ -29,6 +29,7 @@ import { Footer, Header } from "antd/es/layout/layout";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
+
 function SalesDashboard() {
   const [bookings, setBookings] = useState([]);
   const [koiFarms, setKoiFarms] = useState([]); // State để lưu danh sách Koi Farms
@@ -623,14 +624,25 @@ function SalesDashboard() {
     <Layout>
       <Layout>
         <Header className="deli-header">
-          <Button
-            type="primary"
-            icon={<LogoutOutlined />} // Icon logout
-            onClick={handleLogout}
-            style={{ float: "right" }} // Căn phải
-          >
-            Logout
-          </Button>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+            <Link to="/">
+              <Button type="primary">
+                Home
+              </Button>
+            </Link>
+            <Link to="/profile">
+              <Button type="primary">
+                Profile
+              </Button>
+            </Link>
+            <Button
+              type="primary"
+              icon={<LogoutOutlined />}
+              onClick={handleLogout}
+            >
+              Log Out
+            </Button>
+          </div>
         </Header>
         <h1>Sales Staff Dashboard</h1>
 

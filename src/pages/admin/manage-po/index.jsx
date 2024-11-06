@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Table,
   Button,
@@ -17,16 +17,29 @@ const ManagePO = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    fetchPOs();
+    fetchData();
   }, []);
 
-  const fetchPOs = async () => {
+  const fetchData = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('http://localhost:8080/api/pos');
-      setPos(response.data);
+      const [posResponse, bookingsResponse] = await Promise.all([
+        axios.get('http://localhost:8080/api/pos'),
+        axios.get('http://localhost:8080/api/bookings')
+      ]);
+
+      const bookingsMap = new Map(
+        bookingsResponse.data.map(booking => [booking.poId, booking])
+      );
+
+      const posWithBookings = posResponse.data.map(po => ({
+        ...po,
+        bookingId: bookingsMap.get(po.poId)?.bookingId || 'Booking deleted'
+      }));
+
+      setPos(posWithBookings);
     } catch (error) {
-      message.error('Không thể tải danh sách PO: ' + error.message);
+      message.error('Không thể tải dữ liệu: ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -36,7 +49,7 @@ const ManagePO = () => {
     try {
       await axios.delete(`http://localhost:8080/api/pos/${poId}`);
       message.success('Xóa PO thành công');
-      fetchPOs();
+      fetchData();
     } catch (error) {
       message.error('Không thể xóa PO: ' + error.message);
     }
@@ -47,6 +60,11 @@ const ManagePO = () => {
       title: 'PO ID',
       dataIndex: 'poId',
       key: 'poId',
+    },
+    {
+      title: 'Booking ID',
+      dataIndex: 'bookingId',
+      key: 'bookingId',
     },
     {
       title: 'Tổng tiền',

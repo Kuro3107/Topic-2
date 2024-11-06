@@ -6,6 +6,8 @@ import logo from "../../assets/img/logo.jpg";
 const Header = () => {
   const navigate = useNavigate();
   const isLoggedIn = localStorage.getItem("userInfo") !== null;
+  const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
+  const roleId = userInfo?.roleId;
 
   const handleLogout = () => {
     try {
@@ -29,6 +31,25 @@ const Header = () => {
     }
   };
 
+  const handleDashboardClick = () => {
+    switch (roleId) {
+      case 1:
+        navigate("/dashboard");
+        break;
+      case 2:
+        navigate("/sales");
+        break;
+      case 3:
+        navigate("/consulting");
+        break;
+      case 4:
+        navigate("/delivery");
+        break;
+      default:
+        break;
+    }
+  };
+
   return (
     <header className="header">
       <div className="logo-container">
@@ -39,6 +60,13 @@ const Header = () => {
       </div>
       <nav className="nav">
         <ul>
+          {isLoggedIn && roleId !== 5 && (
+            <li>
+              <Link className="header-link" onClick={handleDashboardClick}>
+                Dashboard
+              </Link>
+            </li>
+          )}
           <li>
             <Link to="/" className="header-link">
               Home

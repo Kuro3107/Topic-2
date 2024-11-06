@@ -146,15 +146,28 @@ const Product = () => {
     fetchTours();
   }, [fetchTours]);
 
+  // Thêm hàm kiểm tra role
+  const isCustomerRole = () => {
+    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+    return userInfo && userInfo.roleId === 5; // 5 là role Customer
+  };
+
+  // Cập nhật hàm handleBooking
   const handleBooking = (tripId) => {
     const userInfo = JSON.parse(localStorage.getItem("userInfo"));
     if (!userInfo) {
-      message.warning("Please login to book tour.");
+      message.warning("Vui lòng đăng nhập để đặt tour.");
       navigate("/login");
-    } else {
-      setSelectedTour(tours.find((tour) => tour.tripId === tripId)); // Lưu thông tin tour đã chọn
-      setIsBookingModalVisible(true); // Hiện modal booking
+      return;
     }
+    
+    if (!isCustomerRole()) {
+      message.warning("Chỉ tài khoản khách hàng mới có thể đặt tour.");
+      return;
+    }
+
+    setSelectedTour(tours.find((tour) => tour.tripId === tripId));
+    setIsBookingModalVisible(true);
   };
 
   const handleViewTour = async (tour) => {
@@ -406,7 +419,7 @@ const Product = () => {
             <div className="tour-basic-info">
               <div>
                 <span className="price-tag">
-                  Price: ${selectedTour.priceTotal?.toLocaleString()}
+                  Price: {selectedTour.priceTotal?.toLocaleString()} VNĐ
                 </span>
               </div>
             </div>
@@ -425,7 +438,7 @@ const Product = () => {
                   </p>
                   <p>
                     <span className="detail-label">Note Price:</span>
-                    {detail.notePrice}
+                    {detail.notePrice} VNĐ
                   </p>
                   <p>
                     <span className="detail-label">Day:</span>
@@ -468,7 +481,7 @@ const Product = () => {
                         />
                         <p>{variety.description}</p>
                         <p className="price-tag">
-                          ${variety.koiPrice?.toLocaleString()}
+                          {variety.koiPrice?.toLocaleString()} VNĐ
                         </p>
                       </div>
                     ))}

@@ -169,7 +169,7 @@ function BookingForm() {
           favoriteKoi: [],
           favoriteFarm: [],
           note: "",
-          status: "pending",
+          status: "Pending",
         });
       }
     } catch (error) {

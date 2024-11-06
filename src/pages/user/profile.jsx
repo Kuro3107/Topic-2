@@ -61,6 +61,7 @@ function Profile() {
   const [isRefundModalVisible, setIsRefundModalVisible] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [bookingToDelete, setBookingToDelete] = useState(null);
+  const [isDeleteAccountModalVisible, setIsDeleteAccountModalVisible] = useState(false);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -403,7 +404,7 @@ function Profile() {
   );
 
   const avatarPopoverContent = (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '150px' }}>
       <Upload
         name="avatar"
         showUploadList={false}
@@ -412,7 +413,10 @@ function Profile() {
           return false;
         }}
       >
-        <Button icon={<CameraOutlined />} style={{ width: '100%' }}>
+        <Button 
+          icon={<CameraOutlined />} 
+          style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+        >
           Change Avatar
         </Button>
       </Upload>
@@ -420,7 +424,7 @@ function Profile() {
         icon={<DeleteOutlined />} 
         danger
         onClick={handleDeleteAvatar}
-        style={{ width: '100%' }}
+        style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
       >
         Delete Avatar
       </Button>
@@ -457,6 +461,20 @@ function Profile() {
   const handleCancelDelete = () => {
     setIsDeleteModalVisible(false);
     setBookingToDelete(null);
+  };
+
+  const handleDeleteAccount = async () => {
+    try {
+      await api.delete(`/accounts/${parsedUser.id}`);
+      message.success('Tài khoản đã được xóa thành công');
+      // Xóa thông tin người dùng khỏi localStorage
+      localStorage.removeItem('userInfo');
+      // Chuyển hướng về trang chủ
+      navigate('/');
+    } catch (error) {
+      console.error('Error deleting account:', error);
+      message.error('Có lỗi xảy ra khi xóa tài khoản');
+    }
   };
 
   if (loading) {
@@ -607,8 +625,17 @@ function Profile() {
                 trigger="click"
                 placement="bottom"
               >
-                <Button icon={<PictureOutlined />}>Change Background</Button>
+                <Button icon={<PictureOutlined />} style={{ marginRight: "10px" }}>
+                  Change Background
+                </Button>
               </Popover>
+              <Button 
+                danger
+                icon={<DeleteOutlined />}
+                onClick={() => setIsDeleteAccountModalVisible(true)}
+              >
+                Delete Account
+              </Button>
             </div>
           }
         >
@@ -640,6 +667,11 @@ function Profile() {
             <div style={{ marginBottom: '10px' }}>
               <strong>Phone:</strong> {user.phone || 'Not Updated!'}
             </div>
+            {user.roleId !== 5 && (
+              <div style={{ marginBottom: '10px' }}>
+                <strong>Role:</strong> {roleMapping[user.roleId] || 'Unknown'}
+              </div>
+            )}
           </div>
         </Card>
 
@@ -917,6 +949,19 @@ function Profile() {
         >
           <p>Bạn có chắc chắn muốn hủy đặt tour này không?</p>
           <p>Hành động này không thể hoàn tác.</p>
+        </Modal>
+
+        <Modal
+          title="Xác nhận xóa tài khoản"
+          visible={isDeleteAccountModalVisible}
+          onOk={handleDeleteAccount}
+          onCancel={() => setIsDeleteAccountModalVisible(false)}
+          okText="Xóa"
+          cancelText="Hủy"
+          okButtonProps={{ danger: true }}
+        >
+          <p>Bạn có chắc chắn muốn xóa tài khoản này không?</p>
+          <p>Hành động này không thể hoàn tác và tất cả dữ liệu của bạn sẽ bị xóa vĩnh viễn.</p>
         </Modal>
       </main>
       <Footer />

@@ -10,7 +10,7 @@ const ManageAccounts = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
   const [editingAccount, setEditingAccount] = useState(null);
-  const [activeTab, setActiveTab] = useState("sales"); // Đặt mặc định là "sales"
+  const [activeTab, setActiveTab] = useState("manager"); // Thay đổi giá trị mặc định thành "manager"
 
   useEffect(() => {
     fetchAccounts();
@@ -48,32 +48,51 @@ const ManageAccounts = () => {
   const handleOk = () => {
     form.validateFields().then(async (values) => {
       try {
-        // Thêm trường fullName và phone vào values
+        // Kiểm tra username tồn tại khi tạo mới tài khoản
+        if (!editingAccount) {
+          const usernameExists = accounts.some(
+            (account) => account.username === values.username
+          );
+          if (usernameExists) {
+            message.error("Tên đăng nhập đã tồn tại. Vui lòng chọn tên khác.");
+            return;
+          }
+        }
+
+        // Tạo object accountData cơ bản không có password
         const accountData = {
           username: values.username,
-          password: values.password,
           phone: values.phone,
           email: values.email,
           roleId: values.roleId,
           fullName: values.fullName,
         };
 
+        // Chỉ thêm password vào accountData nếu có nhập password mới
+        if (values.password) {
+          accountData.password = values.password;
+        }
+
         if (editingAccount) {
-          // Sử dụng editingAccount.accountId thay vì editingAccount.id
           await axios.put(
             `http://localhost:8080/api/accounts/${editingAccount.accountId}`,
             accountData
           );
-          message.success("Account updated successfully");
+          message.success("Cập nhật tài khoản thành công");
         } else {
+          // Đối với tài khoản mới, bắt buộc phải có password
+          if (!values.password) {
+            message.error("Password là bắt buộc khi tạo tài khoản mới");
+            return;
+          }
           await axios.post("http://localhost:8080/api/accounts", accountData);
-          message.success("Account created successfully");
+          message.success("Tạo tài khoản mới thành công");
         }
         setIsModalVisible(false);
         fetchAccounts();
       } catch (error) {
         console.error("Error saving account:", error);
-        message.error("Failed to save account");
+        message.error("Có lỗi xảy ra khi lưu tài khoản");
       }
     });
   };
@@ -101,6 +120,8 @@ const ManageAccounts = () => {
       key: "role",
       render: (roleId) => {
         switch (roleId) {
+          case 1:
+            return "Manager";
           case 2:
             return "Sales";
           case 3:
@@ -132,7 +153,9 @@ const ManageAccounts = () => {
   ];
 
   const filteredAccounts =
-    activeTab === "sales"
+    activeTab === "manager"
+      ? accounts.filter((account) => account.roleId === 1)
+      : activeTab === "sales"
       ? accounts.filter((account) => account.roleId === 2)
       : activeTab === "consulting"
       ? accounts.filter((account) => account.roleId === 3)
@@ -143,15 +166,23 @@ const ManageAccounts = () => {
   return (
     <div className="account-management-container">
       <h1>Manage Accounts</h1>
+      <Button
+            onClick={() => showModal()}
+            className="create-button"
+            type="primary"
+          >
+            Create New Account
+          </Button>
       <div className="content-wrapper">
         <Tabs activeKey={activeTab} onChange={setActiveTab}>
+          <TabPane tab="Manager" key="manager" />
           <TabPane tab="Sales Staff" key="sales" />
           <TabPane tab="Consulting Staff" key="consulting" />
           <TabPane tab="Delivery Staff" key="delivery" />
           <TabPane tab="Customers" key="customer" />
         </Tabs>
 
-        {activeTab !== "customer" && (
+        {/* {activeTab !== "customer" && (
           <Button
             onClick={() => showModal()}
             className="create-button"
@@ -159,7 +190,7 @@ const ManageAccounts = () => {
           >
             Create New Account
           </Button>
-        )}
+        )} */}
 
         <Table columns={columns} dataSource={filteredAccounts} rowKey="id" />
       </div>
@@ -179,12 +210,17 @@ const ManageAccounts = () => {
             <Input />
           </Form.Item>
           <Form.Item
-              name="password"
-              label="Password"
-              rules={[{ required: false }]} // Không bắt buộc
-            >
-              <Input.Password />
-            </Form.Item>
+            name="password"
+            label="Password"
+            rules={[
+              { 
+                required: !editingAccount, // Chỉ bắt buộc khi tạo mới
+                message: 'Vui lòng nhập password khi tạo tài khoản mới'
+              }
+            ]}
+          >
+            <Input.Password placeholder={editingAccount ? "Để trống nếu không muốn đổi mật khẩu" : "Nhập mật khẩu"} />
+          </Form.Item>
           <Form.Item
             name="phone"
             label="Phone"
@@ -201,6 +237,7 @@ const ManageAccounts = () => {
           </Form.Item>
           <Form.Item name="roleId" label="Role" rules={[{ required: true }]}>
             <Select>
+            <Option value={1}>1 (Manager)</Option>
               <Option value={2}>2 (Sales)</Option>
               <Option value={3}>3 (Consulting)</Option>
               <Option value={4}>4 (Delivery)</Option>
