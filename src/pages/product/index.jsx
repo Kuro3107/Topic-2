@@ -339,7 +339,7 @@ const Product = () => {
 
       <div className="product-container">
         {renderFilters()}
-        <h1>Tour List</h1>
+        <h1>Tours List</h1>
         {loading ? (
           <div className="loading-container">
             <Spin size="large" />

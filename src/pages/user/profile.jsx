@@ -254,25 +254,26 @@ function Profile() {
   const handleCreateReview = (bookingId) => {
     const booking = orders.find((order) => order.bookingId === bookingId);
     setSelectedBooking(booking);
-    setRating(0); // Đặt lại rating
-    setComments(""); // Đặt lại comments
-    setFeedbackId(null); // Đặt lại feedbackId
+    setRating(0);
+    setComments("");
+    setFeedbackId(null);
+    setIsEditMode(true);
     setIsFeedbackModalVisible(true);
-    setIsEditMode(true); // Chế độ tạo mới
   };
 
   // Hàm để mở modal xem đánh giá
   const handleViewReview = async (bookingId) => {
     const booking = orders.find((order) => order.bookingId === bookingId);
     setSelectedBooking(booking);
-    setFeedbackId(booking.feedbackId); // Lưu feedbackId
+    setFeedbackId(booking.feedbackId);
+    setIsEditMode(false); // Luôn bắt đầu ở chế độ xem
 
     if (booking.feedbackId) {
       try {
         const response = await api.get(`/feedbacks/${booking.feedbackId}`);
         const feedbackData = response.data;
-        setRating(feedbackData.rating); // Lấy rating từ API
-        setComments(feedbackData.comments); // Lấy comments từ API
+        setRating(feedbackData.rating);
+        setComments(feedbackData.comments);
       } catch (error) {
         console.error("Error fetching feedback details:", error);
         toast.error("An error occurred while fetching feedback details.");
@@ -280,7 +281,6 @@ function Profile() {
     }
 
     setIsFeedbackModalVisible(true);
-    setIsEditMode(false); // Chế độ xem
   };
 
   // Hàm để chuyển sang chế độ chỉnh sửa
@@ -297,6 +297,16 @@ function Profile() {
 
   // Hàm để gửi đánh giá
   const handleSubmitFeedback = async () => {
+    if (!rating || rating < 1 || rating > 5) {
+      toast.error("Please provide a valid rating between 1 and 5");
+      return;
+    }
+
+    if (!comments.trim()) {
+      toast.error("Please provide some comments");
+      return;
+    }
+
     const feedbackData = {
       rating,
       comments,
@@ -305,38 +315,39 @@ function Profile() {
     try {
       let response;
       if (feedbackId) {
-        // Cập nhật đánh giá nếu feedbackId đã tồn tại
+        // Cập nhật feedback hiện có
         response = await api.put(`/feedbacks/${feedbackId}`, feedbackData);
+        toast.success("Feedback updated successfully!");
       } else {
-        // Tạo mới đánh giá
+        // Tạo feedback mới
         response = await api.post(`/feedbacks`, feedbackData);
+        const newFeedbackId = response.data.feedbackId;
+        
+        // Cập nhật booking với feedbackId mới
+        await api.patch(`/bookings/${selectedBooking.bookingId}`, {
+          feedbackId: newFeedbackId,
+          status: "Finished",
+          consultant: null
+        });
+        
+        toast.success("Feedback submitted successfully!");
       }
-      const newFeedbackId = response.data.feedbackId;
 
-      // Gửi yêu cầu cập nhật feedbackId, status và xóa consultant cho booking hiện tại
-      await api.patch(`/bookings/${selectedBooking.bookingId}`, {
-        feedbackId: newFeedbackId,
-        status: "Finished",
-        consultant: null // Đặt consultant thành null để xóa trong database
-      });
-
-      // Cập nhật lại state để hiển thị feedback đã được gửi
-      setOrders((prevOrders) =>
-        prevOrders.map((order) =>
+      // Cập nhật state orders
+      setOrders(prevOrders =>
+        prevOrders.map(order =>
           order.bookingId === selectedBooking.bookingId
             ? {
                 ...order,
-                feedbackId: newFeedbackId,
-                rating,
-                comments,
+                feedbackId: feedbackId || response.data.feedbackId,
                 status: "Finished",
-                consultant: null // Cập nhật consultant trong state local thành null
+                consultant: null
               }
             : order
         )
       );
 
-      toast.success("Feedback submitted successfully!");
+      setIsEditMode(false); // Chuyển về chế độ xem
       handleCloseFeedbackModal();
     } catch (error) {
       console.error("Error submitting feedback:", error);
@@ -562,7 +573,7 @@ function Profile() {
                 View Feedback
               </Button>
             ) : record.status &&
-              (record.status.toLowerCase() === "checkin" ||
+              (record.status.toLowerCase() === "" ||
                 record.status.toLowerCase() === "checkout") ? (
               <Button
                 onClick={() => handleCreateReview(record.bookingId)}
@@ -571,7 +582,7 @@ function Profile() {
               >
                 Finish Tour & Send Feedback
               </Button>
-            ) : record.status && record.status.toLowerCase() === "purchased" ? (
+            ) : record.status && (record.status.toLowerCase() === "purchased" || record.status.toLowerCase() === "checkin") ? (
               <Button
                 onClick={showRefundModal}
                 type="primary"
@@ -866,55 +877,80 @@ function Profile() {
         </Modal>
 
         <Modal
-          title={isEditMode ? "Feedback" : "View Feedback"}
+          title={feedbackId ? (isEditMode ? "Edit Feedback" : "View Feedback") : "Create Feedback"}
           visible={isFeedbackModalVisible}
           onCancel={handleCloseFeedbackModal}
           footer={[
             <Button key="cancel" onClick={handleCloseFeedbackModal}>
-              Cancel
+              Close
             </Button>,
-            isEditMode ? (
-              <Button
-                key="submit"
-                type="primary"
+            isEditMode && (
+              <Button 
+                key="submit" 
+                type="primary" 
                 onClick={handleSubmitFeedback}
+                style={{ 
+                  backgroundColor: feedbackId ? '#1890ff' : '#52c41a',
+                  borderColor: feedbackId ? '#1890ff' : '#52c41a'
+                }}
               >
-                Finish Tour & Send Feedback
-              </Button>
-            ) : (
-              <Button key="edit" type="default" onClick={handleEditReview}>
-                Edit Feedback
+                {feedbackId ? "Update Feedback" : "Finish Tour & Send Feedback"}
               </Button>
             ),
+            !isEditMode && selectedBooking?.status === "Finished" && (
+              <Button key="edit" type="primary" onClick={handleEditReview}>
+                Edit Feedback
+              </Button>
+            )
           ]}
         >
           <div>
-            <label>
+            <div className="feedback-item">
               <strong>Rating:</strong>
-              <input
-                type="number"
-                min="1"
-                max="5"
-                value={rating}
-                onChange={(e) => setRating(Number(e.target.value))}
-                disabled={!isEditMode} // Chỉ cho phép chỉnh sửa khi ở chế độ chỉnh sửa
-              />
-            </label>
-            <br />
-            <label>
+              {isEditMode ? (
+                <input
+                  type="number"
+                  min="1"
+                  max="5"
+                  value={rating}
+                  onChange={(e) => setRating(Number(e.target.value))}
+                  style={{
+                    marginLeft: '10px',
+                    padding: '5px',
+                    width: '60px'
+                  }}
+                />
+              ) : (
+                <span style={{ marginLeft: '10px' }}>{rating} / 5</span>
+              )}
+            </div>
+            <div className="feedback-item" style={{ marginTop: '15px' }}>
               <strong>Comments:</strong>
-              <textarea
-                value={comments}
-                onChange={(e) => setComments(e.target.value)}
-                rows={4}
-                style={{
-                  width: "100%",
-                  color: "black",
-                  backgroundColor: "white",
-                }}
-                disabled={!isEditMode} // Chỉ cho phép chỉnh sửa khi ở chế độ chỉnh sửa
-              />
-            </label>
+              {isEditMode ? (
+                <textarea
+                  value={comments}
+                  onChange={(e) => setComments(e.target.value)}
+                  rows={4}
+                  style={{
+                    width: "100%",
+                    marginTop: '5px',
+                    padding: '8px',
+                    borderRadius: '4px',
+                    border: '1px solid #d9d9d9'
+                  }}
+                />
+              ) : (
+                <p style={{ 
+                  marginTop: '5px',
+                  padding: '8px',
+                  backgroundColor: '#f5f5f5',
+                  borderRadius: '4px',
+                  minHeight: '80px'
+                }}>
+                  {comments}
+                </p>
+              )}
+            </div>
           </div>
         </Modal>
 

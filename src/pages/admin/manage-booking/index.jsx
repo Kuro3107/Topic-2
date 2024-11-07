@@ -9,6 +9,7 @@ import {
   Switch,
   message,
   Select,
+  Radio,
 } from "antd";
 import dayjs from "dayjs";
 import axios from "axios";
@@ -19,6 +20,7 @@ function ManageBooking() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
   const [editingBooking, setEditingBooking] = useState(null);
+  const [statusFilter, setStatusFilter] = useState('all'); // Mặc định hiển thị tất cả
 
   const api = "http://localhost:8080/api/bookings"; // Update API URL
 
@@ -119,6 +121,15 @@ const handleOk = () => {
       .map(booking => booking.consultant);
 
     return consultants.filter(consultant => !assignedConsultants.includes(consultant.username));
+  };
+
+  const getFilteredBookings = () => {
+    if (statusFilter === 'all') {
+      return bookings;
+    }
+    return bookings.filter(booking => 
+      booking.status?.toLowerCase() === statusFilter.toLowerCase()
+    );
   };
 
   const columns = [
@@ -239,13 +250,87 @@ const handleOk = () => {
     }
 };
 
+  const BOOKING_STATUSES = [
+    { value: 'all', label: 'All Status' },
+    { value: 'pending', label: 'Pending' },
+    { value: 'detailed', label: 'Detailed' },
+    { value: 'rejected', label: 'Rejected' },
+    { value: 'approved', label: 'Approved' },
+    { value: 'purchased', label: 'Purchased' },
+    { value: 'checkin', label: 'Checkin' },
+    { value: 'checkout', label: 'Checkout' },
+    { value: 'finished', label: 'Finished' }
+  ];
+
   return (
     <div>
       <h1>Manage Booking</h1>
-      <Table columns={columns} dataSource={bookings} rowKey="bookingId" />
+      
+      {/* Thay đổi bộ lọc thành Radio.Group */}
+      <div style={{ marginBottom: 16 }}>
+        <Radio.Group 
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          buttonStyle="solid"
+        >
+          {BOOKING_STATUSES.map(status => (
+            <Radio.Button 
+              key={status.value} 
+              value={status.value}
+              style={{ marginRight: 8, marginBottom: 8 }}
+            >
+              {status.label}
+              <span style={{ marginLeft: 4 }}>
+                ({status.value === 'all' 
+                  ? bookings.length 
+                  : bookings.filter(b => 
+                      b.status?.toLowerCase() === status.value
+                    ).length})
+              </span>
+            </Radio.Button>
+          ))}
+        </Radio.Group>
+
+        {/* Hiển thị tổng số booking đã lọc */}
+        <div style={{ marginTop: 8 }}>
+          <span>
+            Showing: {getFilteredBookings().length} bookings
+          </span>
+        </div>
+      </div>
+
+      {/* Cập nhật Table với status mới */}
+      <Table 
+        columns={columns} 
+        dataSource={getFilteredBookings()} 
+        rowKey="bookingId"
+        rowClassName={(record) => {
+          switch(record.status?.toLowerCase()) {
+            case 'pending':
+              return 'row-pending';
+            case 'detailed':
+              return 'row-detailed';
+            case 'rejected':
+              return 'row-rejected';
+            case 'approved':
+              return 'row-approved';
+            case 'purchased':
+              return 'row-purchased';
+            case 'checkin':
+              return 'row-checkin';
+            case 'checkout':
+              return 'row-checkout';
+            case 'finished':
+              return 'row-finished';
+            default:
+              return '';
+          }
+        }}
+      />
+
       <Modal
         title={editingBooking ? "Edit Booking" : "Add New Booking"}
-        visible={isModalVisible}
+        open={isModalVisible}
         onOk={handleOk}
         onCancel={() => setIsModalVisible(false)}
       >
@@ -263,10 +348,14 @@ const handleOk = () => {
             rules={[{ required: true }]}
           >
             <Select>
-              <Select.Option value="Pending">Pending</Select.Option>
+              {/* <Select.Option value="pending">Pending</Select.Option> */}
               <Select.Option value="Detailed">Detailed</Select.Option>
-              <Select.Option value="Approved">Approved</Select.Option>
               <Select.Option value="Rejected">Rejected</Select.Option>
+              <Select.Option value="Approved">Approved</Select.Option>
+              {/* <Select.Option value="purchased">Purchased</Select.Option>
+              <Select.Option value="checkin">Checkin</Select.Option>
+              <Select.Option value="checkout">Checkout</Select.Option>
+              <Select.Option value="finished">Finished</Select.Option> */}
             </Select>
           </Form.Item>
           <Form.Item
@@ -323,6 +412,64 @@ const handleOk = () => {
           </Form.Item>
         </Form>
       </Modal>
+
+      {/* CSS styles */}
+      <style>
+        {`
+          .row-pending {
+            background-color: #fff7e6;
+          }
+          .row-detailed {
+            background-color: #e6f7ff;
+          }
+          .row-rejected {
+            background-color: #fff1f0;
+          }
+          .row-approved {
+            background-color: #f6ffed;
+          }
+          .row-purchased {
+            background-color: #f9f0ff;
+          }
+          .row-checkin {
+            background-color: #e6fffb;
+          }
+          .row-checkout {
+            background-color: #fcffe6;
+          }
+          .row-finished {
+            background-color: #f0f2f5;
+          }
+          
+          /* Hover effect */
+          .row-pending:hover,
+          .row-detailed:hover,
+          .row-rejected:hover,
+          .row-approved:hover,
+          .row-purchased:hover,
+          .row-checkin:hover,
+          .row-checkout:hover,
+          .row-finished:hover {
+            opacity: 0.8;
+          }
+
+          /* Custom styles cho Radio.Button */
+          .ant-radio-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+          }
+
+          .ant-radio-button-wrapper {
+            min-width: 100px;
+            text-align: center;
+          }
+
+          .ant-radio-button-wrapper-checked {
+            font-weight: bold;
+          }
+        `}
+      </style>
     </div>
   );
 }

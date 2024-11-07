@@ -47,7 +47,7 @@ function SalesDashboard() {
 
   useEffect(() => {
     fetchBookings();
-    fetchKoiFarms(); // Lấy danh sách Koi Farms khi component mount
+    fetchKoiFarms();
   }, []);
 
   const [isEditingTrip, setIsEditingTrip] = useState(false);
@@ -62,9 +62,9 @@ function SalesDashboard() {
       const response = await axios.get(bookingApi);
       const filteredBookings = response.data.filter(
         (booking) =>
-          booking.status === "pending" ||
-          booking.status === "rejected" ||
-          booking.status === "detailed" ||
+          booking.status === "Pending" ||
+          booking.status === "Rejected" ||
+          booking.status === "Detailed" ||
           booking.status === "updated" // Thêm trạng thái mới nếu cần
       );
       setBookings(filteredBookings);
@@ -421,67 +421,85 @@ function SalesDashboard() {
   };
 
   const handleAddFarm = () => {
+    const favoriteKoi = viewingBooking.favoriteKoi || [];
+    const favoriteKoiArray = Array.isArray(favoriteKoi) 
+      ? favoriteKoi 
+      : favoriteKoi.split(',').map(k => k.trim());
+
+    const relevantFarms = koiFarms.filter(farm => {
+      return farm.koiVarieties.some(kv => 
+        favoriteKoiArray.includes(kv.varietyName) || 
+        favoriteKoiArray.includes(kv.varietyId.toString())
+      );
+    });
+
     Modal.confirm({
       title: "Select a farm to add",
       width: 800,
       content: (
-        <Select
-          placeholder="Select a farm"
-          style={{ width: '100%', minHeight: '40px' }}
-          onChange={(value) => {
-            const selectedFarm = koiFarms.find((farm) => farm.farmId === value);
-            if (selectedFarm) {
-              const currentFarms = tripForm.getFieldValue("koiFarms") || [];
-              // Kiểm tra farm đã tồn tại trong trip chưa
-              if (
-                !currentFarms.some(
-                  (farm) => farm.farmId === selectedFarm.farmId
-                )
-              ) {
-                // Thực hiện gọi API để thêm farm vào trip
-                console.log(
-                  "Adding farm to trip:",
-                  viewingBooking.tripId,
-                  selectedFarm.farmId
-                ); // Kiểm tra dữ liệu
-                axios
-                  .post(
+        <div>
+          <p style={{ marginBottom: '10px' }}>
+            Customer's favorite koi varieties: {favoriteKoiArray.join(', ')}
+          </p>
+          <Select
+            placeholder="Select a farm"
+            style={{ width: '100%', minHeight: '40px' }}
+            onChange={(value) => {
+              const selectedFarm = koiFarms.find((farm) => farm.farmId === value);
+              if (selectedFarm) {
+                const currentFarms = tripForm.getFieldValue("koiFarms") || [];
+                if (!currentFarms.some((farm) => farm.farmId === selectedFarm.farmId)) {
+                  console.log("Adding farm to trip:", viewingBooking.tripId, selectedFarm.farmId);
+                  axios.post(
                     `http://localhost:8080/api/trips/${viewingBooking.tripId}/farms`,
                     { farmId: selectedFarm.farmId }
                   )
                   .then(() => {
-                    // Cập nhật lại danh sách farm trong tripForm
                     tripForm.setFieldsValue({
                       koiFarms: [...currentFarms, selectedFarm],
                     });
                     message.success("Farm added successfully");
-                    fetchKoiFarms(viewingBooking.tripId); // ồng bộ danh sách farms với backend
+                    fetchKoiFarms(viewingBooking.tripId);
                   })
                   .catch((error) => {
                     message.error("An error occurred while adding the farm");
                     console.error("Error adding farm:", error);
                   });
-              } else {
-                message.warning(
-                  "This farm has already been added to the trip."
-                );
+                } else {
+                  message.warning("This farm has already been added to the trip.");
+                }
               }
-            }
-          }}
-        >
-          {koiFarms
-            .filter((farm) => {
-              const currentFarms = tripForm.getFieldValue("koiFarms") || [];
-              return !currentFarms.some(
-                (addedFarm) => addedFarm.farmId === farm.farmId
-              );
-            })
-            .map((farm) => (
-              <Select.Option key={farm.farmId} value={farm.farmId}>
-                {farm.farmName} - {farm.location}
-              </Select.Option>
-            ))}
-        </Select>
+            }}
+          >
+            {relevantFarms
+              .filter((farm) => {
+                const currentFarms = tripForm.getFieldValue("koiFarms") || [];
+                return !currentFarms.some(
+                  (addedFarm) => addedFarm.farmId === farm.farmId
+                );
+              })
+              .map((farm) => {
+                const matchingKoiVarieties = farm.koiVarieties
+                  .filter(kv => 
+                    favoriteKoiArray.includes(kv.varietyName) || 
+                    favoriteKoiArray.includes(kv.varietyId.toString())
+                  )
+                  .map(kv => kv.varietyName);
+                
+                return (
+                  <Select.Option key={farm.farmId} value={farm.farmId}>
+                    <div>
+                      <strong>{farm.farmName}</strong> - {farm.location}
+                      <div style={{ fontSize: '12px', color: '#666' }}>
+                        <div>Contact: {farm.contactInfo}</div>
+                        <div>Matching Koi varieties: {matchingKoiVarieties.join(', ')}</div>
+                      </div>
+                    </div>
+                  </Select.Option>
+                );
+              })}
+          </Select>
+        </div>
       ),
       onOk() {
         console.log("Farm added");
@@ -669,7 +687,7 @@ function SalesDashboard() {
             <Card>
               <Statistic
                 title="Rejected Bookings"
-                value={bookings.filter((b) => b.status === "rejected").length}
+                value={bookings.filter((b) => b.status === "Rejected").length}
                 prefix={<CheckOutlined />}
               />
             </Card>
@@ -726,8 +744,8 @@ function SalesDashboard() {
               rules={[{ required: true }]}
             >
               <Select>
-                <Select.Option value="pending">Pending</Select.Option>
-                <Select.Option value="detailed">Detailed</Select.Option>
+                <Select.Option value="Pending">Pending</Select.Option>
+                <Select.Option value="Detailed">Detailed</Select.Option>
                 {/* <Select.Option value="rejected">Rejected</Select.Option> */}
               </Select>
             </Form.Item>

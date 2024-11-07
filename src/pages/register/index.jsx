@@ -81,13 +81,21 @@ function RegisterPage() {
             label="Phone (Optional)"
             name="phone"
             rules={[
-              // { required: true, message: "Please enter phone number!" },
               { pattern: /^0\d{9}$/, message: "Phone number must be 10 digits and start with 0" },
             ]}
           >
             <Input />
           </Form.Item>
-          <Form.Item label="Email (Optional)" name="email">
+          <Form.Item 
+            label="Email (Optional)" 
+            name="email"
+            rules={[
+              {
+                pattern: /^[a-zA-Z0-9._-]+@gmail\.com$/,
+                message: "Email must end with @gmail.com"
+              }
+            ]}
+          >
             <Input />
           </Form.Item>
           <Button type="primary" htmlType="submit">

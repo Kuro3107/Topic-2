@@ -11,20 +11,27 @@ const api = "http://localhost:8080/api/bookings";
 
 function BookingForm() {
   const [formData, setFormData] = useState({
-    startDate: "", // Ensure field name matches with DTO
-    endDate: "", // Ensure field name matches with DTO
-    fullname: "", // Ensure field name matches with DTO
-    phone: "", // Ensure field name matches with DTO
-    email: "", // Ensure field name matches with DTO
-    favoriteKoi: [], // Ensure field name matches with DTO
-    favoriteFarm: [], // Ensure field name matches with DTO
-    note: "", // Ensure field name matches with DTO
-    status: "pending", // Ensure field name matches with DTO
+    startDate: "",
+    endDate: "",
+    fullname: "",
+    phone: "",
+    email: "",
+    favoriteKoi: [],
+    favoriteFarm: [],
+    note: "",
+    status: "Pending",
   });
 
   const [koiOptions, setKoiOptions] = useState([]);
   const [farmOptions, setFarmOptions] = useState([]);
   const [filteredFarmOptions, setFilteredFarmOptions] = useState([]); // State for filtered farms
+
+  const [errors, setErrors] = useState({
+    phone: '',
+    email: '',
+    startDate: '',
+    endDate: ''
+  });
 
   const navigate = useNavigate();
 
@@ -37,7 +44,7 @@ function BookingForm() {
         const options = response.data.map((koi) => ({
           value: koi.varietyId,
           label: `${koi.varietyName || "Undefined name"} - ${
-            koi.koiPrice ? `${koi.koiPrice}` : "Undefined price"
+            koi.koiPrice ? `${koi.koiPrice} VNĐ` : "Undefined price"
           }`,
         }));
         setKoiOptions(options);
@@ -71,9 +78,57 @@ function BookingForm() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({
+    
+    setErrors(prev => ({...prev, [name]: ''}));
+    
+    if (name === 'phone') {
+      const phoneRegex = /^0\d{9}$/;
+      if (value && !phoneRegex.test(value)) {
+        setErrors(prev => ({
+          ...prev,
+          phone: 'Phone number must be 10 digits and start with 0'
+        }));
+      }
+    }
+
+    if (name === 'email') {
+      const emailRegex = /^[a-zA-Z0-9._-]+@gmail\.com$/;
+      if (value && !emailRegex.test(value)) {
+        setErrors(prev => ({
+          ...prev,
+          email: 'Email must end with @gmail.com'
+        }));
+      }
+    }
+
+    if (name === 'startDate') {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const selectedDate = new Date(value);
+      
+      if (selectedDate < today) {
+        setErrors(prev => ({
+          ...prev,
+          startDate: 'Cannot select past date'
+        }));
+      }
+    }
+
+    if (name === 'endDate') {
+      const startDate = new Date(formData.startDate);
+      const endDate = new Date(value);
+      
+      if (endDate <= startDate) {
+        setErrors(prev => ({
+          ...prev,
+          endDate: 'End date must be after start date'
+        }));
+      }
+    }
+
+    setFormData(prevData => ({
       ...prevData,
-      [name]: value,
+      [name]: value
     }));
   };
 
@@ -219,12 +274,13 @@ function BookingForm() {
                     <input
                       type="tel"
                       name="phone"
-                      className="form-input"
+                      className={`form-input ${errors.phone ? 'error-input' : ''}`}
                       value={formData.phone}
                       onChange={handleChange}
                       required
-                      placeholder="Enter your phone number"
+                      placeholder="Enter your phone number (10 digits starting with 0)"
                     />
+                    {errors.phone && <div className="error-message">{errors.phone}</div>}
                   </div>
                 </div>
 
@@ -233,12 +289,13 @@ function BookingForm() {
                   <input
                     type="email"
                     name="email"
-                    className="form-input"
+                    className={`form-input ${errors.email ? 'error-input' : ''}`}
                     value={formData.email}
                     onChange={handleChange}
                     required
-                    placeholder="Enter your email address"
+                    placeholder="Enter your email address (@gmail.com)"
                   />
+                  {errors.email && <div className="error-message">{errors.email}</div>}
                 </div>
               </div>
 
@@ -294,7 +351,7 @@ function BookingForm() {
 
               {/* Visit Dates Section */}
               <div className="form-section">
-                <h3 className="section-title">Visit Dates</h3>
+                <h3 className="section-title">Preferred Dates Visit</h3>
                 <div className="form-grid">
                   <div className="form-group">
                     <label className="form-label">Start Date</label>
@@ -302,11 +359,13 @@ function BookingForm() {
                       <input
                         type="date"
                         name="startDate"
-                        className="form-input"
+                        className={`form-input ${errors.startDate ? 'error-input' : ''}`}
                         value={formData.startDate}
                         onChange={handleChange}
+                        min={new Date().toISOString().split('T')[0]}
                         required
                       />
+                      {errors.startDate && <div className="error-message">{errors.startDate}</div>}
                     </div>
                   </div>
 
@@ -316,11 +375,13 @@ function BookingForm() {
                       <input
                         type="date"
                         name="endDate"
-                        className="form-input"
+                        className={`form-input ${errors.endDate ? 'error-input' : ''}`}
                         value={formData.endDate}
                         onChange={handleChange}
+                        min={formData.startDate || new Date().toISOString().split('T')[0]}
                         required
                       />
+                      {errors.endDate && <div className="error-message">{errors.endDate}</div>}
                     </div>
                   </div>
                 </div>
