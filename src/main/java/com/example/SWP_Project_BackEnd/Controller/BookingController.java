@@ -74,8 +74,8 @@ public class BookingController {
             booking.setStatus(newStatus);
         }
         if (updates.containsKey("consultant")){
-            String newConsultant = ((String) updates.get("consultant") );
-            booking.setStatus(newConsultant);
+            String newConsultant = null;
+            booking.setConsultant(newConsultant);
         }
 
         // Lưu lại booking với feedbackId mới
