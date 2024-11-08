@@ -11,14 +11,28 @@ function RegisterPage() {
 
   const handleRegister = async (values) => {
     try {
-      const checkUsername = await api.get("http://localhost:8080/api/accounts");
-      const usernameExists = checkUsername.data.some(
+      const checkAccounts = await api.get("http://localhost:8080/api/accounts");
+      
+      // Kiểm tra username tồn tại
+      const usernameExists = checkAccounts.data.some(
         (account) => account.username === values.username
       );
       
       if (usernameExists) {
         toast.error("Tên đăng nhập đã tồn tại. Vui lòng chọn tên khác.");
         return;
+      }
+
+      // Thêm kiểm tra email tồn tại
+      if (values.email) {
+        const emailExists = checkAccounts.data.some(
+          (account) => account.email === values.email
+        );
+        
+        if (emailExists) {
+          toast.error("Email này đã được đăng ký. Vui lòng sử dụng email khác.");
+          return;
+        }
       }
 
       const requestBody = {
