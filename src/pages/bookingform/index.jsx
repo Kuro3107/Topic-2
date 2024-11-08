@@ -158,9 +158,9 @@ function BookingForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Sending request..."); // Add log for checking
-    if (!formData.fullname || !formData.phone || !formData.email) {
-      toast.error("Please fill in all required information.");
+    console.log("Sending request...");
+    if (!formData.fullname || !formData.phone || !formData.email || formData.favoriteKoi.length === 0) {
+      toast.error("Please fill in all required information and select at least one favorite koi.");
       return;
     }
     try {
@@ -304,13 +304,13 @@ function BookingForm() {
                 <h3 className="section-title">Your Preferences</h3>
                 <div className="form-grid">
                   <div className="form-group">
-                    <label className="form-label">Choose Your Favorite Koi First</label>
+                    <label className="form-label">Choose Koi Variety You Want To Buy First<span className="required">*</span></label>
                     <div className="select-container">
                       <Select
                         isMulti
                         name="favoriteKoi"
                         options={koiOptions}
-                        className="basic-multi-select"
+                        className={`basic-multi-select ${formData.favoriteKoi.length === 0 ? 'error-select' : ''}`}
                         classNamePrefix="select"
                         onChange={(selectedOptions) =>
                           handleSelectChange(selectedOptions, {
@@ -320,13 +320,16 @@ function BookingForm() {
                         value={koiOptions.filter((option) =>
                           formData.favoriteKoi.includes(option.value)
                         )}
-                        placeholder="Select koi varieties"
+                        placeholder="Select koi varieties (required)"
                       />
+                      {formData.favoriteKoi.length === 0 && (
+                        <div className="error-message">Please select at least one koi variety</div>
+                      )}
                     </div>
                   </div>
 
                   <div className="form-group">
-                    <label className="form-label">Preferred Farms</label>
+                    <label className="form-label">And Preferred Farms</label>
                     <div className="select-container">
                       <Select
                         isMulti
