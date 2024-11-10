@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Table, Button, Modal, Form, Input, InputNumber, message, Select, Radio } from "antd";
 import axios from "axios";
+const { Search } = Input;
 
 const ManageTour = () => {
   const [tours, setTours] = useState([]);
@@ -20,6 +21,7 @@ const ManageTour = () => {
   const apiTour = "http://localhost:8080/api/trips";
   const [isCreatingTour, setIsCreatingTour] = useState(true); // Trạng thái để xác định bước tạo tour
   const [viewMode, setViewMode] = useState("available"); // State để theo dõi chế độ xem
+  const [searchText, setSearchText] = useState(""); // Thêm state cho tìm kiếm
 
   const fetchTours = async () => {
     try {
@@ -276,6 +278,32 @@ const ManageTour = () => {
     farmIds.forEach(farmId => handleAddFarmToTour(farmId)); // Thêm từng farm vào tour
   };
 
+  const handleSearch = (value) => {
+    setSearchText(value);
+  };
+
+  const filteredTours = tours.filter((tour) => {
+    const viewModeFilter = viewMode === "available" ? tour.imageUrl : !tour.imageUrl;
+    if (!viewModeFilter) return false;
+
+    if (searchText) {
+      const searchLower = searchText.toLowerCase();
+      return (
+        tour.tripName?.toLowerCase().includes(searchLower) ||
+        tour.priceTotal?.toString().includes(searchLower) ||
+        tour.tripDetails?.some(detail => 
+          detail.mainTopic?.toLowerCase().includes(searchLower) ||
+          detail.subTopic?.toLowerCase().includes(searchLower)
+        ) ||
+        tour.koiFarms?.some(farm => 
+          farm.farmName?.toLowerCase().includes(searchLower) ||
+          farm.location?.toLowerCase().includes(searchLower)
+        )
+      );
+    }
+    return true;
+  });
+
   const columns = [
     {
       title: "Tour Name",
@@ -351,14 +379,25 @@ const ManageTour = () => {
   return (
     <div>
       <h1>Manage Tours</h1>
-      <Radio.Group 
-        value={viewMode} 
-        onChange={(e) => setViewMode(e.target.value)} 
-        style={{ marginBottom: 16 }}
-      >
-        <Radio value="available">Tour có sẵn</Radio>
-        <Radio value="custom">Tour của riêng khách hàng</Radio>
-      </Radio.Group>
+      <div style={{ marginBottom: 16 }}>
+        <Radio.Group 
+          value={viewMode} 
+          onChange={(e) => setViewMode(e.target.value)} 
+          style={{ marginRight: 16 }}
+        >
+          <Radio value="available">Tour có sẵn</Radio>
+          <Radio value="custom">Tour của riêng khách hàng</Radio>
+        </Radio.Group>
+
+        <Search
+          placeholder="Tìm kiếm theo tên tour, giá, hoạt động hoặc farm..."
+          onSearch={handleSearch}
+          onChange={(e) => handleSearch(e.target.value)}
+          style={{ width: 400, marginLeft: 16 }}
+          allowClear
+        />
+      </div>
+
       <Button
         onClick={() => {
           setIsModalVisible(true);
@@ -369,11 +408,13 @@ const ManageTour = () => {
       >
         Add New Tour
       </Button>
+
       <Table 
         columns={columns} 
-        dataSource={viewMode === "available" ? tours.filter(tour => tour.imageUrl) : tours.filter(tour => !tour.imageUrl)} // Lọc dựa trên chế độ xem
+        dataSource={filteredTours}
         rowKey="tripId"
       />
+
       <Modal
         title={isCreatingTour ? "Create New Tour" : "Update Tour Details"}
         open={isModalVisible}

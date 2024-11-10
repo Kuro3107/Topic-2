@@ -7,6 +7,7 @@ import {
   Card,
   Typography,
   Space,
+  Tabs,
 } from 'antd';
 import axios from 'axios';
 
@@ -166,22 +167,102 @@ const ManagePO = () => {
     );
   };
 
+  const filterPOsByStatus = (status) => {
+    return pos.filter(po => 
+      po.status?.toLowerCase() === status.toLowerCase()
+    );
+  };
+
+  const tabItems = [
+    {
+      key: 'all',
+      label: 'Tất cả',
+      children: (
+        <Table
+          columns={columns}
+          dataSource={pos}
+          rowKey="poId"
+          loading={loading}
+          expandable={{
+            expandedRowRender,
+            expandRowByClick: true,
+          }}
+          pagination={{
+            pageSize: 10,
+            showTotal: (total) => `Tổng số ${total} PO`,
+          }}
+        />
+      ),
+    },
+    {
+      key: 'delivering',
+      label: 'Đang giao',
+      children: (
+        <Table
+          columns={columns}
+          dataSource={filterPOsByStatus('delivering')}
+          rowKey="poId"
+          loading={loading}
+          expandable={{
+            expandedRowRender,
+            expandRowByClick: true,
+          }}
+          pagination={{
+            pageSize: 10,
+            showTotal: (total) => `Tổng số ${total} PO đang giao`,
+          }}
+        />
+      ),
+    },
+    {
+      key: 'delivered',
+      label: 'Đã giao',
+      children: (
+        <Table
+          columns={columns}
+          dataSource={filterPOsByStatus('delivered')}
+          rowKey="poId"
+          loading={loading}
+          expandable={{
+            expandedRowRender,
+            expandRowByClick: true,
+          }}
+          pagination={{
+            pageSize: 10,
+            showTotal: (total) => `Tổng số ${total} PO đã giao`,
+          }}
+        />
+      ),
+    },
+    {
+      key: 'deny',
+      label: 'Đã từ chối',
+      children: (
+        <Table
+          columns={columns}
+          dataSource={filterPOsByStatus('deny')}
+          rowKey="poId"
+          loading={loading}
+          expandable={{
+            expandedRowRender,
+            expandRowByClick: true,
+          }}
+          pagination={{
+            pageSize: 10,
+            showTotal: (total) => `Tổng số ${total} PO bị từ chối`,
+          }}
+        />
+      ),
+    },
+  ];
+
   return (
     <Card>
       <Title level={2}>Quản lý Purchase Orders</Title>
-      <Table
-        columns={columns}
-        dataSource={pos}
-        rowKey="poId"
-        loading={loading}
-        expandable={{
-          expandedRowRender,
-          expandRowByClick: true,
-        }}
-        pagination={{
-          pageSize: 10,
-          showTotal: (total) => `Tổng số ${total} PO`,
-        }}
+      <Tabs
+        defaultActiveKey="all"
+        items={tabItems}
+        type="card"
       />
     </Card>
   );

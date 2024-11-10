@@ -518,7 +518,11 @@ const Product = () => {
             label="Phone"
             name="phone"
             rules={[
-              { required: true, message: "Please input your phone number!" },
+              { required: true, message: "Vui lòng nhập số điện thoại!" },
+              {
+                pattern: /^0\d{9}$/,
+                message: "Số điện thoại phải bắt đầu bằng số 0 và có 10 chữ số!"
+              }
             ]}
           >
             <Input
@@ -530,7 +534,13 @@ const Product = () => {
           <Form.Item
             label="Email"
             name="email"
-            rules={[{ required: true, message: "Please input your email!" }]}
+            rules={[
+              { required: true, message: "Vui lòng nhập email!" },
+              {
+                pattern: /^[a-zA-Z0-9._-]+@gmail\.com$/,
+                message: "Email phải có định dạng @gmail.com!"
+              }
+            ]}
           >
             <Input
               name="email"
@@ -541,15 +551,17 @@ const Product = () => {
           <Form.Item
             label="Start Date"
             name="startDate"
-            rules={[{ required: true, message: "Please select a start date!" }]}
+            rules={[
+              { required: true, message: "Vui lòng chọn ngày bắt đầu!" }
+            ]}
           >
             <DatePicker
-              value={
-                bookingData.startDate ? moment(bookingData.startDate) : null
-              }
-              onChange={(date) =>
-                setBookingData({ ...bookingData, startDate: date })
-              }
+              value={bookingData.startDate ? moment(bookingData.startDate) : null}
+              onChange={(date) => setBookingData({ ...bookingData, startDate: date })}
+              disabledDate={(current) => {
+                // Không cho phép chọn ngày trong quá khứ
+                return current && current < moment().startOf('day');
+              }}
             />
           </Form.Item>
           <Form.Item label="Note">
