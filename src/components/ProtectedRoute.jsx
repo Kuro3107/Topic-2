@@ -12,7 +12,7 @@ const ProtectedRoute = ({ allowedRoles, children }) => {
     console.log("Allowed roles:", allowedRoles);
 
     if (!allowedRoles.includes(userRole)) {
-      message.error("Bạn không có quyền truy cập vào trang này.");
+      message.error("You do not have permission to access this page.");
       navigate("/");
     }
   }, [allowedRoles, userRole, navigate]);

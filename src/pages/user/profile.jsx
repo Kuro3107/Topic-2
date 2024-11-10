@@ -976,15 +976,15 @@ function Profile() {
         </Modal>
 
         <Modal
-          title="Xác nhận hủy đặt tour"
+          title="Confirm tour cancellation"
           visible={isDeleteModalVisible}
           onOk={handleConfirmDelete}
           onCancel={handleCancelDelete}
-          okText="Xác nhận"
-          cancelText="Hủy"
+          okText="Confirm"
+          cancelText="Cancel"
         >
-          <p>Bạn có chắc chắn muốn hủy đặt tour này không?</p>
-          <p>Hành động này không thể hoàn tác.</p>
+          <p>Are you sure you want to cancel this tour?</p>
+          <p>This action cannot be undo.</p>
         </Modal>
 
         <Modal
