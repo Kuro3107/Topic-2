@@ -156,13 +156,13 @@ const Product = () => {
   const handleBooking = (tripId) => {
     const userInfo = JSON.parse(localStorage.getItem("userInfo"));
     if (!userInfo) {
-      message.warning("Vui lòng đăng nhập để đặt tour.");
+      message.warning("Please login to booking tour");
       navigate("/login");
       return;
     }
     
     if (!isCustomerRole()) {
-      message.warning("Chỉ tài khoản khách hàng mới có thể đặt tour.");
+      message.warning("Chỉ có khách hàng tài khoản mới có thể đặt tour.");
       return;
     }
 
@@ -518,10 +518,10 @@ const Product = () => {
             label="Phone"
             name="phone"
             rules={[
-              { required: true, message: "Vui lòng nhập số điện thoại!" },
+              { required: true, message: "Please enter phone number!" },
               {
-                pattern: /^0\d{9}$/,
-                message: "Số điện thoại phải bắt đầu bằng số 0 và có 10 chữ số!"
+                pattern: /(84|0[3|5|7|8|9])+([0-9]{8,9})\b/g,
+                message: "Invalid Phone Number!"
               }
             ]}
           >
@@ -535,10 +535,10 @@ const Product = () => {
             label="Email"
             name="email"
             rules={[
-              { required: true, message: "Vui lòng nhập email!" },
+              { required: true, message: "Please input email!" },
               {
                 pattern: /^[a-zA-Z0-9._-]+@gmail\.com$/,
-                message: "Email phải có định dạng @gmail.com!"
+                message: "Invalid Email (Must end with @gmail.com)"
               }
             ]}
           >
@@ -552,15 +552,15 @@ const Product = () => {
             label="Start Date"
             name="startDate"
             rules={[
-              { required: true, message: "Vui lòng chọn ngày bắt đầu!" }
+              { required: true, message: "Please select a start date!" }
             ]}
           >
             <DatePicker
               value={bookingData.startDate ? moment(bookingData.startDate) : null}
               onChange={(date) => setBookingData({ ...bookingData, startDate: date })}
               disabledDate={(current) => {
-                // Không cho phép chọn ngày trong quá khứ
-                return current && current < moment().startOf('day');
+                // Không cho phép chọn ngày trong quá khứ và phải cách hiện tại ít nhất 3 ngày
+                return current && (current < moment().add(3, 'days').startOf('day'));
               }}
             />
           </Form.Item>

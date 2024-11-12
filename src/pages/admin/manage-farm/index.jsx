@@ -162,14 +162,23 @@ const ManageFarm = () => {
   };
 
   const handleDelete = async (id) => {
-    try {
-      await axios.delete(`${apiFarm}/${id}`); // Xóa theo farm_id
-      message.success("Deleted Koi Farm!");
-      fetchFarms();
-    } catch (error) {
-      message.error("There's Error In Delete Farm!");
-      console.error("Error deleting farm:", error);
-    }
+    Modal.confirm({
+      title: 'Confirm Delete',
+      content: 'Are you sure you want to delete this farm?',
+      okText: 'Delete',
+      okType: 'danger',
+      cancelText: 'Cancel',
+      async onOk() {
+        try {
+          await axios.delete(`${apiFarm}/${id}`);
+          message.success("Deleted Koi Farm!");
+          fetchFarms();
+        } catch (error) {
+          message.error("There's Error In Delete Farm!");
+          console.error("Error deleting farm:", error);
+        }
+      },
+    });
   };
 
   const handleEditSubmit = async () => {

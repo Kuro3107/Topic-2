@@ -84,10 +84,6 @@ function HomePage() {
     { src: '/property_logo_99037720_1614133500.jpg', alt: 'Partner 6' },
     { src: '/1500x2250+Artboard+Shinrin+Hotel+3_4-01.png', alt: 'Partner 7' },
     { src: '/93d92dbf1c42071888488f759314d2c5.jpg', alt: 'Partner 8' },
-    { src: '/japanexpress.png', alt: 'Partner 9' },
-    { src: '/spx.jpg', alt: 'Partner 10' },
-    { src: '/ghtk.jpg', alt: 'Partner 11' },
-    { src: '/607cdb2f875a62174a2ac9e3_After_GHN.png', alt: 'Partner 12' }
     // Add more images as needed
   ];
 

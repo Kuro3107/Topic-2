@@ -203,14 +203,23 @@ const ManageTour = () => {
   };
 
   const handleDelete = async (id) => {
-    try {
-      await axios.delete(`${apiTour}/${id}`);
-      message.success("Tour deleted successfully");
-      fetchTours();
-    } catch (error) {
-      message.error("An error occurred while deleting the tour");
-      console.error("Error deleting tour:", error);
-    }
+    Modal.confirm({
+      title: 'Confirm Delete',
+      content: 'Are you sure you want to delete this tour?',
+      okText: 'Delete',
+      okType: 'danger',
+      cancelText: 'Cancel',
+      async onOk() {
+        try {
+          await axios.delete(`${apiTour}/${id}`);
+          message.success("Tour deleted successfully");
+          fetchTours();
+        } catch (error) {
+          message.error("An error occurred while deleting the tour");
+          console.error("Error deleting tour:", error);
+        }
+      },
+    });
   };
 
   const fetchFarms = async (tourId) => {
@@ -386,7 +395,7 @@ const ManageTour = () => {
           style={{ marginRight: 16 }}
         >
           <Radio value="available">Available Tour</Radio>
-          <Radio value="custom">Custom Tour</Radio>
+          <Radio value="custom">Customer's Tour</Radio>
         </Radio.Group>
 
         <Search

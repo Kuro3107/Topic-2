@@ -728,7 +728,7 @@ function Consulting() {
                 >
                   <option value="not_yet">Not Yet</option>
                   <option value="delivering">Delivering</option>
-                  <option value="delivered">Delivered</option>
+                  {/* <option value="delivered">Delivered</option> */}
                 </select>
               </p>
               <p>

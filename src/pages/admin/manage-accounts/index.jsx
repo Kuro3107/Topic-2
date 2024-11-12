@@ -114,14 +114,23 @@ const ManageAccounts = () => {
   };
 
   const handleDelete = async (id) => {
-    try {
-      await axios.delete(`http://localhost:8080/api/accounts/${id}`);
-      message.success("Account deleted successfully");
-      fetchAccounts();
-    } catch (error) {
-      console.error("Error deleting account:", error);
-      message.error("Failed to delete account");
-    }
+    Modal.confirm({
+      title: 'Confirm Delete',
+      content: 'Are you sure you want to delete this account?',
+      okText: 'Delete',
+      okType: 'danger',
+      cancelText: 'Cancel',
+      async onOk() {
+        try {
+          await axios.delete(`http://localhost:8080/api/accounts/${id}`);
+          message.success("Account deleted successfully");
+          fetchAccounts();
+        } catch (error) {
+          console.error("Error deleting account:", error);
+          message.error("Unable to delete account");
+        }
+      },
+    });
   };
 
   const columns = [
@@ -159,6 +168,7 @@ const ManageAccounts = () => {
           <Button onClick={() => showModal(record)}>Edit</Button>
           <Button
             onClick={() => handleDelete(record.accountId)}
+            danger
             style={{ marginLeft: 8 }}
           >
             Delete

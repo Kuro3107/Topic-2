@@ -50,13 +50,23 @@ function ManageKoi() {
   };
 
   const handleDelete = async (id) => {
-    try {
-      await axios.delete(`http://localhost:8080/api/koi-varieties/${id}`);
-      message.success("Koi variety deleted successfully");
-      fetchKoiVarieties();
-    } catch (error) {
-      message.error("Failed to delete koi variety");
-    }
+    Modal.confirm({
+      title: 'Confirm Delete',
+      content: 'Are you sure you want to delete this koi variety?',
+      okText: 'Delete',
+      okType: 'danger', 
+      cancelText: 'Cancel',
+      async onOk() {
+        try {
+          await axios.delete(`http://localhost:8080/api/koi-varieties/${id}`);
+          message.success("Koi deleted successfully");
+          fetchKoiVarieties();
+        } catch (error) {
+          message.error("An error occurred while deleting the koi");
+          console.error("Error deleting koi:", error);
+        }
+      },
+    });
   };
 
   const handleModalOk = async (values) => {
@@ -120,7 +130,13 @@ function ManageKoi() {
       render: (text, record) => (
         <span>
           <Button onClick={() => handleEdit(record)}>Edit</Button>
-          <Button onClick={() => handleDelete(record.varietyId)}>Delete</Button>
+          <Button 
+            onClick={() => handleDelete(record.varietyId)}
+            danger
+            style={{ marginLeft: 8 }}
+          >
+            Delete
+          </Button>
         </span>
       ),
     },

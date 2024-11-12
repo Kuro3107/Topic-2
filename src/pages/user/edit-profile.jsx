@@ -39,7 +39,7 @@ function EditProfile() {
         );
         
         if (emailExists) {
-          message.error("Email này đã được đăng ký. Vui lòng sử dụng email khác.");
+          message.error("This email is already registered. Please use another email.");
           return;
         }
       }
@@ -69,11 +69,11 @@ function EditProfile() {
       };
   
       localStorage.setItem("userInfo", JSON.stringify(updatedUserInfo));
-      message.success("Cập nhật thông tin thành công");
+      message.success("Information updated successfully");
       navigate("/profile", { replace: true });
     } catch (error) {
       console.error(error);
-      message.error("Cập nhật thông tin thất bại");
+      message.error("Information updated successfully");
     }
   };
 
