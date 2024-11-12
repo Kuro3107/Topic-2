@@ -53,7 +53,7 @@ function ManageBooking() {
   // Cập nhật giá trị cho modal
 const showModal = (booking = null) => {
   if (booking.status === "Finished") {
-      message.warning("Không thể chỉnh sửa booking đã không còn hoạt động");
+      message.warning("Cannot edit booking that is no longer active");
       return;
   }
   setEditingBooking(booking);
@@ -85,7 +85,7 @@ const handleOk = () => {
           };
           updateBooking(editingBooking.bookingId, updatedData);
       } else {
-          message.error("Không có ID đặt chỗ để cập nhật.");
+          message.error("No booking ID to update.");
       }
       setIsModalVisible(false);
   }).catch((error) => {
@@ -134,28 +134,28 @@ const handleOk = () => {
 
   const columns = [
     { title: "ID", dataIndex: "bookingId", key: "bookingId" },
-    { title: "Tên khách hàng", dataIndex: "fullname", key: "fullname" },
+    { title: "Customer Name", dataIndex: "fullname", key: "fullname" },
     {
-      title: "Ngày đặt",
+      title: "Booking Date",
       dataIndex: "bookingDate",
       key: "bookingDate",
       render: (date) => dayjs(date).format("DD/MM/YYYY"),
     },
     {
-      title: "Ngày bắt đầu",
+      title: "Start Date",
       dataIndex: "startDate",
       key: "startDate",
       render: (date) => dayjs(date).format("DD/MM/YYYY"),
     },
     {
-      title: "Ngày kết thúc",
+      title: "End Date",
       dataIndex: "endDate",
       key: "endDate",
       render: (date) => date ? dayjs(date).format("DD/MM/YYYY") : null,
     },
-    { title: "Koi yêu thích", dataIndex: "favoriteKoi", key: "favoriteKoi" },
+    { title: "Favorite Koi", dataIndex: "favoriteKoi", key: "favoriteKoi" },
     {
-      title: "Trang trại yêu thích",
+      title: "Favorite Farm",
       dataIndex: "favoriteFarm",
       key: "favoriteFarm",
     },
@@ -163,22 +163,22 @@ const handleOk = () => {
       title: "Consultant Staff",
       dataIndex: "consultant",
       key: "consultant",
-      render: (consultant) => consultant || 'Chưa chỉ định', // Display if no consultant assigned
+      render: (consultant) => consultant || 'Not assigned', // Display if no consultant assigned
     },
-    { title: "Trạng thái", dataIndex: "status", key: "status" },
+    { title: "Status", dataIndex: "status", key: "status" },
     {
-      title: "Hành động",
+      title: "Action",
       key: "action",
       render: (_, record) => (
         <>
           <Button onClick={() => showModal(record)}>
-            Sửa
+            Edit
           </Button>
           <Button
             onClick={() => deleteBooking(record.bookingId)}
             danger
           >
-            Xóa
+            Delete
           </Button>
           <Button onClick={() => viewTripDetails(record.bookingId)}>
             View Trip Detail
@@ -196,7 +196,7 @@ const handleOk = () => {
         // Lấy trip_id từ booking tương ứng
         const booking = bookings.find(b => b.bookingId === bookingId);
         if (!booking) {
-            message.warning("Không tìm thấy đặt chỗ.");
+            message.warning("Booking not found.");
             return;
         }
 
@@ -206,33 +206,33 @@ const handleOk = () => {
         // Hiển thị thông tin chuyến đi
         if (trips.length > 0) {
             Modal.info({
-                title: 'Chi tiết chuyến đi',
+                title: 'Trip Details',
                 content: (
                     <div>
                         {trips.map(trip => (
                             <div key={trip.tripId}>
                                 <p>Trip ID: {trip.tripId}</p>
-                                <p>Tên chuyến đi: {trip.tripName}</p>
-                                <p>Tổng giá: {trip.priceTotal} VNĐ</p>
+                                <p>Trip Name: {trip.tripName}</p>
+                                <p>Total Price: {trip.priceTotal} VNĐ</p>
                                 {trip.imageUrl && ( // Kiểm tra nếu có imageUrl
                                     <img src={trip.imageUrl} alt={trip.tripName} style={{ width: '100%', height: 'auto' }} />
                                 )}
-                                <h4>Chi tiết chuyến đi:</h4>
+                                <h4>Trip Details:</h4>
                                 {trip.tripDetails.map(detail => (
                                     <div key={detail.tripDetailId}>
                                         <p>Ngày: {detail.day}</p>
-                                        <p>Chủ đề chính: {detail.mainTopic}</p>
-                                        <p>Chủ đề phụ: {detail.subTopic || 'Không có'}</p>
-                                        <p>Giá ghi chú: {detail.notePrice} VNĐ</p>
+                                        <p>Main Topic: {detail.mainTopic}</p>
+                                        <p>Sub Topic: {detail.subTopic || 'No sub topic'}</p>
+                                        <p>Note Price: {detail.notePrice} VNĐ</p>
                                     </div>
                                 ))}
-                                <h4>Trang trại Koi:</h4>
+                                <h4>Koi Farms:</h4>
                                 {trip.koiFarms.map(farm => (
                                     <div key={farm.farmId}>
-                                      <img src={farm.imageUrl} alt="Hình ảnh trang trại" width="200" height="150" />
-                                        <p>Tên trang trại: {farm.farmName}</p>
-                                        <p>Địa điểm: {farm.location}</p>
-                                        <p>Thông tin liên hệ: {farm.contactInfo}</p>
+                                      <img src={farm.imageUrl} alt="Farm Image" width="200" height="150" />
+                                        <p>Farm Name: {farm.farmName}</p>
+                                        <p>Location: {farm.location}</p>
+                                        <p>Contact Info: {farm.contactInfo}</p>
                                     </div>
                                 ))}
                             </div>
@@ -337,14 +337,14 @@ const handleOk = () => {
         <Form form={form} layout="vertical">
           <Form.Item
             name="fullname"
-            label="Tên"
+            label="Name"
             rules={[{ required: true }]}
           >
             <Input disabled={editingBooking !== null} />
           </Form.Item>
           <Form.Item
             name="status"
-            label="Trạng thái"
+            label="Status"
             rules={[{ required: true }]}
           >
             <Select>
@@ -360,21 +360,21 @@ const handleOk = () => {
           </Form.Item>
           <Form.Item
             name="startDate"
-            label="Ngày bắt đầu"
+            label="Start Date"
             rules={[{ required: true }]}
           >
             <DatePicker disabled={editingBooking !== null} />
           </Form.Item>
           <Form.Item
             name="endDate"
-            label="Ngày kết thúc"
+            label="End Date"
             rules={[{ required: true }]}
           >
             <DatePicker disabled={editingBooking !== null} />
           </Form.Item>
           <Form.Item
             name="phone"
-            label="Số điện thoại"
+            label="Phone"
             rules={[{ required: true }]}
           >
             <Input disabled={editingBooking !== null} />
@@ -386,10 +386,10 @@ const handleOk = () => {
           >
             <Input disabled={editingBooking !== null} />
           </Form.Item>
-          <Form.Item name="favoriteKoi" label="Koi yêu thích">
+          <Form.Item name="favoriteKoi" label="Favorite Koi">
             <Input disabled={editingBooking !== null} />
           </Form.Item>
-          <Form.Item name="favoriteFarm" label="Trang trại yêu thích">
+          <Form.Item name="favoriteFarm" label="Favorite Farm">
             <Input disabled={editingBooking !== null} />
           </Form.Item>
           <Form.Item
@@ -407,7 +407,7 @@ const handleOk = () => {
               ))}
             </Select>
           </Form.Item>
-          <Form.Item name="note" label="Ghi chú">
+          <Form.Item name="note" label="Note">
             <Input disabled={editingBooking !== null} />
           </Form.Item>
         </Form>

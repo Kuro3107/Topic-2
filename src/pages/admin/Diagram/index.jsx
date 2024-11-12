@@ -88,7 +88,7 @@ function Diagram() {
 
       setChartData(formattedData);
     } catch (error) {
-      console.error("Lỗi khi lấy dữ liệu:", error);
+      console.error("Error fetching data:", error);
     }
   };
 
@@ -153,7 +153,7 @@ function Diagram() {
         </div>
 
         <div className="chart-card">
-          <h3>Orders Statistics by Status</h3>
+          <h3>Numbers of Booking Finished</h3>
           <ResponsiveContainer width="100%" height={400}>
             <BarChart data={chartData} barSize={45} barGap={0}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -168,19 +168,7 @@ function Diagram() {
               <Bar
                 dataKey="deliveredOrders"
                 fill="#38acff"
-                name="Delivered"
-                maxBarSize={45}
-              />
-              <Bar
-                dataKey="approvedOrders"
-                fill="#10fe08"
-                name="Approved"
-                maxBarSize={45}
-              />
-              <Bar
-                dataKey="rejectedOrders"
-                fill="#ff0000"
-                name="Rejected"
+                name="Finished"
                 maxBarSize={45}
               />
             </BarChart>

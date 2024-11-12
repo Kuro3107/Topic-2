@@ -26,6 +26,7 @@ import {
   CameraOutlined,
   PictureOutlined,
   DeleteOutlined,
+  StarOutlined,
 } from "@ant-design/icons";
 import "./profile.css";
 import api from "../../config/axios";
@@ -542,7 +543,7 @@ function Profile() {
       key: "email",
     },
     {
-      title: "Feedback",
+      title: "Your Action",
       key: "Feedback",
       render: (_, record) => {
         return (
@@ -551,25 +552,25 @@ function Profile() {
               onClick={() => handleViewBooking(record.bookingId)}
               icon={<ShoppingOutlined />}
               style={{ marginRight: 8 }}
-            >
-              View
-            </Button>
+            />
             {record.status && record.status.toLowerCase() === "approved" && (
               <Button
                 onClick={() => handlePayment(record)}
                 type="primary"
+                icon={<ShoppingOutlined />}
                 style={{ marginRight: 8 }}
-              >
-                Pay
-              </Button>
+              />
             )}
             {record.feedbackId ? (
               <Button
                 onClick={() => handleViewReview(record.bookingId)}
                 type="default"
-                style={{ fontWeight: "bold" }}
+                icon={<EditOutlined />}
+                style={{ color: '#1890ff', fontWeight: 'bold' }}
               >
-                View Feedback
+                <span style={{ display: 'flex', alignItems: 'center' }}>
+                  <StarOutlined style={{ marginRight: 4 }} /> Feedback
+                </span>
               </Button>
             ) : record.status &&
               (record.status.toLowerCase() === "" ||
@@ -577,25 +578,21 @@ function Profile() {
               <Button
                 onClick={() => handleCreateReview(record.bookingId)}
                 type="default"
-                style={{ fontWeight: "bold" }}
-              >
-                Finish Tour & Send Feedback
-              </Button>
+                icon={<EditOutlined />}
+              />
             ) : record.status && (record.status.toLowerCase() === "purchased" || record.status.toLowerCase() === "checkin") ? (
               <Button
                 onClick={showRefundModal}
                 type="primary"
                 danger
-              >
-                Cancel & Refund
-              </Button>
+                icon={<DeleteOutlined />}
+              />
             ) : (
               <Button
                 onClick={() => showDeleteConfirm(record.bookingId)}
                 danger
-              >
-                Cancel
-              </Button>
+                icon={<DeleteOutlined />}
+              />
             )}
           </>
         );

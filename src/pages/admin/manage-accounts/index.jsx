@@ -56,7 +56,7 @@ const ManageAccounts = () => {
             (account) => account.username === values.username
           );
           if (usernameExists) {
-            message.error("Tên đăng nhập đã tồn tại. Vui lòng chọn tên khác.");
+            message.error("Username already exists. Please choose a different one.");
             return;
           }
         }
@@ -70,7 +70,7 @@ const ManageAccounts = () => {
           );
           
           if (emailExists) {
-            message.error("Email này đã được đăng ký. Vui lòng sử dụng email khác.");
+            message.error("This email is already registered. Please use a different one.");
             return;
           }
         }
@@ -94,21 +94,21 @@ const ManageAccounts = () => {
             `http://localhost:8080/api/accounts/${editingAccount.accountId}`,
             accountData
           );
-          message.success("Cập nhật tài khoản thành công");
+          message.success("Account updated successfully");
         } else {
           // Đối với tài khoản mới, bắt buộc phải có password
           if (!values.password) {
-            message.error("Password là bắt buộc khi tạo tài khoản mới");
+            message.error("Password is required when creating a new account");
             return;
           }
           await axios.post("http://localhost:8080/api/accounts", accountData);
-          message.success("Tạo tài khoản mới thành công");
+          message.success("New account created successfully");
         }
         setIsModalVisible(false);
         fetchAccounts();
       } catch (error) {
         console.error("Error saving account:", error);
-        message.error("Có lỗi xảy ra khi lưu tài khoản");
+        message.error("An error occurred while saving the account");
       }
     });
   };
@@ -216,7 +216,7 @@ const ManageAccounts = () => {
 
         <div style={{ marginBottom: 16 }}>
           <Search
-            placeholder="Tìm kiếm theo ID, tên, email, số điện thoại..."
+            placeholder="Search by ID, name, email, phone..."
             onSearch={handleSearch}
             onChange={(e) => handleSearch(e.target.value)}
             style={{ width: 300 }}
@@ -247,11 +247,11 @@ const ManageAccounts = () => {
             rules={[
               { 
                 required: !editingAccount, // Chỉ bắt buộc khi tạo mới
-                message: 'Vui lòng nhập password khi tạo tài khoản mới'
+                message: 'Please enter password when creating a new account'
               }
             ]}
           >
-            <Input.Password placeholder={editingAccount ? "Để trống nếu không muốn đổi mật khẩu" : "Nhập mật khẩu"} />
+            <Input.Password placeholder={editingAccount ? "Leave blank if you don't want to change the password" : "Enter password"} />
           </Form.Item>
           <Form.Item
             name="phone"
