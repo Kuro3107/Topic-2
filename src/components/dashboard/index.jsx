@@ -126,7 +126,7 @@ const Dashboard = () => {
           </div>
         </Content>
         <Footer>
-          Ant Design ©2023 Created by Ant UED
+          Lookoi ©2024 Created by Lookoi
         </Footer>
       </Layout>
     </Layout>

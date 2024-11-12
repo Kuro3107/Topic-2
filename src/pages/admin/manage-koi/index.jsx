@@ -134,7 +134,7 @@ function ManageKoi() {
         </Button>
 
         <Search
-          placeholder="Tìm kiếm theo tên, mô tả hoặc giá..."
+          placeholder="Search by name, description, or price..."
           onSearch={handleSearch}
           onChange={(e) => handleSearch(e.target.value)}
           style={{ width: 300 }}

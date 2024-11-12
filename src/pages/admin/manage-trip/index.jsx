@@ -385,12 +385,12 @@ const ManageTour = () => {
           onChange={(e) => setViewMode(e.target.value)} 
           style={{ marginRight: 16 }}
         >
-          <Radio value="available">Tour có sẵn</Radio>
-          <Radio value="custom">Tour của riêng khách hàng</Radio>
+          <Radio value="available">Available Tour</Radio>
+          <Radio value="custom">Custom Tour</Radio>
         </Radio.Group>
 
         <Search
-          placeholder="Tìm kiếm theo tên tour, giá, hoạt động hoặc farm..."
+          placeholder="Search by tour name, price, activities, or farm..."
           onSearch={handleSearch}
           onChange={(e) => handleSearch(e.target.value)}
           style={{ width: 400, marginLeft: 16 }}

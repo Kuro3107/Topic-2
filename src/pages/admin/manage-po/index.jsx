@@ -40,7 +40,7 @@ const ManagePO = () => {
 
       setPos(posWithBookings);
     } catch (error) {
-      message.error('Không thể tải dữ liệu: ' + error.message);
+      message.error('Cannot load data: ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -49,10 +49,10 @@ const ManagePO = () => {
   const handleDelete = async (poId) => {
     try {
       await axios.delete(`http://localhost:8080/api/pos/${poId}`);
-      message.success('Xóa PO thành công');
+      message.success('Delete PO successfully');
       fetchData();
     } catch (error) {
-      message.error('Không thể xóa PO: ' + error.message);
+      message.error('Cannot delete PO: ' + error.message);
     }
   };
 
@@ -68,41 +68,41 @@ const ManagePO = () => {
       key: 'bookingId',
     },
     {
-      title: 'Tổng tiền',
+      title: 'Total Amount',
       dataIndex: 'totalAmount',
       key: 'totalAmount',
       render: (amount) => amount ? `${Number(amount).toLocaleString('vi-VN')} VNĐ` : '0 VNĐ',
     },
     {
-      title: 'Ngày giao Koi',
+      title: 'Koi Delivery Date',
       dataIndex: 'koiDeliveryDate',
       key: 'koiDeliveryDate',
       render: (date) => date ? new Date(date).toLocaleDateString('vi-VN') : 'N/A',
     },
     {
-      title: 'Trạng thái',
+      title: 'Status',
       dataIndex: 'status',
       key: 'status',
       render: (status) => status || 'N/A',
     },
     {
-      title: 'Địa chỉ',
+      title: 'Address',
       dataIndex: 'address',
       key: 'address',
     },
     {
-      title: 'Thao tác',
+      title: 'Action',
       key: 'action',
       render: (_, record) => (
         <Space>
           <Popconfirm
-            title="Bạn có chắc muốn xóa PO này?"
+            title="Are you sure you want to delete this PO?"
             onConfirm={() => handleDelete(record.poId)}
-            okText="Có"
-            cancelText="Không"
+            okText="Yes"
+            cancelText="No"
           >
             <Button type="primary" danger>
-              Xóa
+              Delete
             </Button>
           </Popconfirm>
         </Space>
@@ -118,40 +118,40 @@ const ManagePO = () => {
         key: 'poDetailId',
       },
       {
-        title: 'Loại Koi',
+        title: 'Koi Type',
         dataIndex: ['variety', 'varietyName'],
         key: 'varietyName',
       },
       {
-        title: 'Trang trại',
+        title: 'Farm',
         dataIndex: ['farm', 'farmName'],
         key: 'farmName',
       },
       {
-        title: 'Số lượng',
+        title: 'Quantity',
         dataIndex: 'quantity',
         key: 'quantity',
       },
       {
-        title: 'Đặt cọc',
+        title: 'Deposit',
         dataIndex: 'deposit',
         key: 'deposit',
         render: (price) => price ? `${Number(price).toLocaleString('vi-VN')} VNĐ` : '0 VNĐ',
       },
       {
-        title: 'Tổng giá Koi',
+        title: 'Total Koi Price',
         dataIndex: 'totalKoiPrice',
         key: 'totalKoiPrice',
         render: (price) => price ? `${Number(price).toLocaleString('vi-VN')} VNĐ` : '0 VNĐ',
       },
       {
-        title: 'Giá còn lại',
+        title: 'Remaining Price',
         dataIndex: 'remainingPrice',
         key: 'remainingPrice',
         render: (price) => price ? `${Number(price).toLocaleString('vi-VN')} VNĐ` : '0 VNĐ',
       },
       {
-        title: 'Ngày của chuyến đi',
+        title: 'Trip Day',
         dataIndex: 'day',
         key: 'day',
       }
@@ -176,7 +176,7 @@ const ManagePO = () => {
   const tabItems = [
     {
       key: 'all',
-      label: 'Tất cả',
+      label: 'All',
       children: (
         <Table
           columns={columns}
@@ -189,14 +189,14 @@ const ManagePO = () => {
           }}
           pagination={{
             pageSize: 10,
-            showTotal: (total) => `Tổng số ${total} PO`,
+            showTotal: (total) => `Total ${total} PO`,
           }}
         />
       ),
     },
     {
       key: 'delivering',
-      label: 'Đang giao',
+      label: 'Delivering',
       children: (
         <Table
           columns={columns}
@@ -209,14 +209,14 @@ const ManagePO = () => {
           }}
           pagination={{
             pageSize: 10,
-            showTotal: (total) => `Tổng số ${total} PO đang giao`,
+            showTotal: (total) => `Total ${total} PO delivering`,
           }}
         />
       ),
     },
     {
       key: 'delivered',
-      label: 'Đã giao',
+      label: 'Delivered',
       children: (
         <Table
           columns={columns}
@@ -229,14 +229,14 @@ const ManagePO = () => {
           }}
           pagination={{
             pageSize: 10,
-            showTotal: (total) => `Tổng số ${total} PO đã giao`,
+            showTotal: (total) => `Total ${total} PO delivered`,
           }}
         />
       ),
     },
     {
       key: 'deny',
-      label: 'Đã từ chối',
+      label: 'Denied',
       children: (
         <Table
           columns={columns}
@@ -249,7 +249,7 @@ const ManagePO = () => {
           }}
           pagination={{
             pageSize: 10,
-            showTotal: (total) => `Tổng số ${total} PO bị từ chối`,
+            showTotal: (total) => `Total ${total} PO denied`,
           }}
         />
       ),
@@ -258,7 +258,7 @@ const ManagePO = () => {
 
   return (
     <Card>
-      <Title level={2}>Quản lý Purchase Orders</Title>
+      <Title level={2}>Manage Purchase Orders</Title>
       <Tabs
         defaultActiveKey="all"
         items={tabItems}

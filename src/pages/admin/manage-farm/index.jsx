@@ -87,7 +87,7 @@ const ManageFarm = () => {
   };
 
   const onFinish = async (values) => {
-    console.log("Dữ liệu gửi đến backend:", values); // Thêm log để kiểm tra dữ liệu
+    console.log("Data sent to backend:", values); // Thêm log để kiểm tra dữ liệu
     try {
       const response = await axios.post(apiFarm, values); // Gửi dữ liệu mới
       message.success("Add New Farm Success!");
@@ -103,7 +103,7 @@ const ManageFarm = () => {
   };
 
   const handleEditFinish = async (values) => {
-    console.log("Dữ liệu chỉnh sửa gửi đến backend:", values); // Thêm log để kiểm tra dữ liệu
+    console.log("Data edited sent to backend:", values); // Thêm log để kiểm tra dữ liệu
     try {
       await axios.put(`${apiFarm}/${editingFarm.farmId}`, values); // Cập nhật farmId
       message.success("Updated Farm Success!");
@@ -294,7 +294,7 @@ const ManageFarm = () => {
         </Button>
         
         <Search
-          placeholder="Tìm kiếm theo tên farm, địa điểm, liên hệ hoặc loại koi..."
+          placeholder="Search by farm name, location, contact, or koi variety..."
           onSearch={handleSearch}
           onChange={(e) => handleSearch(e.target.value)}
           style={{ width: 400 }}
@@ -341,7 +341,7 @@ const ManageFarm = () => {
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">
-              Thêm mới
+              Add New
             </Button>
           </Form.Item>
         </Form>
@@ -354,13 +354,13 @@ const ManageFarm = () => {
                 <li key={koi.varietyId} style={{ color: 'black', backgroundColor: 'white' }}>
                   {koi.varietyName}
                   <Button onClick={() => handleRemoveKoi(koi.varietyId)} danger style={{ marginLeft: 8 }}>
-                    Xóa
+                    Delete
                   </Button>
                 </li>
               ))}
             </ul>
 
-            <h3>Thêm Koi</h3>
+            <h3>Add Koi</h3>
             {allKoi.length > 0 ? (
                 <>
                     <select 
@@ -368,7 +368,7 @@ const ManageFarm = () => {
                         value={selectedKoi || ""} 
                         style={{ color: 'black', backgroundColor: 'white', width: '200px' }}
                     >
-                        <option value="">Chọn Koi</option>
+                        <option value="">Choose Koi</option>
                         {allKoi
                             .filter(koi => !koiList.some(existingKoi => existingKoi.varietyId === koi.varietyId))
                             .map(koi => (
@@ -384,7 +384,7 @@ const ManageFarm = () => {
                         disabled={!selectedKoi}
                         style={{ marginTop: 8, marginLeft: 8 }}
                     >
-                        Thêm Koi
+                        Add Koi
                     </Button>
                 </>
             ) : (
@@ -451,21 +451,21 @@ const ManageFarm = () => {
                   <li key={koi.varietyId} style={{ color: 'black', backgroundColor: 'white' }}>
                     {koi.varietyName}
                     <Button onClick={() => handleRemoveKoi(koi.varietyId)} danger style={{ marginLeft: 8 }}>
-                      Xóa
+                      Delete
                     </Button>
                   </li>
                 ))}
               </ul>
 
-              <h3>Thêm Koi</h3>
+              <h3>Add Koi</h3>
               <select onChange={(e) => setSelectedKoi(e.target.value)} value={selectedKoi} style={{ color: 'black', backgroundColor: 'white' }}>
-                <option value="">Chọn Koi</option>
+                <option value="">Choose Koi</option>
                 {allKoi.filter(koi => !koiList.some(existingKoi => existingKoi.varietyName === koi.varietyName)).map(koi => (
                   <option key={koi.varietyId} value={koi.varietyName}>{koi.varietyName}</option>
                 ))}
               </select>
               <Button onClick={handleAddKoi} type="primary" style={{ marginTop: 8 }}>
-                Thêm Koi
+                Add Koi
               </Button>
             </>
           )}

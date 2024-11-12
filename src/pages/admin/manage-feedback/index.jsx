@@ -17,7 +17,7 @@ function ManageFeedback() {
         setBookingData(bookingResponse.data);
       } catch (error) {
         console.error("Error fetching feedback or booking data:", error);
-        message.error("Không thể tải dữ liệu đánh giá");
+        message.error("Cannot load feedback data");
       }
     };
 
@@ -31,17 +31,17 @@ function ManageFeedback() {
       key: "bookingId",
     },
     {
-      title: "Ngày đặt",
+      title: "Booking Date",
       dataIndex: "bookingDate",
       key: "bookingDate",
     },
     {
-      title: "Họ tên",
+      title: "Full Name",
       dataIndex: "fullName",
       key: "fullName",
     },
     {
-      title: "Số điện thoại",
+      title: "Phone",
       dataIndex: "phone",
       key: "phone",
     },
@@ -51,13 +51,13 @@ function ManageFeedback() {
       key: "email",
     },
     {
-      title: "Đánh giá",
+      title: "Rating",
       dataIndex: "rating",
       key: "rating",
       render: (text) => <Rate disabled value={text} />,
     },
     {
-      title: "Nhận xét",
+      title: "Comment",
       dataIndex: "comment",
       key: "comment",
     },
@@ -88,7 +88,7 @@ function ManageFeedback() {
   const tabItems = [
     {
       key: 'all',
-      label: 'Tất cả đánh giá',
+      label: 'All Feedback',
       children: (
         <Table 
           columns={columns} 
@@ -96,14 +96,14 @@ function ManageFeedback() {
           rowKey="bookingId"
           pagination={{
             pageSize: 10,
-            showTotal: (total) => `Tổng số ${total} đánh giá`,
+            showTotal: (total) => `Total ${total} feedbacks`,
           }}
         />
       ),
     },
     {
       key: '5',
-      label: '5 sao',
+      label: '5 stars',
       children: (
         <Table 
           columns={columns} 
@@ -111,14 +111,14 @@ function ManageFeedback() {
           rowKey="bookingId"
           pagination={{
             pageSize: 10,
-            showTotal: (total) => `Tổng số ${total} đánh giá 5 sao`,
+            showTotal: (total) => `Total ${total} 5 stars feedbacks`,
           }}
         />
       ),
     },
     {
       key: '4',
-      label: '4 sao',
+      label: '4 stars',
       children: (
         <Table 
           columns={columns} 
@@ -126,14 +126,14 @@ function ManageFeedback() {
           rowKey="bookingId"
           pagination={{
             pageSize: 10,
-            showTotal: (total) => `Tổng số ${total} đánh giá 4 sao`,
+            showTotal: (total) => `Total ${total} 4 stars feedbacks`,
           }}
         />
       ),
     },
     {
       key: '3',
-      label: '3 sao',
+      label: '3 stars',
       children: (
         <Table 
           columns={columns} 
@@ -141,14 +141,14 @@ function ManageFeedback() {
           rowKey="bookingId"
           pagination={{
             pageSize: 10,
-            showTotal: (total) => `Tổng số ${total} đánh giá 3 sao`,
+            showTotal: (total) => `Total ${total} 3 stars feedbacks`,
           }}
         />
       ),
     },
     {
       key: '2',
-      label: '2 sao',
+      label: '2 stars',
       children: (
         <Table 
           columns={columns} 
@@ -156,14 +156,14 @@ function ManageFeedback() {
           rowKey="bookingId"
           pagination={{
             pageSize: 10,
-            showTotal: (total) => `Tổng số ${total} đánh giá 2 sao`,
+            showTotal: (total) => `Total ${total} 2 stars feedbacks`,
           }}
         />
       ),
     },
     {
       key: '1',
-      label: '1 sao',
+      label: '1 star',
       children: (
         <Table 
           columns={columns} 
@@ -171,7 +171,7 @@ function ManageFeedback() {
           rowKey="bookingId"
           pagination={{
             pageSize: 10,
-            showTotal: (total) => `Tổng số ${total} đánh giá 1 sao`,
+            showTotal: (total) => `Total ${total} 1 star feedbacks`,
           }}
         />
       ),
@@ -180,7 +180,7 @@ function ManageFeedback() {
 
   return (
     <div>
-      <h1>Quản lý đánh giá</h1>
+      <h1>Manage Feedback</h1>
       <Tabs
         defaultActiveKey="all"
         items={tabItems}
