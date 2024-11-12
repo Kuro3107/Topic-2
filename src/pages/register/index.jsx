@@ -19,7 +19,7 @@ function RegisterPage() {
       );
       
       if (usernameExists) {
-        toast.error("Tên đăng nhập đã tồn tại. Vui lòng chọn tên khác.");
+        toast.error("Username already exists. Please choose another one.");
         return;
       }
 
@@ -30,7 +30,7 @@ function RegisterPage() {
         );
         
         if (emailExists) {
-          toast.error("Email này đã được đăng ký. Vui lòng sử dụng email khác.");
+          toast.error("This email is already registered. Please use another email.");
           return;
         }
       }
@@ -51,15 +51,15 @@ function RegisterPage() {
 
       if (response.data && response.data.token) {
         localStorage.setItem('userInfo', JSON.stringify(response.data));
-        toast.success("Đăng ký thành công và đã đăng nhập");
+        toast.success("Registered successfully and logged in");
         navigate("/profile");
       } else {
-        toast.success("Đăng ký thành công");
+        toast.success("Registration successful");
         navigate("/login");
       }
     } catch (error) {
       console.error("Error details:", error.response || error);
-      toast.error(error.response?.data?.message || "Đăng ký thất bại. Vui lòng thử lại.");
+      toast.error(error.response?.data?.message || "Registration failed. Please try again.");
     }
   };
 

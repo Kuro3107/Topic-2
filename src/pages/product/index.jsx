@@ -156,13 +156,13 @@ const Product = () => {
   const handleBooking = (tripId) => {
     const userInfo = JSON.parse(localStorage.getItem("userInfo"));
     if (!userInfo) {
-      message.warning("Vui lòng đăng nhập để đặt tour.");
+      message.warning("Please login to booking tour");
       navigate("/login");
       return;
     }
     
     if (!isCustomerRole()) {
-      message.warning("Chỉ tài khoản khách hàng mới có thể đặt tour.");
+      message.warning("Chỉ có khách hàng tài khoản mới có thể đặt tour.");
       return;
     }
 
@@ -518,10 +518,10 @@ const Product = () => {
             label="Phone"
             name="phone"
             rules={[
-              { required: true, message: "Vui lòng nhập số điện thoại!" },
+              { required: true, message: "Please enter phone number!" },
               {
                 pattern: /^0\d{9}$/,
-                message: "Số điện thoại phải bắt đầu bằng số 0 và có 10 chữ số!"
+                message: "Phone number must start with 0 and have 10 digits!"
               }
             ]}
           >
@@ -535,10 +535,10 @@ const Product = () => {
             label="Email"
             name="email"
             rules={[
-              { required: true, message: "Vui lòng nhập email!" },
+              { required: true, message: "Please input email!" },
               {
                 pattern: /^[a-zA-Z0-9._-]+@gmail\.com$/,
-                message: "Email phải có định dạng @gmail.com!"
+                message: "Email must be in @gmail.com format!"
               }
             ]}
           >
@@ -552,7 +552,7 @@ const Product = () => {
             label="Start Date"
             name="startDate"
             rules={[
-              { required: true, message: "Vui lòng chọn ngày bắt đầu!" }
+              { required: true, message: "Please select a start date!" }
             ]}
           >
             <DatePicker
