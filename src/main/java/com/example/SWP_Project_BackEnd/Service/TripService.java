@@ -58,6 +58,7 @@ public class TripService {
         trip.setTripName(tripDetails.getTripName());
         trip.setPriceTotal(tripDetails.getPriceTotal());
         trip.setImageUrl(tripDetails.getImageUrl());
+        trip.setSaleName(tripDetails.getSaleName());
 
         return tripRepository.save(trip);
     }

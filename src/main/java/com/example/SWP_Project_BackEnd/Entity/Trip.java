@@ -37,6 +37,9 @@ public class Trip {
     @Column(name = "image_url")
     private String imageUrl;
 
+    @Column(name = "sale_name")
+    private String saleName;
+
     @OneToMany(mappedBy = "trip", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 //    @JsonManagedReference
     private List<TripDetail> tripDetails = new ArrayList<>();
