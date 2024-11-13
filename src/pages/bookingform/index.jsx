@@ -82,11 +82,11 @@ function BookingForm() {
     setErrors(prev => ({...prev, [name]: ''}));
     
     if (name === 'phone') {
-      const phoneRegex = /^0\d{9}$/;
+      const phoneRegex = /(84|0[3|5|7|8|9])+([0-9]{8,9})\b/g;
       if (value && !phoneRegex.test(value)) {
         setErrors(prev => ({
           ...prev,
-          phone: 'Phone number must be 10 digits and start with 0'
+          phone: 'Invalid Phone number'
         }));
       }
     }
@@ -96,7 +96,7 @@ function BookingForm() {
       if (value && !emailRegex.test(value)) {
         setErrors(prev => ({
           ...prev,
-          email: 'Email must end with @gmail.com'
+          email: 'Invalid Email (Must end with @gmail.com)'
         }));
       }
     }
@@ -106,10 +106,18 @@ function BookingForm() {
       today.setHours(0, 0, 0, 0);
       const selectedDate = new Date(value);
       
+      const diffTime = selectedDate.getTime() - today.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
       if (selectedDate < today) {
         setErrors(prev => ({
           ...prev,
           startDate: 'Cannot select past date'
+        }));
+      } else if (diffDays < 3) {
+        setErrors(prev => ({
+          ...prev,
+          startDate: 'Start date must be at least 3 days from today'
         }));
       }
     }
@@ -278,7 +286,7 @@ function BookingForm() {
                       value={formData.phone}
                       onChange={handleChange}
                       required
-                      placeholder="Enter your phone number (10 digits starting with 0)"
+                      placeholder="Enter your phone number"
                     />
                     {errors.phone && <div className="error-message">{errors.phone}</div>}
                   </div>
@@ -293,7 +301,7 @@ function BookingForm() {
                     value={formData.email}
                     onChange={handleChange}
                     required
-                    placeholder="Enter your email address (@gmail.com)"
+                    placeholder="Enter your email address"
                   />
                   {errors.email && <div className="error-message">{errors.email}</div>}
                 </div>
@@ -365,7 +373,11 @@ function BookingForm() {
                         className={`form-input ${errors.startDate ? 'error-input' : ''}`}
                         value={formData.startDate}
                         onChange={handleChange}
-                        min={new Date().toISOString().split('T')[0]}
+                        min={(() => {
+                          const minDate = new Date();
+                          minDate.setDate(minDate.getDate() + 4);
+                          return minDate.toISOString().split('T')[0];
+                        })()}
                         required
                       />
                       {errors.startDate && <div className="error-message">{errors.startDate}</div>}

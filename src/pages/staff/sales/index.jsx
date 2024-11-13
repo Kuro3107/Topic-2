@@ -21,6 +21,9 @@ import {
   UserOutlined,
   CheckOutlined,
   LogoutOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+  CalendarOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import axios from "axios";
@@ -28,6 +31,7 @@ import { Space } from "antd";
 import { Footer, Header } from "antd/es/layout/layout";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import './index.css';
 
 
 function SalesDashboard() {
@@ -44,6 +48,8 @@ function SalesDashboard() {
   const farmApi = "http://localhost:8080/api/farms"; // API cho Koi Farms
   const navigate = useNavigate();
   const isLoggedIn = localStorage.getItem("userInfo") !== null;
+
+  const username = localStorage.getItem("username"); // Lấy username từ localStorage
 
   useEffect(() => {
     fetchBookings();
@@ -162,7 +168,7 @@ function SalesDashboard() {
       });
   };
 
-  // Trong hàm xử lý khi nhấn nút "OK"
+  // Thay thế hàm handleTripOk hiện tại bằng đoạn code sau
   const handleTripOk = () => {
     tripForm
       .validateFields()
@@ -170,144 +176,90 @@ function SalesDashboard() {
         const tripDetails = values.tripDetails || [];
         const koiFarms = values.koiFarms || [];
 
+        // Lấy userInfo từ localStorage và parse nó
+        const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+        const saleName = userInfo ? userInfo.username : null;
+
+        if (!saleName) {
+          message.error("Could not get sale staff username. Please login again.");
+          return;
+        }
+
         const payload = {
           tripName: values.tripName,
-          priceTotal: values.priceTotal,
+          priceTotal: values.priceTotal || 0,
           tripDetails: tripDetails,
           koiFarms: koiFarms,
-          favoriteFarm: values.favoriteFarm
-            ? Array.isArray(values.favoriteFarm)
-              ? values.favoriteFarm
-              : values.favoriteFarm.split(",").map((farm) => farm.trim())
-            : [],
-          favoriteKoi: values.favoriteKoi
-            ? Array.isArray(values.favoriteKoi)
-              ? values.favoriteKoi
-              : values.favoriteKoi.split(",").map((koi) => koi.trim())
-            : [],
+          saleName: saleName // Sử dụng username từ userInfo
         };
 
-        console.log("Trip data to be sent:", JSON.stringify(payload)); // Ghi log dữ liệu gửi đi
+        console.log("Trip data to be sent:", JSON.stringify(payload));
 
         if (isEditingTrip) {
           // Cập nhật trip
-          console.log("Updating trip with payload:", payload); // Ghi log trước khi gửi
-          axios
-            .put(
+          try {
+            const response = await axios.put(
               `http://localhost:8080/api/trips/${viewingBooking.tripId}`,
               payload
-            )
-            .then((response) => {
-              console.log("Trip updated response:", response.data);
-              updateTripDetails(viewingBooking.tripId, tripDetails);
+            );
+            console.log("Trip updated successfully:", response.data);
+            message.success("Trip updated successfully");
+            
+            // Cập nhật trip details và koi farms
+            updateTripDetails(viewingBooking.tripId, tripDetails);
+            
+            // Xử lý farms đã thêm và đã xóa
+            const originalFarms = viewingBooking.koiFarms || [];
+            const farmsToAdd = koiFarms.filter(
+              (farm) => !originalFarms.some((orig) => orig.farmId === farm.farmId)
+            );
+            const farmsToRemove = originalFarms.filter(
+              (farm) => !koiFarms.some((kf) => kf.farmId === farm.farmId)
+            );
 
-              // Xử lý farms đã thêm và đã xóa
-              const originalFarms = viewingBooking.koiFarms || [];
-              const farmsToAdd = koiFarms.filter(
-                (farm) =>
-                  !originalFarms.some((orig) => orig.farmId === farm.farmId)
-              );
-              const farmsToRemove = originalFarms.filter(
-                (farm) => !koiFarms.some((kf) => kf.farmId === farm.farmId)
-              );
+            // Cập nhật farms
+            await Promise.all([
+              ...farmsToAdd.map(farm => 
+                axios.post(`http://localhost:8080/api/trips/${viewingBooking.tripId}/farms`, { farmId: farm.farmId })
+              ),
+              ...farmsToRemove.map(farm =>
+                axios.delete(`http://localhost:8080/api/trips/${viewingBooking.tripId}/farms/${farm.farmId}`)
+              )
+            ]);
 
-              // Gọi hàm để thêm farms mới
-              farmsToAdd.forEach((farm) => {
-                axios
-                  .post(
-                    `http://localhost:8080/api/trips/${viewingBooking.tripId}/farms`,
-                    { farmId: farm.farmId }
-                  )
-                  .then((response) => {
-                    console.log("Farm added:", response.data);
-                  })
-                  .catch((error) => {
-                    console.error("Error adding farm:", error);
-                  });
-              });
-
-              // Gọi hàm để xóa farms đã bị loại bỏ
-              farmsToRemove.forEach((farm) => {
-                axios
-                  .delete(
-                    `http://localhost:8080/api/trips/${viewingBooking.tripId}/farms/${farm.farmId}`
-                  )
-                  .then((response) => {
-                    console.log("Farm removed:", response.data);
-                  })
-                  .catch((error) => {
-                    console.error("Error removing farm:", error);
-                    message.error("Unable to remove farm");
-                  });
-              });
-
-              fetchBookings();
-            })
-            .catch((error) => {
-              console.error(
-                "Error updating trip:",
-                error.response ? error.response.data : error.message
-              );
-              message.error("Unable to update trip");
-            });
+            fetchBookings();
+          } catch (error) {
+            console.error("Error updating trip:", error);
+            // message.error("Failed to update trip");
+          }
         } else {
           // Tạo trip mới
-          axios
-            .post(`http://localhost:8080/api/trips`, payload)
-            .then((response) => {
-              const createdTrip = response.data;
-              axios
-                .get(`${bookingApi}/${viewingBooking.bookingId}`)
-                .then((bookingResponse) => {
-                  const currentBooking = bookingResponse.data;
-                  const updatedBooking = {
-                    ...currentBooking,
-                    tripId: createdTrip.tripId,
-                  };
-                  console.log(
-                    "Updating booking with data:",
-                    JSON.stringify(updatedBooking)
-                  ); // Ghi log dữ liệu gửi đi
-                  axios
-                    .put(
-                      `${bookingApi}/${viewingBooking.bookingId}`,
-                      updatedBooking
-                    )
-                    .then(() => {
-                      message.success("Booking updated with new trip ID");
-                      fetchBookings();
-                    })
-                    .catch((error) => {
-                      console.error(
-                        "Error updating booking with trip ID:",
-                        error.response ? error.response.data : error.message
-                      );
-                      message.error("Unable to update booking with trip ID");
-                    });
-                })
-                .catch((error) => {
-                  console.error(
-                    "Error fetching current booking data:",
-                    error.response ? error.response.data : error.message
-                  );
-                  message.error("Unable to fetch current booking data");
-                });
-              updateTripDetails(createdTrip.tripId, tripDetails);
-              updateKoiFarms(createdTrip.tripId, koiFarms, []); // Ghi chú: Chỉ gửi farms mới
-            })
-            .catch((error) => {
-              console.error(
-                "Error creating trip:",
-                error.response ? error.response.data : error.message
-              );
-              message.error("Unable to create trip");
+          try {
+            const tripResponse = await axios.post(`http://localhost:8080/api/trips`, payload);
+            const createdTrip = tripResponse.data;
+            
+            // Cập nhật booking với tripId mới
+            const bookingResponse = await axios.get(`${bookingApi}/${viewingBooking.bookingId}`);
+            const currentBooking = bookingResponse.data;
+            
+            await axios.put(`${bookingApi}/${viewingBooking.bookingId}`, {
+              ...currentBooking,
+              tripId: createdTrip.tripId
             });
+
+            message.success("Trip created successfully");
+            fetchBookings();
+          } catch (error) {
+            console.error("Error creating trip:", error);
+            message.error("Failed to create trip");
+          }
         }
 
         setIsTripModalVisible(false);
       })
       .catch((error) => {
         console.error("Validation error:", error);
+        message.error("Please check your input");
       });
   };
 
@@ -318,7 +270,7 @@ function SalesDashboard() {
         console.log("Trip details before sending:", tripDetails);
         if (
           detail.mainTopic &&
-          detail.subTopic &&
+          // detail.subTopic &&
           detail.day &&
           detail.notePrice
         ) {
@@ -327,7 +279,7 @@ function SalesDashboard() {
               `http://localhost:8080/api/trips/${tripId}/trip-details/${detail.tripDetailId}`,
               {
                 mainTopic: detail.mainTopic,
-                subTopic: detail.subTopic,
+                subTopic: detail.subTopic || null,
                 notePrice: detail.notePrice,
                 day: detail.day,
                 tripId: tripId, // Đảm bảo tripId được truyền đúng nếu cần
@@ -350,14 +302,14 @@ function SalesDashboard() {
         console.log("Trip details before sending:", tripDetails);
         if (
           detail.mainTopic &&
-          detail.subTopic &&
+          // detail.subTopic &&
           detail.day &&
           detail.notePrice
         ) {
           axios
             .post(`http://localhost:8080/api/trips/${tripId}/trip-details`, {
               mainTopic: detail.mainTopic,
-              subTopic: detail.subTopic,
+              subTopic: detail.subTopic || null,
               notePrice: detail.notePrice,
               day: detail.day,
               tripId: tripId, // TripID cần được gửi để liên kết với trip này
@@ -439,7 +391,12 @@ function SalesDashboard() {
       content: (
         <div>
           <p style={{ marginBottom: '10px' }}>
-            Customer's favorite koi varieties: {favoriteKoiArray.join(', ')}
+            Customer&apos;s favorite koi varieties: {favoriteKoiArray.join(', ')}
+          </p>
+          <p style={{ marginBottom: '10px' }}>
+            Customer&apos;s favorite farms: {Array.isArray(viewingBooking.favoriteFarm) 
+              ? viewingBooking.favoriteFarm.join(', ') 
+              : viewingBooking.favoriteFarm}
           </p>
           <Select
             placeholder="Select a farm"
@@ -577,7 +534,7 @@ function SalesDashboard() {
       key: "action",
       render: (_, record) => (
         <>
-          <Button onClick={() => showModal(record)}>View Booking & Update Status</Button>
+          <Button onClick={() => showModal(record)}>Update Booking</Button>
           {/* <Button onClick={() => showBookingDetails(record)}>View Booking</Button> */}
         </>
       ),
@@ -753,7 +710,12 @@ function SalesDashboard() {
               <DatePicker disabled />
             </Form.Item>
             <Form.Item name="endDate" label="End Date">
-              <DatePicker disabled />
+              <DatePicker 
+                disabledDate={(current) => {
+                  const startDate = form.getFieldValue('startDate');
+                  return startDate && current && current.isBefore(startDate, 'day');
+                }}
+              />
             </Form.Item>
             <Form.Item name="note" label="Note">
               <Input.TextArea disabled />
@@ -767,132 +729,162 @@ function SalesDashboard() {
           onOk={handleTripOk}
           onCancel={() => setIsTripModalVisible(false)}
           width={800}
+          className="trip-modal"
         >
           <Form form={tripForm} layout="vertical">
-            <Form.Item name="tripName" label="Trip Name">
-              <Input placeholder="Enter trip name" />
+            <Form.Item 
+              name="tripName" 
+              label="Trip Name"
+              rules={[{ required: true, message: 'Please enter trip name' }]}
+            >
+              <Input placeholder="Enter trip name" size="large" />
             </Form.Item>
 
             {isEditingTrip && (
               <>
-                <Form.Item name="priceTotal" label="Total Price">
+                <Form.Item 
+                  name="priceTotal" 
+                  label="Total Price"
+                  rules={[
+                    { required: true, message: 'Please enter total price' },
+                    { 
+                      type: 'number',
+                      min: 1,
+                      message: 'Price must be greater than 0'
+                    }
+                  ]}
+                >
                   <InputNumber
+                    className="price-input"
                     placeholder="Enter total price"
-                    style={{ width: "100%" }}
+                    min={1}
+                    size="large"
+                    style={{ width: '100%' }}
                   />
                 </Form.Item>
 
-                {/* Form.List cho Trip Details */}
-                <Form.List name="tripDetails">
-                  {(fields, { add, remove }) => (
-                    <>
-                      {fields.map((field, index) => {
-                        const tripDetailId = tripForm.getFieldValue([
-                          "tripDetails",
-                          index,
-                          "tripDetailId",
-                        ]); // Lấy tripDetailId từ form
-                        return (
-                          <Space key={field.key} align="baseline">
-                            <Form.Item
-                              {...field}
-                              name={[field.name, "day"]}
-                              label="Day"
-                            >
-                              <InputNumber min={1} />
-                            </Form.Item>
-                            <Form.Item
-                              {...field}
-                              name={[field.name, "mainTopic"]}
-                              label="Main Topic"
-                            >
-                              <Input placeholder="Enter main topic" />
-                            </Form.Item>
-                            <Form.Item
-                              {...field}
-                              name={[field.name, "subTopic"]}
-                              label="Sub Topic"
-                            >
-                              <Input placeholder="Enter sub topic" />
-                            </Form.Item>
-                            <Form.Item
-                              {...field}
-                              name={[field.name, "notePrice"]}
-                              label="Price Note"
-                            >
-                              <Input placeholder="Enter price note" />
-                            </Form.Item>
-                            <Button
-                              onClick={() => {
-                                if (tripDetailId) {
-                                  // Kiểm tra xem tripDetailId có tồn tại không
-                                  removeTripDetail(
-                                    viewingBooking.tripId,
-                                    tripDetailId
-                                  ); // Gọi hàm xóa trip detail
-                                } else {
-                                  message.error("Trip detail ID is undefined."); // Thông báo lỗi nếu ID không tồn tại
-                                }
-                                remove(field.name); // Xóa trip detail khỏi form
-                              }}
-                            >
-                              Remove
-                            </Button>
-                          </Space>
-                        );
-                      })}
-                      <Button onClick={() => add()}>Add Trip Detail</Button>
-                    </>
-                  )}
-                </Form.List>
+                <div className="farm-section">
+                  <div className="section-header">
+                    <ShoppingCartOutlined />
+                    <span>Koi Farms</span>
+                  </div>
+                  <Form.List name="koiFarms">
+                    {(fields, { remove }) => (
+                      <>
+                        {fields.map((field) => {
+                          const farmId = tripForm.getFieldValue(["koiFarms", field.name, "farmId"]);
+                          const farmName = tripForm.getFieldValue(["koiFarms", field.name, "farmName"]);
+                          const location = tripForm.getFieldValue(["koiFarms", field.name, "location"]);
+                          const imageUrl = tripForm.getFieldValue(["koiFarms", field.name, "imageUrl"]);
 
-                {/* Hiển thị danh sách Koi Farms */}
-                <Form.List name="koiFarms">
-                  {(fields, { add, remove }) => (
-                    <>
-                      {fields.map((field) => {
-                        const farmId = tripForm.getFieldValue([
-                          "koiFarms",
-                          field.name,
-                          "farmId",
-                        ]);
-                        const farmName = tripForm.getFieldValue([
-                          "koiFarms",
-                          field.name,
-                          "farmName",
-                        ]);
-                        const location = tripForm.getFieldValue([
-                          "koiFarms",
-                          field.name,
-                          "location",
-                        ]);
+                          return (
+                            <div key={field.key} className="farm-card">
+                              <div className="farm-info">
+                                <h4>{farmName}</h4>
+                                <p><img src={imageUrl} alt="Koi Farm" /></p>
+                                <p>{location}</p>
+                              </div>
+                              <Button
+                                className="remove-button"
+                                onClick={() => {
+                                  handleRemoveFarm(farmId);
+                                  remove(field.name);
+                                }}
+                                icon={<DeleteOutlined />}
+                              >
+                                Remove
+                              </Button>
+                            </div>
+                          );
+                        })}
+                        <Button
+                          type="dashed"
+                          onClick={handleAddFarm}
+                          className="add-button"
+                          icon={<PlusOutlined />}
+                        >
+                          Add Farm
+                        </Button>
+                      </>
+                    )}
+                  </Form.List>
+                </div>
 
-                        return (
-                          <div key={field.key}>
-                            <h4>{farmName}</h4>
-                            <p>{location}</p>
-                            <Button
-                              onClick={() => {
-                                // Gọi API xóa farm và xóa khỏi form
-                                handleRemoveFarm(farmId); // Hàm này sẽ gọi API và xóa farm khỏi form
-                                remove(field.name); // Xóa farm khỏi form sau khi API xóa thành công
-                              }}
-                            >
-                              Remove Farm
-                            </Button>
-                          </div>
-                        );
-                      })}
-                      <Button
-                        type="dashed"
-                        onClick={handleAddFarm}
-                        style={{ width: "100%", marginTop: "16px" }}
-                      >
-                        Add Farm
-                      </Button>
-                    </>
-                  )}
-                </Form.List>
+                <div className="trip-details-section">
+                  <div className="section-header">
+                    <CalendarOutlined />
+                    <span>Trip Details</span>
+                  </div>
+                  <Form.List name="tripDetails">
+                    {(fields, { add, remove }) => (
+                      <>
+                        {fields.map((field, index) => {
+                          const tripDetailId = tripForm.getFieldValue([
+                            "tripDetails",
+                            index,
+                            "tripDetailId",
+                          ]);
+                          return (
+                            <div key={field.key} className="trip-detail-row">
+                              <Space align="baseline" style={{ width: '100%' }}>
+                                <Form.Item
+                                  {...field}
+                                  name={[field.name, "day"]}
+                                  label="Day"
+                                  rules={[{ required: true, message: 'Required' }]}
+                                >
+                                  <InputNumber min={1} />
+                                </Form.Item>
+                                <Form.Item
+                                  {...field}
+                                  name={[field.name, "mainTopic"]}
+                                  label="Main Topic"
+                                  rules={[{ required: true, message: 'Required' }]}
+                                >
+                                  <Input placeholder="Enter main topic" />
+                                </Form.Item>
+                                <Form.Item
+                                  {...field}
+                                  name={[field.name, "subTopic"]}
+                                  label="Sub Topic"
+                                >
+                                  <Input placeholder="Enter sub topic" />
+                                </Form.Item>
+                                <Form.Item
+                                  {...field}
+                                  name={[field.name, "notePrice"]}
+                                  label="Price Note"
+                                >
+                                  <Input placeholder="Enter price note" />
+                                </Form.Item>
+                                <Button
+                                  className="remove-button"
+                                  onClick={() => {
+                                    if (tripDetailId) {
+                                      removeTripDetail(viewingBooking.tripId, tripDetailId);
+                                    }
+                                    remove(field.name);
+                                  }}
+                                  icon={<DeleteOutlined />}
+                                >
+                                  Remove
+                                </Button>
+                              </Space>
+                            </div>
+                          );
+                        })}
+                        <Button
+                          type="dashed"
+                          onClick={() => add()}
+                          className="add-button"
+                          icon={<PlusOutlined />}
+                        >
+                          Add Trip Detail
+                        </Button>
+                      </>
+                    )}
+                  </Form.List>
+                </div>
               </>
             )}
           </Form>

@@ -520,8 +520,8 @@ const Product = () => {
             rules={[
               { required: true, message: "Please enter phone number!" },
               {
-                pattern: /^0\d{9}$/,
-                message: "Phone number must start with 0 and have 10 digits!"
+                pattern: /(84|0[3|5|7|8|9])+([0-9]{8,9})\b/g,
+                message: "Invalid Phone Number!"
               }
             ]}
           >
@@ -538,7 +538,7 @@ const Product = () => {
               { required: true, message: "Please input email!" },
               {
                 pattern: /^[a-zA-Z0-9._-]+@gmail\.com$/,
-                message: "Email must be in @gmail.com format!"
+                message: "Invalid Email (Must end with @gmail.com)"
               }
             ]}
           >
@@ -559,8 +559,8 @@ const Product = () => {
               value={bookingData.startDate ? moment(bookingData.startDate) : null}
               onChange={(date) => setBookingData({ ...bookingData, startDate: date })}
               disabledDate={(current) => {
-                // Không cho phép chọn ngày trong quá khứ
-                return current && current < moment().startOf('day');
+                // Không cho phép chọn ngày trong quá khứ và phải cách hiện tại ít nhất 3 ngày
+                return current && (current < moment().add(3, 'days').startOf('day'));
               }}
             />
           </Form.Item>

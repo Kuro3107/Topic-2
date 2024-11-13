@@ -26,7 +26,10 @@ import {
   CameraOutlined,
   PictureOutlined,
   DeleteOutlined,
+  CheckCircleOutlined,
   StarOutlined,
+  EyeOutlined,
+  FileTextOutlined,
 } from "@ant-design/icons";
 import "./profile.css";
 import api from "../../config/axios";
@@ -63,6 +66,8 @@ function Profile() {
   const [bookingToDelete, setBookingToDelete] = useState(null);
   const [isDeleteAccountModalVisible, setIsDeleteAccountModalVisible] =
     useState(false);
+  const [isFinishTourModalVisible, setIsFinishTourModalVisible] = useState(false);
+  const [bookingToFinish, setBookingToFinish] = useState(null);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -338,11 +343,11 @@ function Profile() {
         prevOrders.map((order) =>
           order.bookingId === selectedBooking.bookingId
             ? {
-                ...order,
-                feedbackId: feedbackId || response.data.feedbackId,
-                status: "Finished",
-                consultant: null,
-              }
+              ...order,
+              feedbackId: feedbackId || response.data.feedbackId,
+              status: "Finished",
+              consultant: null,
+            }
             : order
         )
       );
@@ -505,6 +510,39 @@ function Profile() {
     }
   };
 
+  const handleFinishTour = (bookingId) => {
+    setBookingToFinish(bookingId);
+    setIsFinishTourModalVisible(true);
+  };
+
+  const handleConfirmFinishTour = async () => {
+    try {
+      await api.patch(`/bookings/${bookingToFinish}`, {
+        status: "Finished",
+        consultant: null,
+      });
+
+      // Cập nhật state orders
+      setOrders((prevOrders) =>
+        prevOrders.map((order) =>
+          order.bookingId === bookingToFinish
+            ? {
+                ...order,
+                status: "Finished",
+                consultant: null,
+              }
+            : order
+        )
+      );
+
+      toast.success("Tour finished successfully!");
+      setIsFinishTourModalVisible(false);
+    } catch (error) {
+      console.error("Error finishing tour:", error);
+      toast.error("An error occurred while finishing the tour.");
+    }
+  };
+
   if (loading) {
     return (
       <div className="loading-container">
@@ -567,50 +605,78 @@ function Profile() {
           <>
             <Button
               onClick={() => handleViewBooking(record.bookingId)}
-              icon={<ShoppingOutlined />}
+              icon={<EyeOutlined />}
               style={{ marginRight: 8 }}
-            />
+              type="default"
+            >
+              View
+            </Button>
             {record.status && record.status.toLowerCase() === "approved" && (
               <Button
                 onClick={() => handlePayment(record)}
                 type="primary"
                 icon={<ShoppingOutlined />}
                 style={{ marginRight: 8 }}
-              />
+              >
+                Pay
+              </Button>
             )}
             {record.feedbackId ? (
               <Button
                 onClick={() => handleViewReview(record.bookingId)}
-                type="default"
-                icon={<EditOutlined />}
-                style={{ color: "#1890ff", fontWeight: "bold" }}
+                icon={<FileTextOutlined />}
+                style={{ 
+                  marginRight: 8,
+                  backgroundColor: '#8c8c8c',
+                  color: 'white'
+                }}
               >
-                <span style={{ display: "flex", alignItems: "center" }}>
-                  <StarOutlined style={{ marginRight: 4 }} /> Feedback
-                </span>
+                View Feedback
               </Button>
-            ) : record.status &&
-              (record.status.toLowerCase() === "" ||
-                record.status.toLowerCase() === "checkout") ? (
+            ) : record.status && record.status.toLowerCase() === "checkout" ? (
+              <Button
+                onClick={() => handleFinishTour(record.bookingId)}
+                icon={<CheckCircleOutlined />}
+                style={{ 
+                  marginRight: 8,
+                  backgroundColor: '#52c41a',
+                  borderColor: '#52c41a',
+                  color: 'white'
+                }}
+              >
+                Finish Tour
+              </Button>
+            ) : record.status && record.status.toLowerCase() === "finished" && !record.feedbackId ? (
               <Button
                 onClick={() => handleCreateReview(record.bookingId)}
-                type="default"
-                style={{ fontWeight: "bold" }}
+                icon={<StarOutlined />}
+                style={{ 
+                  marginRight: 8,
+                  backgroundColor: '#faad14',
+                  borderColor: '#faad14',
+                  color: 'white'
+                }}
               >
-                Finish Tour & Send Feedback
+                Send Feedback
               </Button>
             ) : record.status &&
-              (record.status.toLowerCase() === "purchased" ||
-                record.status.toLowerCase() === "checkin") ? (
-              <Button onClick={showRefundModal} type="primary" danger>
+              (record.status.toLowerCase() === "purchased") ? (
+              <Button 
+                onClick={showRefundModal} 
+                type="primary" 
+                danger
+                icon={<DeleteOutlined />}
+              >
                 Cancel & Refund
               </Button>
             ) : (
-              <Button
-                onClick={() => showDeleteConfirm(record.bookingId)}
+              <Button 
+                onClick={() => showDeleteConfirm(record.bookingId)} 
                 danger
                 icon={<DeleteOutlined />}
-              />
+              >
+                Cancel
+              </Button>
             )}
           </>
         );
@@ -708,7 +774,7 @@ function Profile() {
           <Card
             title={
               <h1>
-                <ShoppingOutlined /> Your Order
+                <ShoppingOutlined /> Booking Orders
               </h1>
             }
           >
@@ -718,7 +784,7 @@ function Profile() {
               ) : (
                 <Table
                   columns={columns}
-                  dataSource={orders} // Đảm bảo sử dụng orders ở đây
+                  dataSource={[...orders].sort((a, b) => new Date(b.bookingDate) - new Date(a.bookingDate))} // Sắp xếp theo bookingDate mới nhất
                   rowKey="bookingId"
                 />
               )}
@@ -848,7 +914,7 @@ function Profile() {
                     </div>
                     <div className="booking-info-item">
                       <strong>Total Price:</strong>
-                      <span>${selectedBooking.tripDetails.priceTotal}</span>
+                      <span>{selectedBooking.tripDetails.priceTotal} VNĐ</span>
                     </div>
                   </div>
 
@@ -865,7 +931,7 @@ function Profile() {
                     {selectedBooking.tripDetails.tripDetails.map((detail) => (
                       <div key={detail.tripDetailId} className="itinerary-day">
                         <strong>Day {detail.day}:</strong> {detail.mainTopic} -{" "}
-                        {detail.subTopic} (Price: ${detail.notePrice})
+                        {detail.subTopic} (Price: {detail.notePrice} VNĐ)
                       </div>
                     ))}
                   </div>
@@ -898,8 +964,8 @@ function Profile() {
             feedbackId
               ? isEditMode
                 ? "Edit Feedback"
-                : "View Feedback"
-              : "Create Feedback"
+                : "Your Feedback"
+              : "How was your experience on this trip?"
           }
           visible={isFeedbackModalVisible}
           onCancel={handleCloseFeedbackModal}
@@ -917,7 +983,7 @@ function Profile() {
                   borderColor: feedbackId ? "#1890ff" : "#52c41a",
                 }}
               >
-                {feedbackId ? "Update Feedback" : "Finish Tour & Send Feedback"}
+                {feedbackId ? "Update Feedback" : "Send Feedback"}
               </Button>
             ),
             !isEditMode && selectedBooking?.status === "Finished" && (
@@ -991,7 +1057,7 @@ function Profile() {
         >
           <p style={{ fontSize: "16px", marginBottom: "20px" }}>
             To cancel a paid trip, please contact us for support and refund
-            instructions.
+            instructions. If you cancel trip within 1 days after purchased, we will refund 100% of the trip price. Otherwise, you will lose all the money.
           </p>
           <p style={{ fontSize: "16px", marginBottom: "10px" }}>
             <strong>Phone:</strong> 0387729579
@@ -1027,6 +1093,18 @@ function Profile() {
             This action cannot be undone and all your data will be permanently
             deleted.
           </p>
+        </Modal>
+
+        <Modal
+          title="Confirm finish tour"
+          visible={isFinishTourModalVisible}
+          onOk={handleConfirmFinishTour}
+          onCancel={() => setIsFinishTourModalVisible(false)}
+          okText="Confirm"
+          cancelText="Cancel"
+        >
+          <p>Are you sure you want to finish this tour?</p>
+          <p>After finishing, you can provide feedback about your experience.</p>
         </Modal>
       </main>
       <Footer />

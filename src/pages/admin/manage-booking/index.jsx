@@ -51,47 +51,43 @@ function ManageBooking() {
   };
 
   // Cập nhật giá trị cho modal
-const showModal = (booking = null) => {
-  if (booking.status === "Finished") {
-      message.warning("Cannot edit booking that is no longer active");
-      return;
-  }
-  setEditingBooking(booking);
-  if (booking) {
+  const showModal = (booking = null) => {
+    setEditingBooking(booking);
+    if (booking) {
       form.setFieldsValue({
-          ...booking,
-          startDate: dayjs(booking.startDate),
-          endDate: dayjs(booking.endDate),
-          consultant: booking.consultant || null, // Cập nhật giá trị consultant
+        ...booking,
+        startDate: dayjs(booking.startDate),
+        endDate: dayjs(booking.endDate),
+        consultant: booking.consultant || null,
       });
-  } else {
+    } else {
       form.resetFields();
-  }
-  setIsModalVisible(true);
-};
+    }
+    setIsModalVisible(true);
+  };
 
-const handleOk = () => {
-  form.validateFields().then((values) => {
-      const bookingData = {
+  const handleOk = () => {
+    form.validateFields().then((values) => {
+      if (editingBooking && editingBooking.bookingId) {
+        const bookingData = {
           status: values.status,
           consultant: values.consultant || null,
-      };
+        };
 
-      if (editingBooking && editingBooking.bookingId) {
-          const updatedData = { 
-              ...editingBooking, 
-              ...bookingData,
-              consultant: values.consultant === undefined ? null : values.consultant
-          };
-          updateBooking(editingBooking.bookingId, updatedData);
+        const updatedData = { 
+          ...editingBooking, 
+          ...bookingData,
+          consultant: values.consultant === undefined ? null : values.consultant
+        };
+        updateBooking(editingBooking.bookingId, updatedData);
       } else {
-          message.error("No booking ID to update.");
+        message.error("There is no booking ID to update.");
       }
       setIsModalVisible(false);
-  }).catch((error) => {
+    }).catch((error) => {
       console.error("Validation failed:", error);
-  });
-};
+    });
+  };
 
   const updateBooking = async (BookingID, bookingData) => {
     try {
@@ -105,14 +101,23 @@ const handleOk = () => {
   };
 
   const deleteBooking = async (BookingID) => {
-    try {
-      await axios.delete(`${api}/${BookingID}`);
-      message.success("Booking deleted successfully");
-      fetchBookings();
-    } catch (error) {
-      console.error("Error deleting booking:", error);
-      message.error("Unable to delete booking");
-    }
+    Modal.confirm({
+      title: 'Confirm Delete',
+      content: 'Are you sure you want to delete this booking?',
+      okText: 'Delete',
+      okType: 'danger',
+      cancelText: 'Cancel',
+      async onOk() {
+        try {
+          await axios.delete(`${api}/${BookingID}`);
+          message.success("Booking deleted successfully");
+          fetchBookings();
+        } catch (error) {
+          console.error("Error deleting booking:", error);
+          message.error("Unable to delete booking");
+        }
+      },
+    });
   };
 
   const getAvailableConsultants = () => {
@@ -190,51 +195,85 @@ const handleOk = () => {
 
   const viewTripDetails = async (bookingId) => {
     try {
-        const responseTrips = await axios.get(`http://localhost:8080/api/trips`); // Gọi API để lấy tất cả các chuyến đi
-        const responseFarms = await axios.get(`http://localhost:8080/api/farms`); // Gọi API để lấy tất cả các trang trại
+        const responseTrips = await axios.get(`http://localhost:8080/api/trips`);
+        const responseFarms = await axios.get(`http://localhost:8080/api/farms`);
 
-        // Lấy trip_id từ booking tương ứng
         const booking = bookings.find(b => b.bookingId === bookingId);
         if (!booking) {
             message.warning("Booking not found.");
             return;
         }
 
-        // Lọc chuyến đi theo trip_id từ booking
         const trips = responseTrips.data.filter(trip => trip.tripId === booking.tripId);
         
-        // Hiển thị thông tin chuyến đi
         if (trips.length > 0) {
             Modal.info({
                 title: 'Trip Details',
+                width: 800,
+                className: 'trip-details-modal',
                 content: (
-                    <div>
+                    <div className="trip-details-container">
                         {trips.map(trip => (
-                            <div key={trip.tripId}>
-                                <p>Trip ID: {trip.tripId}</p>
-                                <p>Trip Name: {trip.tripName}</p>
-                                <p>Total Price: {trip.priceTotal} VNĐ</p>
-                                {trip.imageUrl && ( // Kiểm tra nếu có imageUrl
-                                    <img src={trip.imageUrl} alt={trip.tripName} style={{ width: '100%', height: 'auto' }} />
+                            <div key={trip.tripId} className="trip-section">
+                                <div className="trip-header">
+                                    <h2>{trip.tripName}</h2>
+                                    <div className="trip-meta">
+                                        <div className="trip-info-item">
+                                            <span className="label">Trip ID:</span>
+                                            <span className="value">#{trip.tripId}</span>
+                                        </div>
+                                        <div className="trip-info-item">
+                                            <span className="label">Total Price:</span>
+                                            <span className="value">{trip.priceTotal.toLocaleString()} VNĐ</span>
+                                        </div>
+                                        <div className="trip-info-item">
+                                            <span className="label">Sale Name:</span>
+                                            <span className="value">{trip.saleName}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {trip.imageUrl && (
+                                    <div className="trip-image">
+                                        <img src={trip.imageUrl} alt={trip.tripName} />
+                                    </div>
                                 )}
-                                <h4>Trip Details:</h4>
-                                {trip.tripDetails.map(detail => (
-                                    <div key={detail.tripDetailId}>
-                                        <p>Ngày: {detail.day}</p>
-                                        <p>Main Topic: {detail.mainTopic}</p>
-                                        <p>Sub Topic: {detail.subTopic || 'No sub topic'}</p>
-                                        <p>Note Price: {detail.notePrice} VNĐ</p>
+
+                                <div className="trip-details-section">
+                                    <h3>Trip Schedule</h3>
+                                    <div className="trip-details-grid">
+                                        {trip.tripDetails.map(detail => (
+                                            <div key={detail.tripDetailId} className="detail-card">
+                                                <div className="detail-day">Day {detail.day}</div>
+                                                <div className="detail-content">
+                                                    <h4>{detail.mainTopic}</h4>
+                                                    {detail.subTopic && <p>{detail.subTopic}</p>}
+                                                    <div className="detail-price">
+                                                          {detail.notePrice.toLocaleString()} VNĐ     
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
                                     </div>
-                                ))}
-                                <h4>Koi Farms:</h4>
-                                {trip.koiFarms.map(farm => (
-                                    <div key={farm.farmId}>
-                                      <img src={farm.imageUrl} alt="Farm Image" width="200" height="150" />
-                                        <p>Farm Name: {farm.farmName}</p>
-                                        <p>Location: {farm.location}</p>
-                                        <p>Contact Info: {farm.contactInfo}</p>
+                                </div>
+
+                                <div className="farms-section">
+                                    <h3>Koi Farms</h3>
+                                    <div className="farms-grid">
+                                        {trip.koiFarms.map(farm => (
+                                            <div key={farm.farmId} className="farm-card">
+                                                <div className="farm-image">
+                                                    <img src={farm.imageUrl} alt={farm.farmName} />
+                                                </div>
+                                                <div className="farm-info">
+                                                    <h4>{farm.farmName}</h4>
+                                                    <p><i className="fas fa-map-marker-alt"></i> {farm.location}</p>
+                                                    <p><i className="fas fa-phone"></i> {farm.contactInfo}</p>
+                                                </div>
+                                            </div>
+                                        ))}
                                     </div>
-                                ))}
+                                </div>
                             </div>
                         ))}
                     </div>
@@ -338,59 +377,49 @@ const handleOk = () => {
           <Form.Item
             name="fullname"
             label="Name"
-            rules={[{ required: true }]}
           >
-            <Input disabled={editingBooking !== null} />
+            <Input disabled />
           </Form.Item>
           <Form.Item
             name="status"
             label="Status"
             rules={[{ required: true }]}
           >
-            <Select>
-              {/* <Select.Option value="pending">Pending</Select.Option> */}
+            <Select disabled={editingBooking && editingBooking.status !== "Detailed"}>
               <Select.Option value="Detailed">Detailed</Select.Option>
               <Select.Option value="Rejected">Rejected</Select.Option>
               <Select.Option value="Approved">Approved</Select.Option>
-              {/* <Select.Option value="purchased">Purchased</Select.Option>
-              <Select.Option value="checkin">Checkin</Select.Option>
-              <Select.Option value="checkout">Checkout</Select.Option>
-              <Select.Option value="finished">Finished</Select.Option> */}
             </Select>
           </Form.Item>
           <Form.Item
             name="startDate"
             label="Start Date"
-            rules={[{ required: true }]}
           >
-            <DatePicker disabled={editingBooking !== null} />
+            <DatePicker disabled />
           </Form.Item>
           <Form.Item
             name="endDate"
             label="End Date"
-            rules={[{ required: true }]}
           >
-            <DatePicker disabled={editingBooking !== null} />
+            <DatePicker disabled />
           </Form.Item>
           <Form.Item
             name="phone"
             label="Phone"
-            rules={[{ required: true }]}
           >
-            <Input disabled={editingBooking !== null} />
+            <Input disabled />
           </Form.Item>
           <Form.Item
             name="email"
             label="Email"
-            rules={[{ required: true, type: "email" }]}
           >
-            <Input disabled={editingBooking !== null} />
+            <Input disabled />
           </Form.Item>
           <Form.Item name="favoriteKoi" label="Favorite Koi">
-            <Input disabled={editingBooking !== null} />
+            <Input disabled />
           </Form.Item>
           <Form.Item name="favoriteFarm" label="Favorite Farm">
-            <Input disabled={editingBooking !== null} />
+            <Input disabled />
           </Form.Item>
           <Form.Item
             name="consultant"
@@ -398,7 +427,7 @@ const handleOk = () => {
           >
             <Select 
               allowClear
-              disabled={editingBooking === null || (editingBooking && editingBooking.status !== "Purchased")}
+              disabled={editingBooking && editingBooking.status !== "Detailed"}
             >
               {getAvailableConsultants().map(consultant => (
                 <Select.Option key={consultant.accountId} value={consultant.username}>
@@ -467,6 +496,176 @@ const handleOk = () => {
 
           .ant-radio-button-wrapper-checked {
             font-weight: bold;
+          }
+
+          /* Trip Details Modal Styles */
+          .trip-details-modal .ant-modal-content {
+            border-radius: 8px;
+            overflow: hidden;
+          }
+
+          .trip-details-modal .ant-modal-body {
+            padding: 0;
+          }
+
+          .trip-details-container {
+            max-height: 70vh;
+            overflow-y: auto;
+            padding: 24px;
+          }
+
+          .trip-section {
+            background: #fff;
+          }
+
+          .trip-header {
+            margin-bottom: 24px;
+            border-bottom: 1px solid #f0f0f0;
+            padding-bottom: 16px;
+          }
+
+          .trip-header h2 {
+            margin: 0;
+            color: #1a1a1a;
+            font-size: 24px;
+          }
+
+          .trip-meta {
+            margin-top: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+          }
+
+          .trip-info-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 16px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+          }
+
+          .trip-info-item .label {
+            font-size: 16px;
+            color: #666;
+            min-width: 120px;
+          }
+
+          .trip-info-item .value {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1890ff;
+          }
+
+          .trip-image {
+            margin-bottom: 24px;
+            border-radius: 8px;
+            overflow: hidden;
+          }
+
+          .trip-image img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+          }
+
+          .trip-details-section {
+            margin-bottom: 32px;
+          }
+
+          .trip-details-section h3 {
+            color: #1a1a1a;
+            margin-bottom: 16px;
+          }
+
+          .trip-details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 16px;
+          }
+
+          .detail-card {
+            border: 1px solid #f0f0f0;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+          }
+
+          .detail-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+          }
+
+          .detail-day {
+            background: #1890ff;
+            color: white;
+            padding: 8px 16px;
+            font-weight: bold;
+          }
+
+          .detail-content {
+            padding: 16px;
+          }
+
+          .detail-content h4 {
+            margin: 0 0 8px 0;
+            color: #1a1a1a;
+          }
+
+          .detail-price {
+            margin-top: 8px;
+            color: #52c41a;
+            font-weight: bold;
+          }
+
+          .farms-section {
+            margin-top: 32px;
+          }
+
+          .farms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+          }
+
+          .farm-card {
+            border: 1px solid #f0f0f0;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+          }
+
+          .farm-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+          }
+
+          .farm-image {
+            height: 200px;
+            overflow: hidden;
+          }
+
+          .farm-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+          }
+
+          .farm-info {
+            padding: 16px;
+          }
+
+          .farm-info h4 {
+            margin: 0 0 8px 0;
+            color: #1a1a1a;
+          }
+
+          .farm-info p {
+            margin: 4px 0;
+            color: #666;
+          }
+
+          .farm-info i {
+            margin-right: 8px;
+            color: #1890ff;
           }
         `}
       </style>
