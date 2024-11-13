@@ -583,9 +583,9 @@ function Profile() {
                 onClick={() => handleViewReview(record.bookingId)}
                 type="default"
                 icon={<EditOutlined />}
-                style={{ color: '#1890ff', fontWeight: 'bold' }}
+                style={{ color: "#1890ff", fontWeight: "bold" }}
               >
-                <span style={{ display: 'flex', alignItems: 'center' }}>
+                <span style={{ display: "flex", alignItems: "center" }}>
                   <StarOutlined style={{ marginRight: 4 }} /> Feedback
                 </span>
               </Button>
