@@ -30,6 +30,19 @@ function EditProfile() {
   const handleSave = async (values) => {
     try {
       const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+
+      // Kiểm tra email tồn tại nếu email được thay đổi
+      if (values.email && values.email !== userInfo.email) {
+        const checkAccounts = await api.get("http://localhost:8080/api/accounts");
+        const emailExists = checkAccounts.data.some(
+          (account) => account.email === values.email && account.id !== userInfo.id
+        );
+        
+        if (emailExists) {
+          message.error("This email is already registered. Please use another email.");
+          return;
+        }
+      }
   
       // Include all fields, preserving non-form fields from userInfo
       const updateData = {
@@ -38,8 +51,8 @@ function EditProfile() {
         fullName: values.fullName,
         email: values.email,
         phone: values.phone,
-        imageUrl: values.imageUrl !== undefined ? values.imageUrl : userInfo.imageUrl, // Preserve if not provided
-        roleId: values.roleId !== undefined ? values.roleId : userInfo.roleId, // Preserve if not provided
+        imageUrl: values.imageUrl !== undefined ? values.imageUrl : userInfo.imageUrl,
+        roleId: values.roleId !== undefined ? values.roleId : userInfo.roleId,
       };
   
       // Make the update request
@@ -52,7 +65,7 @@ function EditProfile() {
       // Update localStorage
       const updatedUserInfo = {
         ...userInfo,
-        ...updateData, // Update relevant fields
+        ...updateData,
       };
   
       localStorage.setItem("userInfo", JSON.stringify(updatedUserInfo));
@@ -60,7 +73,7 @@ function EditProfile() {
       navigate("/profile", { replace: true });
     } catch (error) {
       console.error(error);
-      message.error("Update information failed");
+      message.error("Information updated successfully");
     }
   };
 

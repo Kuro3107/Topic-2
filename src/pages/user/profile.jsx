@@ -26,6 +26,10 @@ import {
   CameraOutlined,
   PictureOutlined,
   DeleteOutlined,
+  CheckCircleOutlined,
+  StarOutlined,
+  EyeOutlined,
+  FileTextOutlined,
 } from "@ant-design/icons";
 import "./profile.css";
 import api from "../../config/axios";
@@ -38,7 +42,6 @@ const defaultBackgrounds = [
   "https://images.unsplash.com/photo-1518171802599-4cd16785f93a?q=80&w=2450&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
   "https://images.unsplash.com/photo-1454789548928-9efd52dc4031?q=80&w=2680&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
   "https://images.unsplash.com/photo-1504309092620-4d0ec726efa4?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-  "https://scontent-hkg1-2.xx.fbcdn.net/v/t39.30808-6/463915475_1889758918177483_6652777735107939029_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=833d8c&_nc_eui2=AeHadwfu8UN55EWm56paxASxVEnY-eRM_k5USdj55Ez-TuZHK2ueOZRCqznZWXzjwsr0Tyyu7WksQWov3wXSYvPb&_nc_ohc=7PVzRf7kRo0Q7kNvgHC04W-&_nc_zt=23&_nc_ht=scontent-hkg1-2.xx&_nc_gid=A3Gqn9CkIiCKAXWBBO83gSm&oh=00_AYDqPQ59s18jaKkcfUdeXvBM8C5SbcIRtj6vEG75gcz8Ng&oe=671B1570",
 ];
 
 const defaultImageUrl = "/istockphoto-1495088043-612x612.jpg";
@@ -61,7 +64,10 @@ function Profile() {
   const [isRefundModalVisible, setIsRefundModalVisible] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [bookingToDelete, setBookingToDelete] = useState(null);
-  const [isDeleteAccountModalVisible, setIsDeleteAccountModalVisible] = useState(false);
+  const [isDeleteAccountModalVisible, setIsDeleteAccountModalVisible] =
+    useState(false);
+  const [isFinishTourModalVisible, setIsFinishTourModalVisible] = useState(false);
+  const [bookingToFinish, setBookingToFinish] = useState(null);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -132,14 +138,13 @@ function Profile() {
 
   useEffect(() => {
     const query = new URLSearchParams(window.location.search);
-    const Message = query.get('message');
-    if (Message === 'success') {
-        message.success('Payment successful!');
-    } else if (Message === 'failure' || Message === "retry") {
-        message.error('Payment failed. Please try again.');
+    const Message = query.get("message");
+    if (Message === "success") {
+      message.success("Payment successful!");
+    } else if (Message === "failure" || Message === "retry") {
+      message.error("Payment failed. Please try again.");
     }
-
-}, []);
+  }, []);
 
   const handleEdit = () => {
     navigate("/edit-profile");
@@ -254,25 +259,26 @@ function Profile() {
   const handleCreateReview = (bookingId) => {
     const booking = orders.find((order) => order.bookingId === bookingId);
     setSelectedBooking(booking);
-    setRating(0); // Đặt lại rating
-    setComments(""); // Đặt lại comments
-    setFeedbackId(null); // Đặt lại feedbackId
+    setRating(0);
+    setComments("");
+    setFeedbackId(null);
+    setIsEditMode(true);
     setIsFeedbackModalVisible(true);
-    setIsEditMode(true); // Chế độ tạo mới
   };
 
   // Hàm để mở modal xem đánh giá
   const handleViewReview = async (bookingId) => {
     const booking = orders.find((order) => order.bookingId === bookingId);
     setSelectedBooking(booking);
-    setFeedbackId(booking.feedbackId); // Lưu feedbackId
+    setFeedbackId(booking.feedbackId);
+    setIsEditMode(false); // Luôn bắt đầu ở chế độ xem
 
     if (booking.feedbackId) {
       try {
         const response = await api.get(`/feedbacks/${booking.feedbackId}`);
         const feedbackData = response.data;
-        setRating(feedbackData.rating); // Lấy rating từ API
-        setComments(feedbackData.comments); // Lấy comments từ API
+        setRating(feedbackData.rating);
+        setComments(feedbackData.comments);
       } catch (error) {
         console.error("Error fetching feedback details:", error);
         toast.error("An error occurred while fetching feedback details.");
@@ -280,7 +286,6 @@ function Profile() {
     }
 
     setIsFeedbackModalVisible(true);
-    setIsEditMode(false); // Chế độ xem
   };
 
   // Hàm để chuyển sang chế độ chỉnh sửa
@@ -297,6 +302,16 @@ function Profile() {
 
   // Hàm để gửi đánh giá
   const handleSubmitFeedback = async () => {
+    if (!rating || rating < 1 || rating > 5) {
+      toast.error("Please provide a valid rating between 1 and 5");
+      return;
+    }
+
+    if (!comments.trim()) {
+      toast.error("Please provide some comments");
+      return;
+    }
+
     const feedbackData = {
       rating,
       comments,
@@ -305,38 +320,39 @@ function Profile() {
     try {
       let response;
       if (feedbackId) {
-        // Cập nhật đánh giá nếu feedbackId đã tồn tại
+        // Cập nhật feedback hiện có
         response = await api.put(`/feedbacks/${feedbackId}`, feedbackData);
+        toast.success("Feedback updated successfully!");
       } else {
-        // Tạo mới đánh giá
+        // Tạo feedback mới
         response = await api.post(`/feedbacks`, feedbackData);
+        const newFeedbackId = response.data.feedbackId;
+
+        // Cập nhật booking với feedbackId mới
+        await api.patch(`/bookings/${selectedBooking.bookingId}`, {
+          feedbackId: newFeedbackId,
+          status: "Finished",
+          consultant: null,
+        });
+
+        toast.success("Feedback submitted successfully!");
       }
-      const newFeedbackId = response.data.feedbackId;
 
-      // Gửi yêu cầu cập nhật feedbackId, status và xóa consultant cho booking hiện tại
-      await api.patch(`/bookings/${selectedBooking.bookingId}`, {
-        feedbackId: newFeedbackId,
-        status: "Finished",
-        consultant: null // Đặt consultant thành null để xóa trong database
-      });
-
-      // Cập nhật lại state để hiển thị feedback đã được gửi
+      // Cập nhật state orders
       setOrders((prevOrders) =>
         prevOrders.map((order) =>
           order.bookingId === selectedBooking.bookingId
             ? {
-                ...order,
-                feedbackId: newFeedbackId,
-                rating,
-                comments,
-                status: "Finished",
-                consultant: null // Cập nhật consultant trong state local thành null
-              }
+              ...order,
+              feedbackId: feedbackId || response.data.feedbackId,
+              status: "Finished",
+              consultant: null,
+            }
             : order
         )
       );
 
-      toast.success("Feedback submitted successfully!");
+      setIsEditMode(false); // Chuyển về chế độ xem
       handleCloseFeedbackModal();
     } catch (error) {
       console.error("Error submitting feedback:", error);
@@ -381,11 +397,11 @@ function Profile() {
       );
 
       // Cập nhật state local
-      setUser(prevUser => ({ ...prevUser, imageUrl: defaultImageUrl }));
-      message.success('Avatar đã được xóa thành công!');
+      setUser((prevUser) => ({ ...prevUser, imageUrl: defaultImageUrl }));
+      message.success("Avatar deleted successfully!");
     } catch (error) {
       console.error("Error deleting avatar:", error);
-      message.error('Đã xảy ra lỗi khi xóa avatar.');
+      message.error("An error occurred while deleting the avatar.");
     }
   };
 
@@ -404,7 +420,14 @@ function Profile() {
   );
 
   const avatarPopoverContent = (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '150px' }}>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "8px",
+        width: "150px",
+      }}
+    >
       <Upload
         name="avatar"
         showUploadList={false}
@@ -413,18 +436,28 @@ function Profile() {
           return false;
         }}
       >
-        <Button 
-          icon={<CameraOutlined />} 
-          style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+        <Button
+          icon={<CameraOutlined />}
+          style={{
+            width: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
         >
           Change Avatar
         </Button>
       </Upload>
-      <Button 
-        icon={<DeleteOutlined />} 
+      <Button
+        icon={<DeleteOutlined />}
         danger
         onClick={handleDeleteAvatar}
-        style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+        style={{
+          width: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
       >
         Delete Avatar
       </Button>
@@ -466,14 +499,47 @@ function Profile() {
   const handleDeleteAccount = async () => {
     try {
       await api.delete(`/accounts/${parsedUser.id}`);
-      message.success('Tài khoản đã được xóa thành công');
+      message.success("Account deleted successfully");
       // Xóa thông tin người dùng khỏi localStorage
-      localStorage.removeItem('userInfo');
+      localStorage.removeItem("userInfo");
       // Chuyển hướng về trang chủ
-      navigate('/');
+      navigate("/");
     } catch (error) {
-      console.error('Error deleting account:', error);
-      message.error('Có lỗi xảy ra khi xóa tài khoản');
+      console.error("Error deleting account:", error);
+      message.error("An error occurred while deleting account.");
+    }
+  };
+
+  const handleFinishTour = (bookingId) => {
+    setBookingToFinish(bookingId);
+    setIsFinishTourModalVisible(true);
+  };
+
+  const handleConfirmFinishTour = async () => {
+    try {
+      await api.patch(`/bookings/${bookingToFinish}`, {
+        status: "Finished",
+        consultant: null,
+      });
+
+      // Cập nhật state orders
+      setOrders((prevOrders) =>
+        prevOrders.map((order) =>
+          order.bookingId === bookingToFinish
+            ? {
+                ...order,
+                status: "Finished",
+                consultant: null,
+              }
+            : order
+        )
+      );
+
+      toast.success("Tour finished successfully!");
+      setIsFinishTourModalVisible(false);
+    } catch (error) {
+      console.error("Error finishing tour:", error);
+      toast.error("An error occurred while finishing the tour.");
     }
   };
 
@@ -532,15 +598,16 @@ function Profile() {
       key: "email",
     },
     {
-      title: "Feedback",
+      title: "Your Action",
       key: "Feedback",
       render: (_, record) => {
         return (
           <>
             <Button
               onClick={() => handleViewBooking(record.bookingId)}
-              icon={<ShoppingOutlined />}
+              icon={<EyeOutlined />}
               style={{ marginRight: 8 }}
+              type="default"
             >
               View
             </Button>
@@ -548,6 +615,7 @@ function Profile() {
               <Button
                 onClick={() => handlePayment(record)}
                 type="primary"
+                icon={<ShoppingOutlined />}
                 style={{ marginRight: 8 }}
               >
                 Pay
@@ -556,33 +624,56 @@ function Profile() {
             {record.feedbackId ? (
               <Button
                 onClick={() => handleViewReview(record.bookingId)}
-                type="default"
-                style={{ fontWeight: "bold" }}
+                icon={<FileTextOutlined />}
+                style={{ 
+                  marginRight: 8,
+                  backgroundColor: '#8c8c8c',
+                  color: 'white'
+                }}
               >
                 View Feedback
               </Button>
-            ) : record.status &&
-              (record.status.toLowerCase() === "checkin" ||
-                record.status.toLowerCase() === "checkout") ? (
+            ) : record.status && record.status.toLowerCase() === "checkout" ? (
+              <Button
+                onClick={() => handleFinishTour(record.bookingId)}
+                icon={<CheckCircleOutlined />}
+                style={{ 
+                  marginRight: 8,
+                  backgroundColor: '#52c41a',
+                  borderColor: '#52c41a',
+                  color: 'white'
+                }}
+              >
+                Finish Tour
+              </Button>
+            ) : record.status && record.status.toLowerCase() === "finished" && !record.feedbackId ? (
               <Button
                 onClick={() => handleCreateReview(record.bookingId)}
-                type="default"
-                style={{ fontWeight: "bold" }}
+                icon={<StarOutlined />}
+                style={{ 
+                  marginRight: 8,
+                  backgroundColor: '#faad14',
+                  borderColor: '#faad14',
+                  color: 'white'
+                }}
               >
-                Finish Tour & Send Feedback
+                Send Feedback
               </Button>
-            ) : record.status && record.status.toLowerCase() === "purchased" ? (
-              <Button
-                onClick={showRefundModal}
-                type="primary"
+            ) : record.status &&
+              (record.status.toLowerCase() === "purchased") ? (
+              <Button 
+                onClick={showRefundModal} 
+                type="primary" 
                 danger
+                icon={<DeleteOutlined />}
               >
                 Cancel & Refund
               </Button>
             ) : (
-              <Button
-                onClick={() => showDeleteConfirm(record.bookingId)}
+              <Button 
+                onClick={() => showDeleteConfirm(record.bookingId)} 
                 danger
+                icon={<DeleteOutlined />}
               >
                 Cancel
               </Button>
@@ -625,11 +716,14 @@ function Profile() {
                 trigger="click"
                 placement="bottom"
               >
-                <Button icon={<PictureOutlined />} style={{ marginRight: "10px" }}>
+                <Button
+                  icon={<PictureOutlined />}
+                  style={{ marginRight: "10px" }}
+                >
                   Change Background
                 </Button>
               </Popover>
-              <Button 
+              <Button
                 danger
                 icon={<DeleteOutlined />}
                 onClick={() => setIsDeleteAccountModalVisible(true)}
@@ -642,7 +736,7 @@ function Profile() {
           <div className="profile-info">
             <Popover
               content={avatarPopoverContent}
-              title="Cập nhật ảnh đại diện"
+              title="Update profile avatar"
               trigger="click"
               placement="bottom"
             >
@@ -655,21 +749,21 @@ function Profile() {
                 <Button icon={<CameraOutlined />} className="avatar-edit" />
               </div>
             </Popover>
-            <div style={{ marginBottom: '10px' }}>
-              <strong>Full Name:</strong> {user.fullName || 'Not Updated!'}
+            <div style={{ marginBottom: "10px" }}>
+              <strong>Full Name:</strong> {user.fullName || "Not Updated!"}
             </div>
-            <div style={{ marginBottom: '10px' }}>
-              <strong>Username:</strong> {user.username || 'N/A'}
+            <div style={{ marginBottom: "10px" }}>
+              <strong>Username:</strong> {user.username || "N/A"}
             </div>
-            <div style={{ marginBottom: '10px' }}>
-              <strong>Email:</strong> {user.email || 'Not Updated!'}
+            <div style={{ marginBottom: "10px" }}>
+              <strong>Email:</strong> {user.email || "Not Updated!"}
             </div>
-            <div style={{ marginBottom: '10px' }}>
-              <strong>Phone:</strong> {user.phone || 'Not Updated!'}
+            <div style={{ marginBottom: "10px" }}>
+              <strong>Phone:</strong> {user.phone || "Not Updated!"}
             </div>
             {user.roleId !== 5 && (
-              <div style={{ marginBottom: '10px' }}>
-                <strong>Role:</strong> {roleMapping[user.roleId] || 'Unknown'}
+              <div style={{ marginBottom: "10px" }}>
+                <strong>Role:</strong> {roleMapping[user.roleId] || "Unknown"}
               </div>
             )}
           </div>
@@ -680,7 +774,7 @@ function Profile() {
           <Card
             title={
               <h1>
-                <ShoppingOutlined /> Your Order
+                <ShoppingOutlined /> Booking Orders
               </h1>
             }
           >
@@ -688,9 +782,9 @@ function Profile() {
               {loading ? (
                 <Spin />
               ) : (
-                <Table 
+                <Table
                   columns={columns}
-                  dataSource={orders} // Đảm bảo sử dụng orders ở đây
+                  dataSource={[...orders].sort((a, b) => new Date(b.bookingDate) - new Date(a.bookingDate))} // Sắp xếp theo bookingDate mới nhất
                   rowKey="bookingId"
                 />
               )}
@@ -820,7 +914,7 @@ function Profile() {
                     </div>
                     <div className="booking-info-item">
                       <strong>Total Price:</strong>
-                      <span>${selectedBooking.tripDetails.priceTotal}</span>
+                      <span>{selectedBooking.tripDetails.priceTotal} VNĐ</span>
                     </div>
                   </div>
 
@@ -837,7 +931,7 @@ function Profile() {
                     {selectedBooking.tripDetails.tripDetails.map((detail) => (
                       <div key={detail.tripDetailId} className="itinerary-day">
                         <strong>Day {detail.day}:</strong> {detail.mainTopic} -{" "}
-                        {detail.subTopic} (Price: ${detail.notePrice})
+                        {detail.subTopic} (Price: {detail.notePrice} VNĐ)
                       </div>
                     ))}
                   </div>
@@ -866,102 +960,151 @@ function Profile() {
         </Modal>
 
         <Modal
-          title={isEditMode ? "Feedback" : "View Feedback"}
+          title={
+            feedbackId
+              ? isEditMode
+                ? "Edit Feedback"
+                : "Your Feedback"
+              : "How was your experience on this trip?"
+          }
           visible={isFeedbackModalVisible}
           onCancel={handleCloseFeedbackModal}
           footer={[
             <Button key="cancel" onClick={handleCloseFeedbackModal}>
-              Cancel
+              Close
             </Button>,
-            isEditMode ? (
+            isEditMode && (
               <Button
                 key="submit"
                 type="primary"
                 onClick={handleSubmitFeedback}
+                style={{
+                  backgroundColor: feedbackId ? "#1890ff" : "#52c41a",
+                  borderColor: feedbackId ? "#1890ff" : "#52c41a",
+                }}
               >
-                Finish Tour & Send Feedback
+                {feedbackId ? "Update Feedback" : "Send Feedback"}
               </Button>
-            ) : (
-              <Button key="edit" type="default" onClick={handleEditReview}>
+            ),
+            !isEditMode && selectedBooking?.status === "Finished" && (
+              <Button key="edit" type="primary" onClick={handleEditReview}>
                 Edit Feedback
               </Button>
             ),
           ]}
         >
           <div>
-            <label>
+            <div className="feedback-item">
               <strong>Rating:</strong>
-              <input
-                type="number"
-                min="1"
-                max="5"
-                value={rating}
-                onChange={(e) => setRating(Number(e.target.value))}
-                disabled={!isEditMode} // Chỉ cho phép chỉnh sửa khi ở chế độ chỉnh sửa
-              />
-            </label>
-            <br />
-            <label>
+              {isEditMode ? (
+                <input
+                  type="number"
+                  min="1"
+                  max="5"
+                  value={rating}
+                  onChange={(e) => setRating(Number(e.target.value))}
+                  style={{
+                    marginLeft: "10px",
+                    padding: "5px",
+                    width: "60px",
+                  }}
+                />
+              ) : (
+                <span style={{ marginLeft: "10px" }}>{rating} / 5</span>
+              )}
+            </div>
+            <div className="feedback-item" style={{ marginTop: "15px" }}>
               <strong>Comments:</strong>
-              <textarea
-                value={comments}
-                onChange={(e) => setComments(e.target.value)}
-                rows={4}
-                style={{
-                  width: "100%",
-                  color: "black",
-                  backgroundColor: "white",
-                }}
-                disabled={!isEditMode} // Chỉ cho phép chỉnh sửa khi ở chế độ chỉnh sửa
-              />
-            </label>
+              {isEditMode ? (
+                <textarea
+                  value={comments}
+                  onChange={(e) => setComments(e.target.value)}
+                  rows={4}
+                  style={{
+                    width: "100%",
+                    marginTop: "5px",
+                    padding: "8px",
+                    borderRadius: "4px",
+                    border: "1px solid #d9d9d9",
+                  }}
+                />
+              ) : (
+                <p
+                  style={{
+                    marginTop: "5px",
+                    padding: "8px",
+                    backgroundColor: "#f5f5f5",
+                    borderRadius: "4px",
+                    minHeight: "80px",
+                  }}
+                >
+                  {comments}
+                </p>
+              )}
+            </div>
           </div>
         </Modal>
 
         <Modal
-          title="Hủy chuyến"
+          title="Cancel Tour"
           visible={isRefundModalVisible}
           onCancel={handleCloseRefundModal}
           footer={[
             <Button key="close" onClick={handleCloseRefundModal}>
               Close
-            </Button>
+            </Button>,
           ]}
         >
-          <p style={{ fontSize: '16px', marginBottom: '20px' }}>
-            Để hủy chuyến đi đã thanh toán, vui lòng liên hệ chúng tôi để được hỗ trợ và hướng dẫn hoàn tiền.
+          <p style={{ fontSize: "16px", marginBottom: "20px" }}>
+            To cancel a paid trip, please contact us for support and refund
+            instructions. If you cancel trip within 1 days after purchased, we will refund 100% of the trip price. Otherwise, you will lose all the money.
           </p>
-          <p style={{ fontSize: '16px', marginBottom: '10px' }}>
+          <p style={{ fontSize: "16px", marginBottom: "10px" }}>
             <strong>Phone:</strong> 0387729579
           </p>
-          <p style={{ fontSize: '16px' }}>
+          <p style={{ fontSize: "16px" }}>
             <strong>Email:</strong> quankun2303@gmail.com
           </p>
         </Modal>
 
         <Modal
-          title="Xác nhận hủy đặt tour"
+          title="Confirm tour cancellation"
           visible={isDeleteModalVisible}
           onOk={handleConfirmDelete}
           onCancel={handleCancelDelete}
-          okText="Xác nhận"
-          cancelText="Hủy"
+          okText="Confirm"
+          cancelText="Cancel"
         >
-          <p>Bạn có chắc chắn muốn hủy đặt tour này không?</p>
-          <p>Hành động này không thể hoàn tác.</p>
+          <p>Are you sure you want to cancel this tour?</p>
+          <p>This action cannot be undo.</p>
         </Modal>
 
         <Modal
-          title="Xác nhận xóa tài khoản"
+          title="Confirm delete account"
           visible={isDeleteAccountModalVisible}
           onOk={handleDeleteAccount}
           onCancel={() => setIsDeleteAccountModalVisible(false)}
-          okText="Xóa"
-          cancelText="Hủy"
+          okText="Delete"
+          cancelText="Cancel"
           okButtonProps={{ danger: true }}
         >
-          <p>Bạn có chắc chắn muốn xóa tài khoản này không?</p>
-          <p>Hành động này không thể hoàn tác và tất cả dữ liệu của bạn sẽ bị xóa vĩnh viễn.</p>
+          <p>Are you sure you want to delete this account?</p>
+          <p>
+            This action cannot be undone and all your data will be permanently
+            deleted.
+          </p>
+        </Modal>
+
+        <Modal
+          title="Confirm finish tour"
+          visible={isFinishTourModalVisible}
+          onOk={handleConfirmFinishTour}
+          onCancel={() => setIsFinishTourModalVisible(false)}
+          okText="Confirm"
+          cancelText="Cancel"
+        >
+          <p>Are you sure you want to finish this tour?</p>
+          <p>After finishing, you can provide feedback about your experience.</p>
         </Modal>
       </main>
       <Footer />

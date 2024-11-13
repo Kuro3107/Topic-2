@@ -11,20 +11,27 @@ const api = "http://localhost:8080/api/bookings";
 
 function BookingForm() {
   const [formData, setFormData] = useState({
-    startDate: "", // Ensure field name matches with DTO
-    endDate: "", // Ensure field name matches with DTO
-    fullname: "", // Ensure field name matches with DTO
-    phone: "", // Ensure field name matches with DTO
-    email: "", // Ensure field name matches with DTO
-    favoriteKoi: [], // Ensure field name matches with DTO
-    favoriteFarm: [], // Ensure field name matches with DTO
-    note: "", // Ensure field name matches with DTO
-    status: "pending", // Ensure field name matches with DTO
+    startDate: "",
+    endDate: "",
+    fullname: "",
+    phone: "",
+    email: "",
+    favoriteKoi: [],
+    favoriteFarm: [],
+    note: "",
+    status: "Pending",
   });
 
   const [koiOptions, setKoiOptions] = useState([]);
   const [farmOptions, setFarmOptions] = useState([]);
   const [filteredFarmOptions, setFilteredFarmOptions] = useState([]); // State for filtered farms
+
+  const [errors, setErrors] = useState({
+    phone: '',
+    email: '',
+    startDate: '',
+    endDate: ''
+  });
 
   const navigate = useNavigate();
 
@@ -37,7 +44,7 @@ function BookingForm() {
         const options = response.data.map((koi) => ({
           value: koi.varietyId,
           label: `${koi.varietyName || "Undefined name"} - ${
-            koi.koiPrice ? `${koi.koiPrice}` : "Undefined price"
+            koi.koiPrice ? `${koi.koiPrice} VNĐ` : "Undefined price"
           }`,
         }));
         setKoiOptions(options);
@@ -71,9 +78,65 @@ function BookingForm() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({
+    
+    setErrors(prev => ({...prev, [name]: ''}));
+    
+    if (name === 'phone') {
+      const phoneRegex = /(84|0[3|5|7|8|9])+([0-9]{8,9})\b/g;
+      if (value && !phoneRegex.test(value)) {
+        setErrors(prev => ({
+          ...prev,
+          phone: 'Invalid Phone number'
+        }));
+      }
+    }
+
+    if (name === 'email') {
+      const emailRegex = /^[a-zA-Z0-9._-]+@gmail\.com$/;
+      if (value && !emailRegex.test(value)) {
+        setErrors(prev => ({
+          ...prev,
+          email: 'Invalid Email (Must end with @gmail.com)'
+        }));
+      }
+    }
+
+    if (name === 'startDate') {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const selectedDate = new Date(value);
+      
+      const diffTime = selectedDate.getTime() - today.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
+      if (selectedDate < today) {
+        setErrors(prev => ({
+          ...prev,
+          startDate: 'Cannot select past date'
+        }));
+      } else if (diffDays < 3) {
+        setErrors(prev => ({
+          ...prev,
+          startDate: 'Start date must be at least 3 days from today'
+        }));
+      }
+    }
+
+    if (name === 'endDate') {
+      const startDate = new Date(formData.startDate);
+      const endDate = new Date(value);
+      
+      if (endDate <= startDate) {
+        setErrors(prev => ({
+          ...prev,
+          endDate: 'End date must be after start date'
+        }));
+      }
+    }
+
+    setFormData(prevData => ({
       ...prevData,
-      [name]: value,
+      [name]: value
     }));
   };
 
@@ -103,9 +166,9 @@ function BookingForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Sending request..."); // Add log for checking
-    if (!formData.fullname || !formData.phone || !formData.email) {
-      toast.error("Please fill in all required information.");
+    console.log("Sending request...");
+    if (!formData.fullname || !formData.phone || !formData.email || formData.favoriteKoi.length === 0) {
+      toast.error("Please fill in all required information and select at least one favorite koi.");
       return;
     }
     try {
@@ -219,12 +282,13 @@ function BookingForm() {
                     <input
                       type="tel"
                       name="phone"
-                      className="form-input"
+                      className={`form-input ${errors.phone ? 'error-input' : ''}`}
                       value={formData.phone}
                       onChange={handleChange}
                       required
                       placeholder="Enter your phone number"
                     />
+                    {errors.phone && <div className="error-message">{errors.phone}</div>}
                   </div>
                 </div>
 
@@ -233,12 +297,13 @@ function BookingForm() {
                   <input
                     type="email"
                     name="email"
-                    className="form-input"
+                    className={`form-input ${errors.email ? 'error-input' : ''}`}
                     value={formData.email}
                     onChange={handleChange}
                     required
                     placeholder="Enter your email address"
                   />
+                  {errors.email && <div className="error-message">{errors.email}</div>}
                 </div>
               </div>
 
@@ -247,13 +312,13 @@ function BookingForm() {
                 <h3 className="section-title">Your Preferences</h3>
                 <div className="form-grid">
                   <div className="form-group">
-                    <label className="form-label">Choose Your Favorite Koi First</label>
+                    <label className="form-label">Choose Koi Variety You Want To Buy First<span className="required">*</span></label>
                     <div className="select-container">
                       <Select
                         isMulti
                         name="favoriteKoi"
                         options={koiOptions}
-                        className="basic-multi-select"
+                        className={`basic-multi-select ${formData.favoriteKoi.length === 0 ? 'error-select' : ''}`}
                         classNamePrefix="select"
                         onChange={(selectedOptions) =>
                           handleSelectChange(selectedOptions, {
@@ -263,13 +328,16 @@ function BookingForm() {
                         value={koiOptions.filter((option) =>
                           formData.favoriteKoi.includes(option.value)
                         )}
-                        placeholder="Select koi varieties"
+                        placeholder="Select koi varieties (required)"
                       />
+                      {formData.favoriteKoi.length === 0 && (
+                        <div className="error-message">Please select at least one koi variety</div>
+                      )}
                     </div>
                   </div>
 
                   <div className="form-group">
-                    <label className="form-label">Preferred Farms</label>
+                    <label className="form-label">And Preferred Farms</label>
                     <div className="select-container">
                       <Select
                         isMulti
@@ -294,7 +362,7 @@ function BookingForm() {
 
               {/* Visit Dates Section */}
               <div className="form-section">
-                <h3 className="section-title">Visit Dates</h3>
+                <h3 className="section-title">Preferred Dates Visit</h3>
                 <div className="form-grid">
                   <div className="form-group">
                     <label className="form-label">Start Date</label>
@@ -302,11 +370,17 @@ function BookingForm() {
                       <input
                         type="date"
                         name="startDate"
-                        className="form-input"
+                        className={`form-input ${errors.startDate ? 'error-input' : ''}`}
                         value={formData.startDate}
                         onChange={handleChange}
+                        min={(() => {
+                          const minDate = new Date();
+                          minDate.setDate(minDate.getDate() + 4);
+                          return minDate.toISOString().split('T')[0];
+                        })()}
                         required
                       />
+                      {errors.startDate && <div className="error-message">{errors.startDate}</div>}
                     </div>
                   </div>
 
@@ -316,11 +390,13 @@ function BookingForm() {
                       <input
                         type="date"
                         name="endDate"
-                        className="form-input"
+                        className={`form-input ${errors.endDate ? 'error-input' : ''}`}
                         value={formData.endDate}
                         onChange={handleChange}
+                        min={formData.startDate || new Date().toISOString().split('T')[0]}
                         required
                       />
+                      {errors.endDate && <div className="error-message">{errors.endDate}</div>}
                     </div>
                   </div>
                 </div>

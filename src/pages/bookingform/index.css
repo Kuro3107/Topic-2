@@ -220,3 +220,33 @@ input[type="checkbox"] {
     font-size: 2rem;
   }
 }
+
+.error-message {
+  color: #ff4d4f;
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+.error-input {
+  border-color: #ff4d4f !important;
+}
+
+.error-input:focus {
+  box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.2);
+}
+
+/* Thêm vào file CSS của bạn */
+.required {
+  color: red;
+  margin-left: 4px;
+}
+
+.error-select .select__control {
+  border-color: #ff4d4f;
+}
+
+.error-message {
+  color: #ff4d4f;
+  font-size: 14px;
+  margin-top: 4px;
+}

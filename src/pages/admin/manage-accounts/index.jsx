@@ -4,6 +4,7 @@ import axios from "axios";
 
 const { Option } = Select;
 const { TabPane } = Tabs;
+const { Search } = Input;
 
 const ManageAccounts = () => {
   const [accounts, setAccounts] = useState([]);
@@ -11,6 +12,7 @@ const ManageAccounts = () => {
   const [form] = Form.useForm();
   const [editingAccount, setEditingAccount] = useState(null);
   const [activeTab, setActiveTab] = useState("manager"); // Thay đổi giá trị mặc định thành "manager"
+  const [searchText, setSearchText] = useState("");
 
   useEffect(() => {
     fetchAccounts();
@@ -54,7 +56,21 @@ const ManageAccounts = () => {
             (account) => account.username === values.username
           );
           if (usernameExists) {
-            message.error("Tên đăng nhập đã tồn tại. Vui lòng chọn tên khác.");
+            message.error("Username already exists. Please choose a different one.");
+            return;
+          }
+        }
+
+        // Kiểm tra email tồn tại
+        if (values.email) {
+          const emailExists = accounts.some(
+            (account) => 
+              account.email === values.email && 
+              (!editingAccount || account.accountId !== editingAccount.accountId)
+          );
+          
+          if (emailExists) {
+            message.error("This email is already registered. Please use a different one.");
             return;
           }
         }
@@ -78,38 +94,47 @@ const ManageAccounts = () => {
             `http://localhost:8080/api/accounts/${editingAccount.accountId}`,
             accountData
           );
-          message.success("Cập nhật tài khoản thành công");
+          message.success("Account updated successfully");
         } else {
           // Đối với tài khoản mới, bắt buộc phải có password
           if (!values.password) {
-            message.error("Password là bắt buộc khi tạo tài khoản mới");
+            message.error("Password is required when creating a new account");
             return;
           }
           await axios.post("http://localhost:8080/api/accounts", accountData);
-          message.success("Tạo tài khoản mới thành công");
+          message.success("New account created successfully");
         }
         setIsModalVisible(false);
         fetchAccounts();
       } catch (error) {
         console.error("Error saving account:", error);
-        message.error("Có lỗi xảy ra khi lưu tài khoản");
+        message.error("An error occurred while saving the account");
       }
     });
   };
 
   const handleDelete = async (id) => {
-    try {
-      await axios.delete(`http://localhost:8080/api/accounts/${id}`);
-      message.success("Account deleted successfully");
-      fetchAccounts();
-    } catch (error) {
-      console.error("Error deleting account:", error);
-      message.error("Failed to delete account");
-    }
+    Modal.confirm({
+      title: 'Confirm Delete',
+      content: 'Are you sure you want to delete this account?',
+      okText: 'Delete',
+      okType: 'danger',
+      cancelText: 'Cancel',
+      async onOk() {
+        try {
+          await axios.delete(`http://localhost:8080/api/accounts/${id}`);
+          message.success("Account deleted successfully");
+          fetchAccounts();
+        } catch (error) {
+          console.error("Error deleting account:", error);
+          message.error("Unable to delete account");
+        }
+      },
+    });
   };
 
   const columns = [
-    { title: "ID", dataIndex: "accountId", key: "accountId" }, // Thêm cột ID
+    { title: "ID", dataIndex: "accountId", key: "accountId" },
     { title: "Username", dataIndex: "username", key: "username" },
     { title: "Full Name", dataIndex: "fullName", key: "fullName" },
     { title: "Phone", dataIndex: "phone", key: "phone" },
@@ -142,7 +167,8 @@ const ManageAccounts = () => {
         <span>
           <Button onClick={() => showModal(record)}>Edit</Button>
           <Button
-            onClick={() => handleDelete(record.id)}
+            onClick={() => handleDelete(record.accountId)}
+            danger
             style={{ marginLeft: 8 }}
           >
             Delete
@@ -152,27 +178,43 @@ const ManageAccounts = () => {
     },
   ];
 
-  const filteredAccounts =
-    activeTab === "manager"
-      ? accounts.filter((account) => account.roleId === 1)
-      : activeTab === "sales"
-      ? accounts.filter((account) => account.roleId === 2)
-      : activeTab === "consulting"
-      ? accounts.filter((account) => account.roleId === 3)
-      : activeTab === "delivery"
-      ? accounts.filter((account) => account.roleId === 4)
-      : accounts.filter((account) => account.roleId === 5); // "Customers"
+  const handleSearch = (value) => {
+    setSearchText(value);
+  };
+
+  const filteredAccounts = accounts
+    .filter((account) => {
+      // Lọc theo role trước
+      if (activeTab === "manager" && account.roleId !== 1) return false;
+      if (activeTab === "sales" && account.roleId !== 2) return false;
+      if (activeTab === "consulting" && account.roleId !== 3) return false;
+      if (activeTab === "delivery" && account.roleId !== 4) return false;
+      if (activeTab === "customer" && account.roleId !== 5) return false;
+
+      // Nếu có searchText thì tìm kiếm trong tất cả các trường
+      if (searchText) {
+        const searchLower = searchText.toLowerCase();
+        return (
+          account.accountId?.toString().includes(searchLower) ||
+          account.username?.toLowerCase().includes(searchLower) ||
+          account.fullName?.toLowerCase().includes(searchLower) ||
+          account.phone?.toLowerCase().includes(searchLower) ||
+          account.email?.toLowerCase().includes(searchLower)
+        );
+      }
+      return true;
+    });
 
   return (
     <div className="account-management-container">
       <h1>Manage Accounts</h1>
       <Button
-            onClick={() => showModal()}
-            className="create-button"
-            type="primary"
-          >
-            Create New Account
-          </Button>
+        onClick={() => showModal()}
+        className="create-button"
+        type="primary"
+      >
+        Create New Account
+      </Button>
       <div className="content-wrapper">
         <Tabs activeKey={activeTab} onChange={setActiveTab}>
           <TabPane tab="Manager" key="manager" />
@@ -182,17 +224,17 @@ const ManageAccounts = () => {
           <TabPane tab="Customers" key="customer" />
         </Tabs>
 
-        {/* {activeTab !== "customer" && (
-          <Button
-            onClick={() => showModal()}
-            className="create-button"
-            type="primary"
-          >
-            Create New Account
-          </Button>
-        )} */}
+        <div style={{ marginBottom: 16 }}>
+          <Search
+            placeholder="Search by ID, name, email, phone..."
+            onSearch={handleSearch}
+            onChange={(e) => handleSearch(e.target.value)}
+            style={{ width: 300 }}
+            allowClear
+          />
+        </div>
 
-        <Table columns={columns} dataSource={filteredAccounts} rowKey="id" />
+        <Table columns={columns} dataSource={filteredAccounts} rowKey="accountId" />
       </div>
 
       <Modal
@@ -215,23 +257,35 @@ const ManageAccounts = () => {
             rules={[
               { 
                 required: !editingAccount, // Chỉ bắt buộc khi tạo mới
-                message: 'Vui lòng nhập password khi tạo tài khoản mới'
+                message: 'Please enter password when creating a new account'
               }
             ]}
           >
-            <Input.Password placeholder={editingAccount ? "Để trống nếu không muốn đổi mật khẩu" : "Nhập mật khẩu"} />
+            <Input.Password placeholder={editingAccount ? "Leave blank if you don't want to change the password" : "Enter password"} />
           </Form.Item>
           <Form.Item
             name="phone"
             label="Phone"
-            rules={[{ required: false }]} // Không bắt buộc
+            rules={[
+              { required: false },
+              {
+                pattern: /^0\d{9}$/,
+                message: "Phone number must be 10 digits and start with 0"
+              }
+            ]}
           >
             <Input />
           </Form.Item>
           <Form.Item
             name="email"
             label="Email"
-            rules={[{ required: false, type: "email" }]} // Không bắt buộc
+            rules={[
+              { required: false },
+              {
+                pattern: /^[a-zA-Z0-9._-]+@gmail\.com$/,
+                message: "Please enter a valid Gmail address"
+              }
+            ]}
           >
             <Input />
           </Form.Item>

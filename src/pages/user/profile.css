@@ -69,7 +69,7 @@
 
 .avatar-edit {
   position: absolute;
-  bottom: -20px; /* Đặt nút dưới avatar */
+  bottom: -40px; /* Đặt nút dưới avatar */
   left: 50%;
   transform: translateX(-50%);
   background: white;

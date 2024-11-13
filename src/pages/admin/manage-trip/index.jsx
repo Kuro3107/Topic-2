@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Table, Button, Modal, Form, Input, InputNumber, message, Select, Radio } from "antd";
 import axios from "axios";
+const { Search } = Input;
 
 const ManageTour = () => {
   const [tours, setTours] = useState([]);
@@ -20,6 +21,7 @@ const ManageTour = () => {
   const apiTour = "http://localhost:8080/api/trips";
   const [isCreatingTour, setIsCreatingTour] = useState(true); // Trạng thái để xác định bước tạo tour
   const [viewMode, setViewMode] = useState("available"); // State để theo dõi chế độ xem
+  const [searchText, setSearchText] = useState(""); // Thêm state cho tìm kiếm
 
   const fetchTours = async () => {
     try {
@@ -201,14 +203,23 @@ const ManageTour = () => {
   };
 
   const handleDelete = async (id) => {
-    try {
-      await axios.delete(`${apiTour}/${id}`);
-      message.success("Tour deleted successfully");
-      fetchTours();
-    } catch (error) {
-      message.error("An error occurred while deleting the tour");
-      console.error("Error deleting tour:", error);
-    }
+    Modal.confirm({
+      title: 'Confirm Delete',
+      content: 'Are you sure you want to delete this tour?',
+      okText: 'Delete',
+      okType: 'danger',
+      cancelText: 'Cancel',
+      async onOk() {
+        try {
+          await axios.delete(`${apiTour}/${id}`);
+          message.success("Tour deleted successfully");
+          fetchTours();
+        } catch (error) {
+          message.error("An error occurred while deleting the tour");
+          console.error("Error deleting tour:", error);
+        }
+      },
+    });
   };
 
   const fetchFarms = async (tourId) => {
@@ -275,6 +286,32 @@ const ManageTour = () => {
     setSelectedFarms(farmIds);
     farmIds.forEach(farmId => handleAddFarmToTour(farmId)); // Thêm từng farm vào tour
   };
+
+  const handleSearch = (value) => {
+    setSearchText(value);
+  };
+
+  const filteredTours = tours.filter((tour) => {
+    const viewModeFilter = viewMode === "available" ? tour.imageUrl : !tour.imageUrl;
+    if (!viewModeFilter) return false;
+
+    if (searchText) {
+      const searchLower = searchText.toLowerCase();
+      return (
+        tour.tripName?.toLowerCase().includes(searchLower) ||
+        tour.priceTotal?.toString().includes(searchLower) ||
+        tour.tripDetails?.some(detail => 
+          detail.mainTopic?.toLowerCase().includes(searchLower) ||
+          detail.subTopic?.toLowerCase().includes(searchLower)
+        ) ||
+        tour.koiFarms?.some(farm => 
+          farm.farmName?.toLowerCase().includes(searchLower) ||
+          farm.location?.toLowerCase().includes(searchLower)
+        )
+      );
+    }
+    return true;
+  });
 
   const columns = [
     {
@@ -351,14 +388,25 @@ const ManageTour = () => {
   return (
     <div>
       <h1>Manage Tours</h1>
-      <Radio.Group 
-        value={viewMode} 
-        onChange={(e) => setViewMode(e.target.value)} 
-        style={{ marginBottom: 16 }}
-      >
-        <Radio value="available">Tour có sẵn</Radio>
-        <Radio value="custom">Tour của riêng khách hàng</Radio>
-      </Radio.Group>
+      <div style={{ marginBottom: 16 }}>
+        <Radio.Group 
+          value={viewMode} 
+          onChange={(e) => setViewMode(e.target.value)} 
+          style={{ marginRight: 16 }}
+        >
+          <Radio value="available">Available Tour</Radio>
+          <Radio value="custom">Customer's Tour</Radio>
+        </Radio.Group>
+
+        <Search
+          placeholder="Search by tour name, price, activities, or farm..."
+          onSearch={handleSearch}
+          onChange={(e) => handleSearch(e.target.value)}
+          style={{ width: 400, marginLeft: 16 }}
+          allowClear
+        />
+      </div>
+
       <Button
         onClick={() => {
           setIsModalVisible(true);
@@ -369,11 +417,13 @@ const ManageTour = () => {
       >
         Add New Tour
       </Button>
+
       <Table 
         columns={columns} 
-        dataSource={viewMode === "available" ? tours.filter(tour => tour.imageUrl) : tours.filter(tour => !tour.imageUrl)} // Lọc dựa trên chế độ xem
+        dataSource={filteredTours}
         rowKey="tripId"
       />
+
       <Modal
         title={isCreatingTour ? "Create New Tour" : "Update Tour Details"}
         open={isModalVisible}

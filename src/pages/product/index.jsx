@@ -156,13 +156,13 @@ const Product = () => {
   const handleBooking = (tripId) => {
     const userInfo = JSON.parse(localStorage.getItem("userInfo"));
     if (!userInfo) {
-      message.warning("Vui lòng đăng nhập để đặt tour.");
+      message.warning("Please login to booking tour");
       navigate("/login");
       return;
     }
     
     if (!isCustomerRole()) {
-      message.warning("Chỉ tài khoản khách hàng mới có thể đặt tour.");
+      message.warning("Chỉ có khách hàng tài khoản mới có thể đặt tour.");
       return;
     }
 
@@ -339,7 +339,7 @@ const Product = () => {
 
       <div className="product-container">
         {renderFilters()}
-        <h1>Tour List</h1>
+        <h1>Tours List</h1>
         {loading ? (
           <div className="loading-container">
             <Spin size="large" />
@@ -518,7 +518,11 @@ const Product = () => {
             label="Phone"
             name="phone"
             rules={[
-              { required: true, message: "Please input your phone number!" },
+              { required: true, message: "Please enter phone number!" },
+              {
+                pattern: /(84|0[3|5|7|8|9])+([0-9]{8,9})\b/g,
+                message: "Invalid Phone Number!"
+              }
             ]}
           >
             <Input
@@ -530,7 +534,13 @@ const Product = () => {
           <Form.Item
             label="Email"
             name="email"
-            rules={[{ required: true, message: "Please input your email!" }]}
+            rules={[
+              { required: true, message: "Please input email!" },
+              {
+                pattern: /^[a-zA-Z0-9._-]+@gmail\.com$/,
+                message: "Invalid Email (Must end with @gmail.com)"
+              }
+            ]}
           >
             <Input
               name="email"
@@ -541,15 +551,17 @@ const Product = () => {
           <Form.Item
             label="Start Date"
             name="startDate"
-            rules={[{ required: true, message: "Please select a start date!" }]}
+            rules={[
+              { required: true, message: "Please select a start date!" }
+            ]}
           >
             <DatePicker
-              value={
-                bookingData.startDate ? moment(bookingData.startDate) : null
-              }
-              onChange={(date) =>
-                setBookingData({ ...bookingData, startDate: date })
-              }
+              value={bookingData.startDate ? moment(bookingData.startDate) : null}
+              onChange={(date) => setBookingData({ ...bookingData, startDate: date })}
+              disabledDate={(current) => {
+                // Không cho phép chọn ngày trong quá khứ và phải cách hiện tại ít nhất 3 ngày
+                return current && (current < moment().add(3, 'days').startOf('day'));
+              }}
             />
           </Form.Item>
           <Form.Item label="Note">

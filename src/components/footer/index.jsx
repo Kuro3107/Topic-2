@@ -16,14 +16,14 @@ const Footer = () => {
           <h3>Contact</h3>
           <p><MailOutlined /> Email: phqtuan2000@gmail.com</p>
           <p><PhoneOutlined /> Phone: 094-424-6472</p>
-          <p><HomeOutlined /> Address: Lô E2a-7, Đường D1, Đ. D1, Long Thạnh Mỹ, Thành Phố Thủ Đức, Hồ Chí Minh 700000, Việt Nam</p>
+          <p><HomeOutlined /> Address: Thu Duc City, Ho Chi Minh City, Vietnam</p>
         </div>
         <div className="footer-section">
           <h3>Follow Us</h3>
           <div className="social-links">
-            <a href="#"><FacebookFilled /> Facebook</a>
-            <a href="#"><TwitterCircleFilled /> Twitter</a>
-            <a href="#"><InstagramOutlined /> Instagram</a>
+            <a href="https://www.facebook.com/contrailord"><FacebookFilled /> Facebook</a>
+            <a href="https://x.com/?lang=en"><TwitterCircleFilled /> Twitter</a>
+            <a href="https://www.instagram.com/"><InstagramOutlined /> Instagram</a>
           </div>
         </div>
       </div>

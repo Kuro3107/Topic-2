@@ -352,7 +352,7 @@ const handlePasswordReset = async (values) => {
     centered
     footer={
       <div style={{ textAlign: 'center', color: '#666', padding: '10px', fontSize: '13px' }}>
-        Forgot Password and Reset Password function only works for users who have registered Email and Phone. 
+        Reset Password function only works for users who have registered Email and Phone. 
         If you have not registered, please contact us for support.
       </div>
     }

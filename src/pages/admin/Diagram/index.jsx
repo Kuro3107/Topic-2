@@ -55,10 +55,10 @@ function Diagram() {
           case "Approved":
             acc[monthYear].approvedOrders += 1;
             break;
-          case "rejected":
+          case "Rejected":
             acc[monthYear].rejectedOrders += 1;
             break;
-          case "Finished": // Thay ��ổi từ delivered thành checkout
+          case "Finished": // Thay ổi từ delivered thành checkout
             acc[monthYear].deliveredOrders += 1;
             // Tính doanh thu
             const trip = tripsMap[booking.tripId];
@@ -88,14 +88,14 @@ function Diagram() {
 
       setChartData(formattedData);
     } catch (error) {
-      console.error("Lỗi khi lấy dữ liệu:", error);
+      console.error("Error fetching data:", error);
     }
   };
 
   const formatCurrency = (value) => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
-      currency: "USD",
+      currency: "VND",
     }).format(value);
   };
 
@@ -133,10 +133,10 @@ function Diagram() {
         <div className="chart-card">
           <h3>Monthly Revenue from Completed Trips</h3>
           <ResponsiveContainer width="100%" height={400}>
-            <LineChart data={chartData}>
+            <LineChart data={chartData} margin={{ top: 10, right: 30, left: 10, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" />
-              <YAxis tickFormatter={(value) => formatCurrency(value)} />
+              <YAxis tickFormatter={(value) => formatCurrency(value)} width={100} />
               <Tooltip content={<CustomTooltip />} />
               <Legend />
               <Line
@@ -153,7 +153,7 @@ function Diagram() {
         </div>
 
         <div className="chart-card">
-          <h3>Orders Statistics by Status</h3>
+          <h3>Numbers of Booking Finished</h3>
           <ResponsiveContainer width="100%" height={400}>
             <BarChart data={chartData} barSize={45} barGap={0}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -168,19 +168,7 @@ function Diagram() {
               <Bar
                 dataKey="deliveredOrders"
                 fill="#38acff"
-                name="Delivered"
-                maxBarSize={45}
-              />
-              <Bar
-                dataKey="approvedOrders"
-                fill="#10fe08"
-                name="Approved"
-                maxBarSize={45}
-              />
-              <Bar
-                dataKey="rejectedOrders"
-                fill="#ff0000"
-                name="Rejected"
+                name="Finished"
                 maxBarSize={45}
               />
             </BarChart>

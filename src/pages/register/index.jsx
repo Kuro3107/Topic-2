@@ -11,14 +11,28 @@ function RegisterPage() {
 
   const handleRegister = async (values) => {
     try {
-      const checkUsername = await api.get("http://localhost:8080/api/accounts");
-      const usernameExists = checkUsername.data.some(
+      const checkAccounts = await api.get("http://localhost:8080/api/accounts");
+      
+      // Kiểm tra username tồn tại
+      const usernameExists = checkAccounts.data.some(
         (account) => account.username === values.username
       );
       
       if (usernameExists) {
-        toast.error("Tên đăng nhập đã tồn tại. Vui lòng chọn tên khác.");
+        toast.error("Username already exists. Please choose another one.");
         return;
+      }
+
+      // Thêm kiểm tra email tồn tại
+      if (values.email) {
+        const emailExists = checkAccounts.data.some(
+          (account) => account.email === values.email
+        );
+        
+        if (emailExists) {
+          toast.error("This email is already registered. Please use another email.");
+          return;
+        }
       }
 
       const requestBody = {
@@ -37,15 +51,15 @@ function RegisterPage() {
 
       if (response.data && response.data.token) {
         localStorage.setItem('userInfo', JSON.stringify(response.data));
-        toast.success("Đăng ký thành công và đã đăng nhập");
+        toast.success("Registered successfully and logged in");
         navigate("/profile");
       } else {
-        toast.success("Đăng ký thành công");
+        toast.success("Registration successful");
         navigate("/login");
       }
     } catch (error) {
       console.error("Error details:", error.response || error);
-      toast.error(error.response?.data?.message || "Đăng ký thất bại. Vui lòng thử lại.");
+      toast.error(error.response?.data?.message || "Registration failed. Please try again.");
     }
   };
 
@@ -81,13 +95,21 @@ function RegisterPage() {
             label="Phone (Optional)"
             name="phone"
             rules={[
-              // { required: true, message: "Please enter phone number!" },
               { pattern: /^0\d{9}$/, message: "Phone number must be 10 digits and start with 0" },
             ]}
           >
             <Input />
           </Form.Item>
-          <Form.Item label="Email (Optional)" name="email">
+          <Form.Item 
+            label="Email (Optional)" 
+            name="email"
+            rules={[
+              {
+                pattern: /^[a-zA-Z0-9._-]+@gmail\.com$/,
+                message: "Email must end with @gmail.com"
+              }
+            ]}
+          >
             <Input />
           </Form.Item>
           <Button type="primary" htmlType="submit">

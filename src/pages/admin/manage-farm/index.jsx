@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Table, Button, Modal, Form, Input, message } from "antd";
 import axios from "axios";
+const { Search } = Input;
 
 const ManageFarm = () => {
   const [farms, setFarms] = useState([]);
@@ -14,6 +15,7 @@ const ManageFarm = () => {
   const [allKoi, setAllKoi] = useState([]); // Thêm state để quản lý danh sách tất cả các koi
   const [selectedKoi, setSelectedKoi] = useState(null); // Thêm state để lưu koi được chọn
   const apiFarm = "http://localhost:8080/api/farms"; // Cập nhật URL API
+  const [searchText, setSearchText] = useState("");
   
   const fetchFarms = async () => {
     try {
@@ -43,11 +45,12 @@ const ManageFarm = () => {
     }
   };
 
-  const showAddModal = () => {
+  const showAddModal = async () => {
     setIsAddModalVisible(true);
     form.resetFields(); // Đặt lại các trường trong form
     setNewFarmId(null); // Đặt lại ID farm mới
     setKoiList([]); // Đặt lại danh sách koi
+    await fetchAllKoi(); // Fetch danh sách koi khi mở modal
   };
 
   const showEditModal = async (farm) => {
@@ -59,21 +62,39 @@ const ManageFarm = () => {
     fetchAllKoi(); // Gọi hàm để lấy danh sách tất cả các koi
   };
 
-  const handleCancel = () => {
+  const handleAddModalClose = () => {
     setIsAddModalVisible(false);
-    setIsEditModalVisible(false);
     form.resetFields();
+    setNewFarmId(null);
+    setKoiList([]);
+    setSelectedKoi(null);
+    fetchFarms(); // Cập nhật lại danh sách farm để hiển thị đầy đủ thông tin
+  };
+
+  const handleEditModalClose = () => {
+    setIsEditModalVisible(false);
     editForm.resetFields();
-    setSelectedKoi(null); // Đặt lại koi được chọn
+    setEditingFarm(null);
+    setSelectedKoi(null);
+  };
+
+  const handleCancel = () => {
+    if (isAddModalVisible) {
+        handleAddModalClose();
+    } else if (isEditModalVisible) {
+        handleEditModalClose();
+    }
   };
 
   const onFinish = async (values) => {
-    console.log("Dữ liệu gửi đến backend:", values); // Thêm log để kiểm tra dữ liệu
+    console.log("Data sent to backend:", values); // Thêm log để kiểm tra dữ liệu
     try {
       const response = await axios.post(apiFarm, values); // Gửi dữ liệu mới
       message.success("Add New Farm Success!");
       setNewFarmId(response.data.farmId); // Lưu ID của farm mới tạo
-      fetchAllKoi(); // Gọi hàm để lấy danh sách tất cả các koi
+      await fetchAllKoi(); // Fetch danh sách koi ngay sau khi tạo farm
+      const koiResponse = await axios.get(`${apiFarm}/${response.data.farmId}/koi-varieties`);
+      setKoiList(koiResponse.data); // Cập nhật danh sách koi của farm mới
       fetchFarms(); // Cập nhật danh sách farm sau khi thêm mới
     } catch (error) {
       message.error("There's Error In Save Farm!");
@@ -82,7 +103,7 @@ const ManageFarm = () => {
   };
 
   const handleEditFinish = async (values) => {
-    console.log("Dữ liệu chỉnh sửa gửi đến backend:", values); // Thêm log để kiểm tra dữ liệu
+    console.log("Data edited sent to backend:", values); // Thêm log để kiểm tra dữ liệu
     try {
       await axios.put(`${apiFarm}/${editingFarm.farmId}`, values); // Cập nhật farmId
       message.success("Updated Farm Success!");
@@ -95,9 +116,10 @@ const ManageFarm = () => {
   };
 
   const handleAddKoi = async () => {
-    if (!selectedKoi || !newFarmId) return; // Nếu không có koi được chọn hoặc farm chưa được tạo thì không làm gì
+    if (!selectedKoi) return;
+    const farmId = editingFarm ? editingFarm.farmId : newFarmId;
+    if (!farmId) return;
 
-    // Tìm koi trong danh sách allKoi để lấy varietyId
     const koiToAdd = allKoi.find(koi => koi.varietyName === selectedKoi);
     if (!koiToAdd) {
         message.error("Koi not found!");
@@ -105,32 +127,34 @@ const ManageFarm = () => {
     }
 
     try {
-        // Gửi yêu cầu thêm koi vào farm với varietyId
-        await axios.post(`${apiFarm}/${newFarmId}/koi-varieties`, { 
-            varietyId: koiToAdd.varietyId // Đảm bảo rằng bạn đang gửi đúng thuộc tính
+        await axios.post(`${apiFarm}/${farmId}/koi-varieties`, { 
+            varietyId: koiToAdd.varietyId
         }); 
         message.success("Added Koi Successfully!");
-        const koiResponse = await axios.get(`${apiFarm}/${newFarmId}/koi-varieties`);
-        setKoiList(koiResponse.data); // Cập nhật lại danh sách koi
-        setSelectedKoi(null); // Đặt lại koi được chọn
-        fetchFarms(); // Cập nhật danh sách farm sau khi thêm koi
+        const koiResponse = await axios.get(`${apiFarm}/${farmId}/koi-varieties`);
+        setKoiList(koiResponse.data);
+        setSelectedKoi(null);
+        fetchFarms();
     } catch (error) {
         message.error("Error adding Koi!");
         console.error("Error adding koi:", error);
     }
   };
 
-  const handleRemoveKoi = async (varietyId) => { // Thay đổi tham số thành varietyId
+  const handleRemoveKoi = async (varietyId) => {
     if (!varietyId) {
-        message.error("Koi ID is not defined!"); // Thêm thông báo lỗi nếu varietyId không hợp lệ
+        message.error("Koi ID is not defined!");
         return;
     }
+    const farmId = editingFarm ? editingFarm.farmId : newFarmId;
+    if (!farmId) return;
+
     try {
-        await axios.delete(`${apiFarm}/${newFarmId}/koi-varieties/${varietyId}`); // Gửi yêu cầu xóa koi
+        await axios.delete(`${apiFarm}/${farmId}/koi-varieties/${varietyId}`);
         message.success("Removed Koi Successfully!");
-        const koiResponse = await axios.get(`${apiFarm}/${newFarmId}/koi-varieties`);
-        setKoiList(koiResponse.data); // Cập nhật lại danh sách koi
-        fetchFarms(); // Cập nhật danh sách farm sau khi xóa koi
+        const koiResponse = await axios.get(`${apiFarm}/${farmId}/koi-varieties`);
+        setKoiList(koiResponse.data);
+        fetchFarms();
     } catch (error) {
         message.error("Error removing Koi!");
         console.error("Error removing koi:", error);
@@ -138,15 +162,55 @@ const ManageFarm = () => {
   };
 
   const handleDelete = async (id) => {
+    Modal.confirm({
+      title: 'Confirm Delete',
+      content: 'Are you sure you want to delete this farm?',
+      okText: 'Delete',
+      okType: 'danger',
+      cancelText: 'Cancel',
+      async onOk() {
+        try {
+          await axios.delete(`${apiFarm}/${id}`);
+          message.success("Deleted Koi Farm!");
+          fetchFarms();
+        } catch (error) {
+          message.error("There's Error In Delete Farm!");
+          console.error("Error deleting farm:", error);
+        }
+      },
+    });
+  };
+
+  const handleEditSubmit = async () => {
     try {
-      await axios.delete(`${apiFarm}/${id}`); // Xóa theo farm_id
-      message.success("Deleted Koi Farm!");
-      fetchFarms();
+        const values = await editForm.validateFields();
+        await handleEditFinish(values);
+        message.success("Farm updated successfully!");
+        setIsEditModalVisible(false);
+        fetchFarms();
     } catch (error) {
-      message.error("There's Error In Delete Farm!");
-      console.error("Error deleting farm:", error);
+        console.error("Validation failed:", error);
     }
   };
+
+  const handleSearch = (value) => {
+    setSearchText(value);
+  };
+
+  const filteredFarms = farms.filter((farm) => {
+    if (searchText) {
+      const searchLower = searchText.toLowerCase();
+      return (
+        farm.farmName?.toLowerCase().includes(searchLower) ||
+        farm.location?.toLowerCase().includes(searchLower) ||
+        farm.contactInfo?.toLowerCase().includes(searchLower) ||
+        farm.koiVarieties?.some(koi => 
+          koi.varietyName.toLowerCase().includes(searchLower)
+        )
+      );
+    }
+    return true;
+  });
 
   const columns = [
     {
@@ -159,7 +223,36 @@ const ManageFarm = () => {
       dataIndex: "imageUrl",
       key: "imageUrl",
       render: (imageUrl) => (
-        <img src={imageUrl} alt="Farm" style={{ width: 50, height: 50 }} />
+        <img 
+            src={imageUrl} 
+            alt="Farm" 
+            style={{ 
+                width: 100,         // Tăng kích thước từ 50 lên 100
+                height: 100,        // Tăng kích thước từ 50 lên 100
+                objectFit: 'cover', // Đảm bảo ảnh không bị méo
+                borderRadius: '8px', // Bo tròn góc
+                border: '1px solid #d9d9d9', // Thêm viền
+                cursor: 'pointer'   // Con trỏ pointer khi hover
+            }}
+            onClick={() => {
+                // Hiển thị ảnh kích thước đầy đủ khi click
+                Modal.info({
+                    title: 'Farm Image',
+                    content: (
+                        <img 
+                            src={imageUrl} 
+                            alt="Farm Full Size" 
+                            style={{ 
+                                width: '100%',
+                                maxHeight: '80vh',
+                                objectFit: 'contain'
+                            }} 
+                        />
+                    ),
+                    width: 800,
+                });
+            }}
+        />
       ),
     },
     {
@@ -201,16 +294,25 @@ const ManageFarm = () => {
   return (
     <div>
       <h1>Farm Manage</h1>
-      <Button
-        onClick={showAddModal}
-        type="primary"
-        style={{ marginBottom: 16 }}
-      >
-        Add New Farm
-      </Button>
-      <Table columns={columns} dataSource={farms} rowKey="farm_id" />{" "}
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
+        <Button
+          onClick={showAddModal}
+          type="primary"
+        >
+          Add New Farm
+        </Button>
+        
+        <Search
+          placeholder="Search by farm name, location, contact, or koi variety..."
+          onSearch={handleSearch}
+          onChange={(e) => handleSearch(e.target.value)}
+          style={{ width: 400 }}
+          allowClear
+        />
+      </div>
+
+      <Table columns={columns} dataSource={filteredFarms} rowKey="farm_id" />
       
-      {/* Modal cho thêm farm mới */}
       <Modal
         title="Add New Farm"
         visible={isAddModalVisible}
@@ -248,12 +350,11 @@ const ManageFarm = () => {
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">
-              Thêm mới
+              Add New
             </Button>
           </Form.Item>
         </Form>
 
-        {/* Hiển thị danh sách koi và nút thêm koi sau khi farm được tạo */}
         {newFarmId && (
           <>
             <h3>Koi in Farm</h3>
@@ -262,35 +363,64 @@ const ManageFarm = () => {
                 <li key={koi.varietyId} style={{ color: 'black', backgroundColor: 'white' }}>
                   {koi.varietyName}
                   <Button onClick={() => handleRemoveKoi(koi.varietyId)} danger style={{ marginLeft: 8 }}>
-                    Xóa
+                    Delete
                   </Button>
                 </li>
               ))}
             </ul>
 
-            <h3>Thêm Koi</h3>
-            <select onChange={(e) => setSelectedKoi(e.target.value)} value={selectedKoi} style={{ color: 'black', backgroundColor: 'white' }}>
-              <option value="">Chọn Koi</option>
-              {allKoi.filter(koi => !koiList.some(existingKoi => existingKoi.varietyName === koi.varietyName)).map(koi => (
-                <option key={koi.varietyId} value={koi.varietyName}>{koi.varietyName}</option>
-              ))}
-            </select>
-            <Button onClick={handleAddKoi} type="primary" style={{ marginTop: 8 }}>
-              Thêm Koi
-            </Button>
-            <Button onClick={handleCancel} style={{ marginTop: 8, marginLeft: 8 }}>
-              Hoàn tất
+            <h3>Add Koi</h3>
+            {allKoi.length > 0 ? (
+                <>
+                    <select 
+                        onChange={(e) => setSelectedKoi(e.target.value)} 
+                        value={selectedKoi || ""} 
+                        style={{ color: 'black', backgroundColor: 'white', width: '200px' }}
+                    >
+                        <option value="">Choose Koi</option>
+                        {allKoi
+                            .filter(koi => !koiList.some(existingKoi => existingKoi.varietyId === koi.varietyId))
+                            .map(koi => (
+                                <option key={koi.varietyId} value={koi.varietyName}>
+                                    {koi.varietyName}
+                                </option>
+                            ))
+                        }
+                    </select>
+                    <Button 
+                        onClick={handleAddKoi} 
+                        type="primary" 
+                        disabled={!selectedKoi}
+                        style={{ marginTop: 8, marginLeft: 8 }}
+                    >
+                        Add Koi
+                    </Button>
+                </>
+            ) : (
+                <div>Loading Koi varieties...</div>
+            )}
+            <Button 
+                onClick={handleAddModalClose} 
+                style={{ marginTop: 8, marginLeft: 8 }}
+            >
+                Hoàn tất
             </Button>
           </>
         )}
       </Modal>
 
-      {/* Modal cho chỉnh sửa farm */}
       <Modal
         title="Edit Farm Information"
         visible={isEditModalVisible}
         onCancel={handleCancel}
-        footer={null}
+        footer={[
+            <Button key="cancel" onClick={handleCancel}>
+                Cancel
+            </Button>,
+            <Button key="submit" type="primary" onClick={handleEditSubmit}>
+                Submit
+            </Button>
+        ]}
       >
         <Form form={editForm} onFinish={handleEditFinish} layout="vertical">
           <Form.Item
@@ -322,7 +452,6 @@ const ManageFarm = () => {
             <Input placeholder="Input Contact Information" />
           </Form.Item>
 
-          {/* Hiển thị danh sách koi chỉ khi farm đã được tạo */}
           {editingFarm && (
             <>
               <h3>Koi in Farm</h3>
@@ -331,21 +460,21 @@ const ManageFarm = () => {
                   <li key={koi.varietyId} style={{ color: 'black', backgroundColor: 'white' }}>
                     {koi.varietyName}
                     <Button onClick={() => handleRemoveKoi(koi.varietyId)} danger style={{ marginLeft: 8 }}>
-                      Xóa
+                      Delete
                     </Button>
                   </li>
                 ))}
               </ul>
 
-              <h3>Thêm Koi</h3>
+              <h3>Add Koi</h3>
               <select onChange={(e) => setSelectedKoi(e.target.value)} value={selectedKoi} style={{ color: 'black', backgroundColor: 'white' }}>
-                <option value="">Chọn Koi</option>
+                <option value="">Choose Koi</option>
                 {allKoi.filter(koi => !koiList.some(existingKoi => existingKoi.varietyName === koi.varietyName)).map(koi => (
                   <option key={koi.varietyId} value={koi.varietyName}>{koi.varietyName}</option>
                 ))}
               </select>
               <Button onClick={handleAddKoi} type="primary" style={{ marginTop: 8 }}>
-                Thêm Koi
+                Add Koi
               </Button>
             </>
           )}

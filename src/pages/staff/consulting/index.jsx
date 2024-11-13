@@ -104,7 +104,7 @@ function Consulting() {
   useEffect(() => {
     fetchFarms();
     fetchKoiVarieties();
-  }, []); // Chỉ chạy một lần
+  }, []); // Chỉ chạy một lần khi component mount
 
   const fetchBookings = async () => {
     try {
@@ -176,6 +176,7 @@ function Consulting() {
         );
         if (tripResponse.data) {
           setTripDetails(tripResponse.data);
+          console.log("Trip details set:", tripResponse.data);
         } else {
           message.error("No trip details found.");
         }
@@ -316,7 +317,7 @@ function Consulting() {
       totalKoiPrice: totalKoiPrice,
       remainingPrice: remainingPrice,
       quantity: quantity,
-      day: day, // Hoặc có thể thay đổi theo yêu cầu
+      day: day, // Hoặc có thể thay đi theo yêu cầu
     };
 
     try {
@@ -473,6 +474,49 @@ function Consulting() {
     }
   };
 
+  // Cập nhật hàm mở modal "Add PODetail"
+  const openAddPODetailModal = async () => {
+    console.log("Trip details before opening modal:", tripDetails);
+    
+    // Kiểm tra và lấy lại thông tin trip nếu cần
+    if (selectedBooking && selectedBooking.tripId) {
+        try {
+            const tripResponse = await api.get(
+                `http://localhost:8080/api/trips/${selectedBooking.tripId}`
+            );
+            if (tripResponse.data) {
+                // Kiểm tra dữ liệu trực tiếp từ response thay vì tripDetails
+                const tripData = tripResponse.data;
+                if (!tripData || !tripData.koiFarms || tripData.koiFarms.length === 0) {
+                    message.error("No farm data available.");
+                    return;
+                }
+                
+                setTripDetails(tripData);
+                console.log("Trip details set:", tripData);
+                
+                // Tải dữ liệu về farms và koi varieties nếu chưa có
+                if (farms.length === 0) {
+                    await fetchFarms();
+                }
+                if (koiVarieties.length === 0) {
+                    await fetchKoiVarieties();
+                }
+                
+                // Mở modal sau khi đã có đầy đủ dữ liệu
+                setIsAddPODetailVisible(true);
+            } else {
+                message.error("No trip details found.");
+            }
+        } catch (error) {
+            console.error("Error fetching trip details:", error);
+            message.error("An error occurred while fetching trip details.");
+        }
+    } else {
+        message.error("Please view booking details first.");
+    }
+  };
+
   return (
     <Layout>
       <Layout>
@@ -573,7 +617,7 @@ function Consulting() {
                         <strong>Trip Name:</strong> {tripDetails.tripName}
                       </p>
                       <p>
-                        <strong>Total Price:</strong> ${tripDetails.priceTotal}
+                        <strong>Total Price:</strong> {tripDetails.priceTotal} VNĐ
                       </p>
                     </div>
                     {tripDetails.imageUrl && ( // Kiểm tra nếu có imageUrl
@@ -591,7 +635,7 @@ function Consulting() {
                       <div key={detail.tripDetailId} className="itinerary-item">
                         <strong>Day {detail.day}:</strong> {detail.mainTopic} -{" "}
                         {detail.subTopic}
-                        <div>Price: ${detail.notePrice}</div>
+                        <div>Price: {detail.notePrice} VNĐ</div>
                       </div>
                     ))}
                   </div>
@@ -614,8 +658,8 @@ function Consulting() {
                               className="koi-variety-card"
                             >
                               <strong>{variety.varietyName}</strong>
-                              <p>{variety.description}</p>
-                              <p>Price: ${variety.koiPrice}</p>
+                              {/* <p>{variety.description}</p> */}
+                              <p>Price: {variety.koiPrice} VNĐ</p>
                               <img
                                 src={variety.imageUrl}
                                 alt={variety.varietyName}
@@ -684,7 +728,7 @@ function Consulting() {
                 >
                   <option value="not_yet">Not Yet</option>
                   <option value="delivering">Delivering</option>
-                  <option value="delivered">Delivered</option>
+                  {/* <option value="delivered">Delivered</option> */}
                 </select>
               </p>
               <p>
@@ -699,7 +743,7 @@ function Consulting() {
               <h3>PODetails</h3>
               <Button
                 type="primary"
-                onClick={() => setIsAddPODetailVisible(true)}
+                onClick={openAddPODetailModal} // Sử dụng hàm mới
               >
                 Add PODetail
               </Button>

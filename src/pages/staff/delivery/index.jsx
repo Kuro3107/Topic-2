@@ -213,7 +213,7 @@ const Delivery = () => {
       render: (_, record) => (
         <>
           <Button onClick={() => handleViewPODetails(record.poId)}>
-            Xem PODetails
+            View PODetails
           </Button>
           <Button onClick={() => handleEdit(record)}>Edit</Button>
         </>
@@ -255,7 +255,7 @@ const Delivery = () => {
                   key: 'delivering',
                   label: (
                     <span style={{ color: '#1890ff', fontWeight: 'bold' }}>
-                      Đơn đang vận chuyển
+                      Order in transit
                     </span>
                   ),
                   children: (
@@ -273,7 +273,7 @@ const Delivery = () => {
                   key: 'delivered',
                   label: (
                     <span style={{ color: '#52c41a', fontWeight: 'bold' }}>
-                      Đã vận chuyển
+                      Shipped
                     </span>
                   ),
                   children: (
@@ -291,7 +291,7 @@ const Delivery = () => {
                   key: 'deny',
                   label: (
                     <span style={{ color: 'red', fontWeight: 'bold' }}>
-                      Đơn bị từ chối
+                      Application rejected
                     </span>
                   ),
                   children: (
@@ -316,7 +316,7 @@ const Delivery = () => {
 
       {/* Modal chỉnh sửa PODetails */}
       <Modal
-        title="Chỉnh sửa PODetails"
+        title="Edit PODetails"
         visible={isEditVisible}
         onCancel={handleCloseEdit}
         footer={[
@@ -347,7 +347,7 @@ const Delivery = () => {
 
       {/* Modal hiển thị PODetails */}
       <Modal
-        title="Chi Tiết PODetails"
+        title="PODetails"
         visible={isPODetailsVisible}
         onCancel={handleClosePODetails}
         footer={[
